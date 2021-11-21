@@ -1,4 +1,4 @@
-import 'package:flutter/cupertino.dart';
+  import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:pray_training/params.dart';
 import 'package:pray_training/pray_list.dart';
@@ -16,6 +16,13 @@ class _MainPage extends State<MainPage> {
   // Future<SharedPreferences> pref = SharedPreferences.getInstance();
 
   // Map<String, List<String>> map = {};
+
+  final _prayList = [
+    // {'1. 나라를 위한 기도':'homeland'},
+    // {'21. 부부간에 불화가 있을 때 드리는 기도':'spouse'}
+    'homeland', 'spouse'
+  ];
+  var _selectedPray = 'spouse';
 
   Future<List<Params>>? params;
   late Map<String, List<String>> pageParam;
@@ -44,26 +51,47 @@ class _MainPage extends State<MainPage> {
           title: Text('APPBAR'),
         ),
         drawer: PrayList(),
-        body: Center(
-          child: FutureBuilder<List<Params>>(
-            future: params,
-            builder: (context, snapshot) {
-              if (snapshot.hasData) {
-                Params p = snapshot.data!.asMap().values.elementAt(0);
-                return Text('text : ${p.param1}');
-              } else {
-                return Text('tttt');
-              }
-            },
-          ),
-          // child: Text('child'),
+        body: Padding (
+          padding: const EdgeInsets.all(8.0),
+          child: Center(
+            child: DropdownButton(
+              value: _selectedPray,
+              items: _prayList.map(
+                  (value) {
+                    return DropdownMenuItem(
+                      value: value,
+                      child: Text(value),
+                    );
+                  },
+              ).toList(),
+              onChanged: (value) {
+                setState(() {
+                  _selectedPray = value.toString();
+                });
+              },
+              // items: _prayList.map((e) => e.)
+            )
+          )
         )
     );
+  }
+
+  void _insertData(Params param) async {
+    final Database database = await widget.db;
+    await database.insert('params', param.toMap(), conflictAlgorithm: ConflictAlgorithm.replace);
   }
 
   Future<List<Params>> getParams() async {
     final Database database = await widget.db;
     final List<Map<String, dynamic>> maps = await database.query('params');
+
+    if (maps.isEmpty) {
+      var map = {
+        'pray': 'pray'
+      };
+
+      maps.add(map);
+    }
 
     return List.generate(maps.length, (i) {
       // int active = maps[i]['active'] == 1 ? 1 : 0;
