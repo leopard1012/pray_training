@@ -26,60 +26,50 @@ class _PrayForSpouse extends State<PrayForSpouse> {
   @override
   Widget build(BuildContext context) {
     // TODO: implement build
-    // final Object? args = ModalRoute.of(context)!.settings.arguments;
-    // final String args;
-    //
-    // params!.then((value){
-    //   String s = value.param1;
-    // });
-
-
 
     return Scaffold(
       appBar: AppBar(
         title: Text('21. 부부간에 불화가 있을 때 드리는 기도'),
       ),
       drawer: PrayList(),
-      body: Container(
-        child: Center(
-          child: Column(
-            children: <Widget>[
-              Padding(
-                padding: EdgeInsets.all(0),
-                child: TextField(
-                  controller: dataController,
-                  decoration: InputDecoration(labelText: 'param'),
-                ),
+      body: Center(
+        child: Column(
+          children: <Widget>[
+            Padding(
+              padding: const EdgeInsets.all(0),
+              child: TextField(
+                controller: dataController,
+                decoration: const InputDecoration(labelText: 'param'),
               ),
-              RaisedButton(
-                onPressed: (){
-                  Params param = Params(pray: 'spouse', param1: dataController.value.text, param2: 'param2', param3: 'param3');
-                  _insertData(param);
-                },
-                child: Text('저장하기'),
-              ),
+            ),
+            ElevatedButton(
+              onPressed: (){
+                Params param = Params(pray: 'spouse', param1: dataController.value.text, param2: 'param2', param3: 'param3');
+                _insertData(param);
+              },
+              child: const Text('저장하기'),
+            ),
 
-              SingleChildScrollView(
-                scrollDirection: Axis.vertical,
-                child: FutureBuilder(
-                  future: getPray(),
-                  builder: (BuildContext context, AsyncSnapshot<List<TextSpan>> snapshot) {
-                    return Text.rich(
-                        TextSpan(
-                          style: Theme
-                              .of(context)
-                              .textTheme
-                              .bodyText1!
-                              .copyWith(
-                              fontSize: 20, fontWeight: FontWeight.bold),
-                          children: snapshot.data,
-                        )
-                    );
-                  }
-                ),
+            SingleChildScrollView(
+              scrollDirection: Axis.vertical,
+              child: FutureBuilder(
+                future: getPray(),
+                builder: (BuildContext context, AsyncSnapshot<List<TextSpan>> snapshot) {
+                  return Text.rich(
+                      TextSpan(
+                        style: Theme
+                            .of(context)
+                            .textTheme
+                            .bodyText1!
+                            .copyWith(
+                            fontSize: 20, fontWeight: FontWeight.bold),
+                        children: snapshot.data,
+                      )
+                  );
+                }
               ),
-            ]
-          ),
+            ),
+          ]
         ),
       ),
     );

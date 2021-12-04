@@ -17,11 +17,31 @@ class _MainPage extends State<MainPage> {
 
   // Map<String, List<String>> map = {};
 
-  final _prayList = [
-    // {'1. 나라를 위한 기도':'homeland'},
-    // {'21. 부부간에 불화가 있을 때 드리는 기도':'spouse'}
-    'homeland', 'spouse'
+  final _prayNameList = [
+    '2. 교회를 위한 기도',
+    '3. 담임목사님을 위한 기도',
+    '4. 목장과 목장원을 위한 기도',
+    '5. 태신자를 위한 기도',
+    '6. 사람을 위한 기도',
+    '7. 가정을 위한 기도',
+    '8. 남편을 위한 기도',
+    '9. 아내를 위한 기도',
+    '10. 부모님을 위한 기도',
+    '11. 자녀를 위한 기도',
+    '12. 개인기도',
+    '13. 개인기도2',
+    '14. 회개기도',
+    '21. 부부간에 불화가 있을 때 드리는 기도',
+    '26. 마귀를 물리치는 기도',
+    '27. 질병을 치료하는 기도'
   ];
+
+  final _prayCodeList = [
+    'church','pastor','cell','believer','person','home','husband','wife',
+    'parents','children','personal_1','personal_2','repentance','spouse',
+    'devil','disease'
+  ];
+
   var _selectedPray = 'spouse';
 
   Future<List<Params>>? params;
@@ -45,6 +65,15 @@ class _MainPage extends State<MainPage> {
     //     }
     // );
 
+    List<DropdownMenuItem> prayList = [];
+
+    for (int i = 0 ; i < _prayCodeList.length ; i++) {
+      prayList.add(new DropdownMenuItem(
+          value: _prayCodeList[i],
+          child: Text(_prayNameList[i]),
+      ));
+    }
+
     // TODO: implement build
     return Scaffold(
         appBar: AppBar(
@@ -53,25 +82,19 @@ class _MainPage extends State<MainPage> {
         drawer: PrayList(),
         body: Padding (
           padding: const EdgeInsets.all(8.0),
-          child: Center(
-            child: DropdownButton(
+          // child: Center(
+            child: DropdownButton<dynamic>(
               value: _selectedPray,
-              items: _prayList.map(
-                  (value) {
-                    return DropdownMenuItem(
-                      value: value,
-                      child: Text(value),
-                    );
-                  },
-              ).toList(),
+              items: prayList,
               onChanged: (value) {
                 setState(() {
                   _selectedPray = value.toString();
+                  Navigator.popAndPushNamed(context, '/conf/' + value.toString());
                 });
               },
               // items: _prayList.map((e) => e.)
             )
-          )
+          // )
         )
     );
   }

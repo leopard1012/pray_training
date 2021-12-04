@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:path/path.dart';
+import 'package:pray_training/confs/conf_church.dart';
 import 'package:pray_training/params.dart';
 import 'dart:io';
 import 'package:pray_training/pray_list.dart';
@@ -33,6 +34,8 @@ import 'package:pray_training/prays/pray_for_tired.dart';
 import 'package:pray_training/prays/pray_for_wife.dart';
 import 'package:sqflite/sqflite.dart';
 
+import 'confs/conf_pastor.dart';
+import 'confs/conf_person.dart';
 import 'main_page.dart';
 
 
@@ -94,6 +97,9 @@ class MyApp extends StatelessWidget {
         '/night': (context) => PrayForNight(),
         '/devil': (context) => PrayForDevil(),
         '/disease': (context) => PrayForDisease(),
+        '/conf/church': (context) => ConfChurch(database),
+        '/conf/pastor': (context) => ConfPastor(database),
+        '/conf/person': (context) => ConfPerson(database),
       },
     );
   }
