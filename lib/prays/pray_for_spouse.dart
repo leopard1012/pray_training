@@ -33,24 +33,7 @@ class _PrayForSpouse extends State<PrayForSpouse> {
       ),
       drawer: PrayList(),
       body: Center(
-        child: Column(
-          children: <Widget>[
-            Padding(
-              padding: const EdgeInsets.all(0),
-              child: TextField(
-                controller: dataController,
-                decoration: const InputDecoration(labelText: 'param'),
-              ),
-            ),
-            ElevatedButton(
-              onPressed: (){
-                Params param = Params(pray: 'spouse', param1: dataController.value.text, param2: 'param2', param3: 'param3');
-                _insertData(param);
-              },
-              child: const Text('저장하기'),
-            ),
-
-            SingleChildScrollView(
+          child: SingleChildScrollView(
               scrollDirection: Axis.vertical,
               child: FutureBuilder(
                 future: getPray(),
@@ -69,15 +52,8 @@ class _PrayForSpouse extends State<PrayForSpouse> {
                 }
               ),
             ),
-          ]
-        ),
       ),
     );
-  }
-
-  void _insertData(Params param) async {
-    final Database database = await widget.db;
-    await database.insert('params', param.toMap(), conflictAlgorithm: ConflictAlgorithm.replace);
   }
 
   Future<Params> getParams(String prayType) async {

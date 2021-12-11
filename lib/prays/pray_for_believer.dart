@@ -1,12 +1,87 @@
 import 'package:flutter/material.dart';
 import 'package:pray_training/pray_list.dart';
+import 'package:sqflite/sqflite.dart';
 
-class PrayForBeliever extends StatelessWidget {
+import '../params.dart';
+
+class PrayForBeliever extends StatefulWidget {
+  final Future<Database> db;
+  PrayForBeliever(this.db);
+
+  @override
+  State<StatefulWidget> createState() => _PrayForBeliever();
+}
+
+class _PrayForBeliever extends State<PrayForBeliever> {
+  late TextEditingController dataController;
+  // Future<Params>? params;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    // params = getParams('spouse');
+    dataController = TextEditingController();
+  }
+
   @override
   Widget build(BuildContext context) {
     // TODO: implement build
-    final Object? args = ModalRoute.of(context)!.settings.arguments;
-    String param = '';
+
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('05. 태신자를 위한 기도'),
+      ),
+      drawer: PrayList(),
+      body: Center(
+        child: SingleChildScrollView(
+          scrollDirection: Axis.vertical,
+          child: FutureBuilder(
+              future: getPray(),
+              builder: (BuildContext context, AsyncSnapshot<List<TextSpan>> snapshot) {
+                return Text.rich(
+                    TextSpan(
+                      style: Theme
+                          .of(context)
+                          .textTheme
+                          .bodyText1!
+                          .copyWith(
+                          fontSize: 20, fontWeight: FontWeight.bold),
+                      children: snapshot.data,
+                    )
+                );
+              }
+          ),
+        ),
+      ),
+    );
+  }
+
+  Future<Params> getParams(String prayType) async {
+    final Database database = await widget.db;
+    final List<Map<String, dynamic>> maps = await database.query('params');
+
+    Params p = Params(pray: prayType);
+
+    List.generate(maps.length, (i) {
+      // int active = maps[i]['active'] == 1 ? 1 : 0;
+      if (prayType == maps[i]['pray'].toString()) {
+        p = Params(
+            pray: maps[i]['pray'].toString(),
+            param1: maps[i]['param1'].toString(),
+            param2: maps[i]['param2'].toString(),
+            param3: maps[i]['param3']);
+      }
+    });
+
+    return p;
+  }
+
+  Future<List<TextSpan>> getPray() async {
+    // final Object args = params!.then((value) => value.param1);
+    Params params = await getParams('believer');
+    // final args = await params.the
+    String? param = params.param1 ?? '태신자';
 
     final String prayContent =
         '1) 하나님 아버지는 거룩하십니다.\n'
@@ -18,7 +93,7 @@ class PrayForBeliever extends StatelessWidget {
     +param+'가 하나님의 통치를 받으며 하나님의 백성답게 하나님 나라의 법을 깨닫고 지키며 살게 하옵시고, 하나님 나라의 영광을 위하여 일하게 하옵소서.\n'
     '그리고 '+param+'를 통하여 하나님 나라가 세상 모든 사람들에게 전파되기를 원합니다.\n'
     '\n'
-    '3) 한나ㅣㅁ의 뜻이 하늘에서 이루어진 것 같이 땅에서 '+param+'에게 이루어지기를 원합니다.\n'
+    '3) 하나님의 뜻이 하늘에서 이루어진 것 같이 땅에서 '+param+'에게 이루어지기를 원합니다.\n'
     '또한 '+param+'가 하나님의 뜻을 깨닫고 이루어 드리기를 기도합니다.\n'
     +param+'가 하나님의 뜻대로 구원받은 백성이 되고 다른 사람을 구원할 수 있게 하옵소서.\n'
     '그리고 하나님의 뜻이 '+param+'를 통하여 온 당에 전파되기를 원합니다.\n'
@@ -61,16 +136,48 @@ class PrayForBeliever extends StatelessWidget {
     '\n'
     '10) 예수님의 이름으로 기도드립니다. 아멘.';
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('05. param를 위한 기도'),
-      ),
-      drawer: PrayList(),
-      body: Container(
-        child: Center(
-          child: Text(args.toString()),
-        ),
-      ),
-    );
+    final wordToStyle = param;
+    final wordStyle = TextStyle(color: Colors.blue);
+    // final leftOverStyle = Theme.of(context).textTheme.bodyText1!.copyWith(fontSize: 20, fontWeight: FontWeight.bold);
+    final spans = _getSpans(prayContent, wordToStyle, wordStyle);
+
+    return spans;
+  }
+
+  List<TextSpan> _getSpans(String text, String matchWord, TextStyle style) {
+    List<TextSpan> spans = [];
+    int spanBoundary = 0;
+
+    do {
+
+      // 전체 String 에서 키워드 검색
+      final startIndex = text.indexOf(matchWord, spanBoundary);
+
+      // 전체 String 에서 해당 키워드가 더 이상 없을때 마지막 KeyWord부터 끝까지의 TextSpan 추가
+      if (startIndex == -1) {
+        spans.add(TextSpan(text: text.substring(spanBoundary)));
+        return spans;
+      }
+
+      // 전체 String 사이에서 발견한 키워드들 사이의 text에 대한 textSpan 추가
+      if (startIndex > spanBoundary) {
+        print(text.substring(spanBoundary, startIndex));
+        spans.add(TextSpan(text: text.substring(spanBoundary, startIndex)));
+      }
+
+      // 검색하고자 했던 키워드에 대한 textSpan 추가
+      final endIndex = startIndex + matchWord.length;
+      final spanText = text.substring(startIndex, endIndex);
+      spans.add(TextSpan(text: spanText, style: style));
+
+      // mark the boundary to start the next search from
+      spanBoundary = endIndex;
+
+      // continue until there are no more matches
+    }
+    //String 전체 검사
+    while (spanBoundary < text.length);
+
+    return spans;
   }
 }
