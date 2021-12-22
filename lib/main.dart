@@ -1,7 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:path/path.dart';
+import 'package:pray_training/confs/conf_believer.dart';
+import 'package:pray_training/confs/conf_children.dart';
 import 'package:pray_training/confs/conf_church.dart';
+import 'package:pray_training/confs/conf_devil.dart';
+import 'package:pray_training/confs/conf_disease.dart';
+import 'package:pray_training/confs/conf_home.dart';
+import 'package:pray_training/confs/conf_husband.dart';
+import 'package:pray_training/confs/conf_parents.dart';
+import 'package:pray_training/confs/conf_personal_1.dart';
+import 'package:pray_training/confs/conf_personal_2.dart';
+import 'package:pray_training/confs/conf_repentance.dart';
+import 'package:pray_training/confs/conf_wife.dart';
 import 'package:pray_training/params.dart';
 import 'dart:io';
 import 'package:pray_training/pray_list.dart';
@@ -34,6 +45,7 @@ import 'package:pray_training/prays/pray_for_tired.dart';
 import 'package:pray_training/prays/pray_for_wife.dart';
 import 'package:sqflite/sqflite.dart';
 
+import 'confs/conf_cell.dart';
 import 'confs/conf_pastor.dart';
 import 'confs/conf_person.dart';
 import 'main_page.dart';
@@ -72,18 +84,18 @@ class MyApp extends StatelessWidget {
         '/': (context) => MainPage(database),
         '/homeland': (context) => PrayForHomeland(),
         '/church': (context) => PrayForChurch(database),
-        '/pastor': (context) => PrayForPastor(),
+        '/pastor': (context) => PrayForPastor(database),
         '/cell': (context) => PrayForCell(database),
         '/believer': (context) => PrayForBeliever(database),
         '/person': (context) => PrayForPerson(database),
         '/home': (context) => PrayForHome(database),
         '/husband': (context) => PrayForHusband(database),
         '/wife': (context) => PrayForWife(database),
-        '/parents': (context) => PrayForParents(),
-        '/children': (context) => PrayForCHildren(),
-        '/personal_1': (context) => PrayForPersonal1(),
-        '/personal_2': (context) => PrayForPersonal2(),
-        '/repentance': (context) => PrayForRepentance(),
+        '/parents': (context) => PrayForParents(database),
+        '/children': (context) => PrayForChildren(database),
+        '/personal_1': (context) => PrayForPersonal1(database),
+        '/personal_2': (context) => PrayForPersonal2(database),
+        '/repentance': (context) => PrayForRepentance(database),
         '/spiritual_power': (context) => PrayForSpiritualPower(),
         '/temtations': (context) => PrayForTemptations(),
         '/tarry': (context) => PrayForTarry(),
@@ -95,11 +107,25 @@ class MyApp extends StatelessWidget {
         '/business': (context) => PrayForBusiness(),
         '/dawn': (context) => PrayForDawn(),
         '/night': (context) => PrayForNight(),
-        '/devil': (context) => PrayForDevil(),
-        '/disease': (context) => PrayForDisease(),
+        '/devil': (context) => PrayForDevil(database),
+        '/disease': (context) => PrayForDisease(database),
         '/conf/church': (context) => ConfChurch(database),
         '/conf/pastor': (context) => ConfPastor(database),
         '/conf/person': (context) => ConfPerson(database),
+        '/conf/cell': (context) => ConfCell(database),
+        '/conf/believer': (context) => ConfBeliever(database),
+        '/conf/home': (context) => ConfHome(database),
+        '/conf/husband': (context) => ConfHusband(database),
+        '/conf/parents': (context) => ConfParents(database),
+        '/conf/wife': (context) => ConfWife(database),
+        '/conf/children': (context) => ConfChildren(database),
+        '/conf/personal_1': (context) => ConfPersonal1(database),
+        '/conf/personal_2': (context) => ConfPersonal2(database),
+        '/conf/repentance': (context) => ConfRepentance(database),
+        // '/conf/spouse': (context) => ConfSpo(database),
+        '/conf/devil': (context) => ConfDevil(database),
+        '/conf/disease': (context) => ConfDisease(database),
+
       },
     );
   }
@@ -108,7 +134,7 @@ class MyApp extends StatelessWidget {
     return openDatabase(
       join(await getDatabasesPath(), 'params_database.db'),
       onCreate: (db, version) {
-        return db.execute("CREATE TABLE params(pray TEXT PRIMARY KEY, param1 TEXT, param2 TEXT, param3 TEXT)",);
+        return db.execute("CREATE TABLE params(pray TEXT PRIMARY KEY, param1 TEXT, param2 TEXT, param3 TEXT, param4 TEXT, param5 TEXT)",);
       },
       version: 1
     );

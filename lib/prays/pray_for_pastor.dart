@@ -1,13 +1,34 @@
 import 'package:flutter/material.dart';
 import 'package:pray_training/pray_list.dart';
+import 'package:sqflite/sqflite.dart';
 
-class PrayForPastor extends StatelessWidget {
+import '../params.dart';
+
+class PrayForPastor extends StatefulWidget {
+  final Future<Database> db;
+
+  PrayForPastor(this.db);
+
+  @override
+  State<StatefulWidget> createState() => _PrayForPastor();
+}
+
+class _PrayForPastor extends State<PrayForPastor> {
+  late TextEditingController dataController;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    dataController = TextEditingController();
+  }
+
   @override
   Widget build(BuildContext context) {
     // TODO: implement build
     return Scaffold(
       appBar: AppBar(
-        title: Text('01. 나라를 위한 기도'),
+        title: Text('03. 담임목사님을 위한 기도'),
       ),
       drawer: PrayList(),
       body: Center(
@@ -34,8 +55,31 @@ class PrayForPastor extends StatelessWidget {
     );
   }
 
+  Future<Params> getParams(String prayType) async {
+    final Database database = await widget.db;
+    final List<Map<String, dynamic>> maps = await database.query('params');
+
+    Params p = Params(pray: prayType);
+
+    List.generate(maps.length, (i) {
+      // int active = maps[i]['active'] == 1 ? 1 : 0;
+      if (prayType == maps[i]['pray'].toString()) {
+        p = Params(
+            pray: maps[i]['pray'].toString(),
+            param1: maps[i]['param1'].toString(),
+            param2: maps[i]['param2'].toString(),
+            param3: maps[i]['param3'],
+            param4: maps[i]['param4'],
+            param5: maps[i]['param5']);
+      }
+    });
+
+    return p;
+  }
+
   Future<List<TextSpan>> getPray() async {
-    String? param = 'NONE';
+    Params params = await getParams('pastor');
+    String? target = params.param1 ?? '그들(이름)';
 
     final String prayContent =
         '1) 하나님 아버지는 거룩하신 분이십니다.\n'
@@ -64,7 +108,7 @@ class PrayForPastor extends StatelessWidget {
             '5) 하나님! 다른 사람들의 죄를 용서해 주시기를 원합니다.\n'
             '우리 담임목사님과 가정에 상처를 주고 힘들게 했던 사람들을 용서해 주시기 원합니다.\n'
             '예수님의 이름으로 용서해 주옵소서.\n'
-            '그리고 ' + 'param' + ' 축복해 주옵소서.'
+            '그리고 ' + target + '을 축복해 주옵소서.'
             '그들이 하나님을 경외하고 복 받기를 원합니다.\n'
             '\n'
             '6) 하나님! 다른 사람들의 죄를 용서해 준 것 같이 우리 담임목사님과 가정의 죄도 십자가의 보혈로 사하여 주옵소서.\n'
@@ -92,7 +136,7 @@ class PrayForPastor extends StatelessWidget {
             '\n'
             '10) 예수님의 이름으로 기도드립니다. 아멘.';
 
-    final wordToStyle = param;
+    final wordToStyle = target;
     final wordStyle = TextStyle(color: Colors.blue);
     // final leftOverStyle = Theme.of(context).textTheme.bodyText1!.copyWith(fontSize: 20, fontWeight: FontWeight.bold);
     final spans = _getSpans(prayContent, wordToStyle, wordStyle);

@@ -68,7 +68,9 @@ class _PrayForCell extends State<PrayForCell> {
             pray: maps[i]['pray'].toString(),
             param1: maps[i]['param1'].toString(),
             param2: maps[i]['param2'].toString(),
-            param3: maps[i]['param3']);
+            param3: maps[i]['param3'],
+            param4: maps[i]['param4'],
+            param5: maps[i]['param5']);
       }
     });
 

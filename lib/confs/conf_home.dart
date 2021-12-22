@@ -1,20 +1,20 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:sqflite/sqflite.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 import '../params.dart';
 import '../pray_list.dart';
 
-class ConfPerson extends StatefulWidget {
+class ConfHome extends StatefulWidget {
   final Future<Database> db;
-  ConfPerson(this.db);
+  ConfHome(this.db);
 
   @override
-  State<StatefulWidget> createState() => _ConfPerson();
+  State<StatefulWidget> createState() => _ConfHome();
 }
 
-class _ConfPerson extends State<ConfPerson> {
+class _ConfHome extends State<ConfHome> {
   final _prayNameList = [
     '2. 교회를 위한 기도',
     '3. 담임목사님을 위한 기도',
@@ -41,10 +41,8 @@ class _ConfPerson extends State<ConfPerson> {
   ];
 
   final _inputTextController1 = TextEditingController();
-  final _inputTextController2 = TextEditingController();
-  final _inputTextController3 = TextEditingController();
 
-  var _selectedPray = 'person';
+  var _selectedPray = 'home';
 
   Future<Params>? params;
   late Map<String, List<String>> pageParam;
@@ -58,12 +56,6 @@ class _ConfPerson extends State<ConfPerson> {
       if (value.param1 != null) {
         _inputTextController1.text = value.param1.toString();
       }
-      if (value.param1 != null) {
-        _inputTextController2.text = value.param2.toString();
-      }
-      if (value.param1 != null) {
-        _inputTextController3.text = value.param3.toString();
-      }
     });
   }
 
@@ -71,8 +63,6 @@ class _ConfPerson extends State<ConfPerson> {
   void dispose() {
     // TODO: implement dispose
     _inputTextController1.dispose();
-    _inputTextController2.dispose();
-    _inputTextController3.dispose();
     super.dispose();
   }
 
@@ -87,7 +77,7 @@ class _ConfPerson extends State<ConfPerson> {
         child: Text(_prayNameList[i]),
       ));
     }
-
+//debug 모드로 해서 여기 넘어오는거 확인필요
     // TODO: implement build
     return Scaffold(
         appBar: AppBar(
@@ -115,47 +105,23 @@ class _ConfPerson extends State<ConfPerson> {
                 controller: _inputTextController1,
                 decoration: const InputDecoration(
                   border: OutlineInputBorder(),
-                  labelText: '대상자', 
+                  labelText: '죄 용서 대상자',
                 ),
               ),
             ),
             Padding (
-              padding: const EdgeInsets.all(8.0),
-              child: TextField(
-                controller: _inputTextController2,
-                decoration: const InputDecoration(
-                  border: OutlineInputBorder(),
-                  labelText: '중보기도문',
-                ),
-                maxLines: null,
-                keyboardType: TextInputType.multiline,
-              ),
-            ),
-            Padding (
-              padding: const EdgeInsets.all(8.0),
-              child: TextField(
-                controller: _inputTextController3,
-                decoration: const InputDecoration(
-                  border: OutlineInputBorder(),
-                  labelText: '대상자가 상처준 일',
-                ),
-              ),
-            ),
-            Padding (
-              padding: const EdgeInsets.all(8.0),
-              child: ElevatedButton(
+                padding: const EdgeInsets.all(8.0),
+                child: ElevatedButton(
                   child: const Text('저장'),
                   onPressed: (){
                     Params param = Params(
-                      pray: 'person',
-                      param1: _inputTextController1.text,
-                      param2: _inputTextController2.text,
-                      param3: _inputTextController3.text,
+                      pray: 'home',
+                      param1: _inputTextController1.text
                     );
                     _insertData(param);
                     flutterToast();
                   },
-              )
+                )
             )
           ],
         )
@@ -169,11 +135,11 @@ class _ConfPerson extends State<ConfPerson> {
 
   void flutterToast() {
     Fluttertoast.showToast(msg: '저장하였습니다.',
-        gravity: ToastGravity.BOTTOM,
-        backgroundColor: Colors.grey,
-        fontSize: 20.0,
-        textColor: Colors.black,
-        toastLength: Toast.LENGTH_SHORT);
+    gravity: ToastGravity.BOTTOM,
+    backgroundColor: Colors.grey,
+    fontSize: 20.0,
+    textColor: Colors.black,
+    toastLength: Toast.LENGTH_SHORT);
   }
 
   Future<Params> getParams(String prayType) async {

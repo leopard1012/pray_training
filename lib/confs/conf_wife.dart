@@ -6,15 +6,15 @@ import 'package:sqflite/sqflite.dart';
 import '../params.dart';
 import '../pray_list.dart';
 
-class ConfPerson extends StatefulWidget {
+class ConfWife extends StatefulWidget {
   final Future<Database> db;
-  ConfPerson(this.db);
+  ConfWife(this.db);
 
   @override
-  State<StatefulWidget> createState() => _ConfPerson();
+  State<StatefulWidget> createState() => _ConfWife();
 }
 
-class _ConfPerson extends State<ConfPerson> {
+class _ConfWife extends State<ConfWife> {
   final _prayNameList = [
     '2. 교회를 위한 기도',
     '3. 담임목사님을 위한 기도',
@@ -42,9 +42,8 @@ class _ConfPerson extends State<ConfPerson> {
 
   final _inputTextController1 = TextEditingController();
   final _inputTextController2 = TextEditingController();
-  final _inputTextController3 = TextEditingController();
 
-  var _selectedPray = 'person';
+  var _selectedPray = 'wife';
 
   Future<Params>? params;
   late Map<String, List<String>> pageParam;
@@ -61,9 +60,6 @@ class _ConfPerson extends State<ConfPerson> {
       if (value.param1 != null) {
         _inputTextController2.text = value.param2.toString();
       }
-      if (value.param1 != null) {
-        _inputTextController3.text = value.param3.toString();
-      }
     });
   }
 
@@ -72,7 +68,6 @@ class _ConfPerson extends State<ConfPerson> {
     // TODO: implement dispose
     _inputTextController1.dispose();
     _inputTextController2.dispose();
-    _inputTextController3.dispose();
     super.dispose();
   }
 
@@ -115,7 +110,7 @@ class _ConfPerson extends State<ConfPerson> {
                 controller: _inputTextController1,
                 decoration: const InputDecoration(
                   border: OutlineInputBorder(),
-                  labelText: '대상자', 
+                  labelText: '아내',
                 ),
               ),
             ),
@@ -133,24 +128,13 @@ class _ConfPerson extends State<ConfPerson> {
             ),
             Padding (
               padding: const EdgeInsets.all(8.0),
-              child: TextField(
-                controller: _inputTextController3,
-                decoration: const InputDecoration(
-                  border: OutlineInputBorder(),
-                  labelText: '대상자가 상처준 일',
-                ),
-              ),
-            ),
-            Padding (
-              padding: const EdgeInsets.all(8.0),
               child: ElevatedButton(
                   child: const Text('저장'),
                   onPressed: (){
                     Params param = Params(
-                      pray: 'person',
+                      pray: 'wife',
                       param1: _inputTextController1.text,
                       param2: _inputTextController2.text,
-                      param3: _inputTextController3.text,
                     );
                     _insertData(param);
                     flutterToast();

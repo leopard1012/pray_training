@@ -5,7 +5,37 @@ class PrayForBusiness extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // TODO: implement build
-    final Object? args = ModalRoute.of(context)!.settings.arguments;
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('23. 사업을 위한 기도'),
+      ),
+      drawer: PrayList(),
+      body: Center(
+        child: SingleChildScrollView(
+          scrollDirection: Axis.vertical,
+          child: FutureBuilder(
+              future: getPray(),
+              builder: (BuildContext context, AsyncSnapshot<List<TextSpan>> snapshot) {
+                return Text.rich(
+                    TextSpan(
+                      style: Theme
+                          .of(context)
+                          .textTheme
+                          .bodyText1!
+                          .copyWith(
+                          fontSize: 20, fontWeight: FontWeight.bold),
+                      children: snapshot.data,
+                    )
+                );
+              }
+          ),
+        ),
+      ),
+    );
+  }
+
+  Future<List<TextSpan>> getPray() async {
+    String? param = 'NONE';
 
     final String prayContent =
         '1) 하나님은 거룩하신 분이십니다.\n'
@@ -68,16 +98,48 @@ class PrayForBusiness extends StatelessWidget {
         '\n'
         '10) 예수님의 이름으로 기도드립니다. 아멘.';
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('23. 사업을 위한 기도'),
-      ),
-      drawer: PrayList(),
-      body: Container(
-        child: Center(
-          child: Text(args.toString()),
-        ),
-      ),
-    );
+    final wordToStyle = param;
+    final wordStyle = TextStyle(color: Colors.blue);
+    // final leftOverStyle = Theme.of(context).textTheme.bodyText1!.copyWith(fontSize: 20, fontWeight: FontWeight.bold);
+    final spans = _getSpans(prayContent, wordToStyle, wordStyle);
+
+    return spans;
+  }
+
+  List<TextSpan> _getSpans(String text, String matchWord, TextStyle style) {
+    List<TextSpan> spans = [];
+    int spanBoundary = 0;
+
+    do {
+
+      // 전체 String 에서 키워드 검색
+      final startIndex = text.indexOf(matchWord, spanBoundary);
+
+      // 전체 String 에서 해당 키워드가 더 이상 없을때 마지막 KeyWord부터 끝까지의 TextSpan 추가
+      if (startIndex == -1) {
+        spans.add(TextSpan(text: text.substring(spanBoundary)));
+        return spans;
+      }
+
+      // 전체 String 사이에서 발견한 키워드들 사이의 text에 대한 textSpan 추가
+      if (startIndex > spanBoundary) {
+        print(text.substring(spanBoundary, startIndex));
+        spans.add(TextSpan(text: text.substring(spanBoundary, startIndex)));
+      }
+
+      // 검색하고자 했던 키워드에 대한 textSpan 추가
+      final endIndex = startIndex + matchWord.length;
+      final spanText = text.substring(startIndex, endIndex);
+      spans.add(TextSpan(text: spanText, style: style));
+
+      // mark the boundary to start the next search from
+      spanBoundary = endIndex;
+
+      // continue until there are no more matches
+    }
+    //String 전체 검사
+    while (spanBoundary < text.length);
+
+    return spans;
   }
 }

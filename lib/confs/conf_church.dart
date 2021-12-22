@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:sqflite/sqflite.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 import '../params.dart';
 import '../pray_list.dart';
@@ -39,16 +40,30 @@ class _ConfChurch extends State<ConfChurch> {
     'devil','disease'
   ];
 
+  final _inputTextController1 = TextEditingController();
+
   var _selectedPray = 'church';
 
-  Future<List<Params>>? params;
+  Future<Params>? params;
   late Map<String, List<String>> pageParam;
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-    params = getParams();
+    params = getParams(_selectedPray);
+    params!.then((value) {
+      if (value.param1 != null) {
+        _inputTextController1.text = value.param1.toString();
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    _inputTextController1.dispose();
+    super.dispose();
   }
 
   @override
@@ -86,16 +101,27 @@ class _ConfChurch extends State<ConfChurch> {
             ),
             Padding (
               padding: const EdgeInsets.all(8.0),
-              child: Column(
-                children: const <Widget>[
-                  TextField(
-                   decoration: InputDecoration(
-                     border: OutlineInputBorder(),
-                     labelText: '중보기도문',
-                   ),
-                  )
-                ],
-              )
+              child: TextField(
+                controller: _inputTextController1,
+                decoration: const InputDecoration(
+                  border: OutlineInputBorder(),
+                  labelText: '중보기도문',
+                ),
+              ),
+            ),
+            Padding (
+                padding: const EdgeInsets.all(8.0),
+                child: ElevatedButton(
+                  child: const Text('저장'),
+                  onPressed: (){
+                    Params param = Params(
+                      pray: 'church',
+                      param1: _inputTextController1.text
+                    );
+                    _insertData(param);
+                    flutterToast();
+                  },
+                )
             )
           ],
         )
@@ -107,25 +133,34 @@ class _ConfChurch extends State<ConfChurch> {
     await database.insert('params', param.toMap(), conflictAlgorithm: ConflictAlgorithm.replace);
   }
 
-  Future<List<Params>> getParams() async {
+  void flutterToast() {
+    Fluttertoast.showToast(msg: '저장하였습니다.',
+    gravity: ToastGravity.BOTTOM,
+    backgroundColor: Colors.grey,
+    fontSize: 20.0,
+    textColor: Colors.black,
+    toastLength: Toast.LENGTH_SHORT);
+  }
+
+  Future<Params> getParams(String prayType) async {
     final Database database = await widget.db;
     final List<Map<String, dynamic>> maps = await database.query('params');
 
-    if (maps.isEmpty) {
-      var map = {
-        'pray': 'pray'
-      };
+    Params p = Params(pray: prayType);
 
-      maps.add(map);
-    }
-
-    return List.generate(maps.length, (i) {
-      // int active = maps[i]['active'] == 1 ? 1 : 0;
-      return Params(
-          pray: maps[i]['pray'].toString(),
-          param1: maps[i]['param1'].toString(),
-          param2: maps[i]['param2'].toString(),
-          param3: maps[i]['param3']);
+    List.generate(maps.length, (i) {
+      if (prayType == maps[i]['pray'].toString()) {
+        p = Params(
+            pray: maps[i]['pray'].toString(),
+            param1: maps[i]['param1'].toString(),
+            param2: maps[i]['param2'].toString(),
+            param3: maps[i]['param3'].toString(),
+            param4: maps[i]['param4'],
+            param5: maps[i]['param5']
+        );
+      }
     });
+
+    return p;
   }
 }

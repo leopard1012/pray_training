@@ -69,7 +69,9 @@ class _PrayForChurch extends State<PrayForChurch> {
             pray: maps[i]['pray'].toString(),
             param1: maps[i]['param1'].toString(),
             param2: maps[i]['param2'].toString(),
-            param3: maps[i]['param3']);
+            param3: maps[i]['param3'],
+            param4: maps[i]['param4'],
+            param5: maps[i]['param5']);
       }
     });
 
@@ -77,9 +79,7 @@ class _PrayForChurch extends State<PrayForChurch> {
   }
 
   Future<List<TextSpan>> getPray() async {
-    // final Object args = params!.then((value) => value.param1);
     Params params = await getParams('church');
-    // final args = await params.the
     String? withPray = params.param1 ?? '(교회를 위한 중보기도)';
 
     final String prayContent =
