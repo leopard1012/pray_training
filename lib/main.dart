@@ -12,6 +12,7 @@ import 'package:pray_training/confs/conf_parents.dart';
 import 'package:pray_training/confs/conf_personal_1.dart';
 import 'package:pray_training/confs/conf_personal_2.dart';
 import 'package:pray_training/confs/conf_repentance.dart';
+import 'package:pray_training/confs/conf_spouse.dart';
 import 'package:pray_training/confs/conf_wife.dart';
 import 'package:pray_training/params.dart';
 import 'dart:io';
@@ -122,7 +123,7 @@ class MyApp extends StatelessWidget {
         '/conf/personal_1': (context) => ConfPersonal1(database),
         '/conf/personal_2': (context) => ConfPersonal2(database),
         '/conf/repentance': (context) => ConfRepentance(database),
-        // '/conf/spouse': (context) => ConfSpo(database),
+        '/conf/spouse': (context) => ConfSpouse(database),
         '/conf/devil': (context) => ConfDevil(database),
         '/conf/disease': (context) => ConfDisease(database),
 
