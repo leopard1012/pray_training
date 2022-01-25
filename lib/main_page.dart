@@ -1,4 +1,4 @@
-  import 'package:flutter/cupertino.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:pray_training/params.dart';
 import 'package:pray_training/pray_list.dart';
@@ -18,6 +18,7 @@ class _MainPage extends State<MainPage> {
   // Map<String, List<String>> map = {};
 
   final _prayNameList = [
+    '1. 나라를 위한 기도',
     '2. 교회를 위한 기도',
     '3. 담임목사님을 위한 기도',
     '4. 목장과 목장원을 위한 기도',
@@ -31,18 +32,26 @@ class _MainPage extends State<MainPage> {
     '12. 개인기도',
     '13. 개인기도2',
     '14. 회개기도',
+    '15. 영적인 힘을 얻기 위한 기도',
+    '16. 시험이 있을 때 드리는 기도',
+    '17. 기도가 잘 되지 않을 때 드리는 기도',
+    '18. 삶에 지칠 때 드리는 기도',
+    '19. 감사할 때 드리는 기도',
+    '20. 몸이 아플 때 드리는 기도',
     '21. 부부간에 불화가 있을 때 드리는 기도',
+    '22. 물질적인 어려움에 있을 때 드리는 기도',
+    '23. 사업을 위한 기도',
+    '24. 하루를 시작하며 드리는 기도',
+    '25. 하루를 마감하며 드리는 기도',
     '26. 마귀를 물리치는 기도',
     '27. 질병을 치료하는 기도'
   ];
 
   final _prayCodeList = [
-    'church','pastor','cell','believer','person','home','husband','wife',
-    'parents','children','personal_1','personal_2','repentance','spouse',
-    'devil','disease'
+    'homeland','church','pastor','cell','believer','person','home','husband','wife',
+    'parents','children','personal_1','personal_2','repentance','spiritual_power','temptations','tarry','tired',
+    'thanks','healing','spouse','money','business','dawn','night','devil','disease'
   ];
-
-  var _selectedPray = 'spouse';
 
   Future<List<Params>>? params;
   late Map<String, List<String>> pageParam;
@@ -56,48 +65,115 @@ class _MainPage extends State<MainPage> {
 
   @override
   Widget build(BuildContext context) {
-    // Future 안에 있는 List 가져오는거 테스트해야함
-    // params!.then((value) =>
-    //     for(Map<String, dynamic) map : value) {
-    //       if (map.get('pray').equals('/spouse')) {
-    //
-    //       }
-    //     }
-    // );
-
-    List<DropdownMenuItem> prayList = [];
-
-    for (int i = 0 ; i < _prayCodeList.length ; i++) {
-      prayList.add(new DropdownMenuItem(
-          value: _prayCodeList[i],
-          child: Text(_prayNameList[i]),
-      ));
-    }
-
     // TODO: implement build
     return Scaffold(
         appBar: AppBar(
-          title: Text('APPBAR'),
+          title: const Text('Main'),
+          automaticallyImplyLeading: false
         ),
-        drawer: PrayList(),
-        body: Padding (
-          padding: const EdgeInsets.all(8.0),
-          // child: Center(
-            child: DropdownButton<dynamic>(
-              value: _selectedPray,
-              items: prayList,
-              onChanged: (value) {
-                setState(() {
-                  _selectedPray = value.toString();
-                  Navigator.popAndPushNamed(context, '/conf/' + value.toString());
-                });
-              },
-              // items: _prayList.map((e) => e.)
+        // body: GridView.builder(
+        //     padding: const EdgeInsets.all(8.0),
+        //     itemCount: 27, //item 개수
+        //     gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        //     crossAxisCount: 3, //1개행에 보여줄 item 개수
+        //     childAspectRatio: 5 / 3, //가로 / 세로 비율
+        //     mainAxisSpacing: 10, //수평 padding
+        //     crossAxisSpacing: 10, //수직 padding
+        //   ),
+        //   itemBuilder: (BuildContext context, int index) {
+        //     return GestureDetector(
+        //       onTap: () {
+        //         Navigator.pushNamed(context, '/' + _prayCodeList[index]);
+        //       },
+        //       child: Container(
+        //         padding: const EdgeInsets.all(3.0),
+        //         decoration: BoxDecoration(
+        //           border: Border.all(
+        //             width: 2,
+        //             color: Colors.orange
+        //           )
+        //         ),
+        //         // color: Colors.redAccent,
+        //         child: Text(
+        //           _prayNameList[index],
+        //           style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+        //         ),
+        //       ),
+        //     );
+        //   }
+        // ),
+      body: Column(
+        children: <Widget>[
+          const Text("TTTTTTTTTTTTTTTTTTTTTTTTTTT"),
+          Expanded(child: GridView.builder(
+                padding: const EdgeInsets.all(8.0),
+                itemCount: 27, //item 개수
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 3, //1개행에 보여줄 item 개수
+                childAspectRatio: 5 / 3, //가로 / 세로 비율
+                mainAxisSpacing: 10, //수평 padding
+                crossAxisSpacing: 10, //수직 padding
+              ),
+              itemBuilder: (BuildContext context, int index) {
+                return GestureDetector(
+                  onTap: () {
+                    Navigator.pushNamed(context, '/' + _prayCodeList[index]);
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.all(3.0),
+                    decoration: BoxDecoration(
+                      border: Border.all(
+                        width: 2,
+                        color: Colors.orange
+                      )
+                    ),
+                    // color: Colors.redAccent,
+                    child: Text(
+                      _prayNameList[index],
+                      style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                );
+              }
             )
-          // )
-        )
+          )
+        ]
+      )
     );
   }
+
+  // @override
+  // Widget build(BuildContext context) {
+  //   List<DropdownMenuItem> prayList = [];
+  //
+  //   for (int i = 0 ; i < _prayCodeList.length ; i++) {
+  //     prayList.add(new DropdownMenuItem(
+  //         value: _prayCodeList[i],
+  //         child: Text(_prayNameList[i]),
+  //     ));
+  //   }
+  //
+  //   // TODO: implement build
+  //   return Scaffold(
+  //       appBar: AppBar(
+  //         title: Text('APPBAR'),
+  //       ),
+  //       drawer: PrayList(),
+  //       body: Padding (
+  //         padding: const EdgeInsets.all(8.0),
+  //           child: DropdownButton<dynamic>(
+  //             value: _selectedPray,
+  //             items: prayList,
+  //             onChanged: (value) {
+  //               setState(() {
+  //                 _selectedPray = value.toString();
+  //                 Navigator.pushReplacementNamed(context, '/conf/' + value.toString());
+  //               });
+  //             },
+  //           )
+  //       )
+  //   );
+  // }
 
   void _insertData(Params param) async {
     final Database database = await widget.db;
