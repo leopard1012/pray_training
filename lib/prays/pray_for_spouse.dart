@@ -1,7 +1,10 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:pray_training/params.dart';
 import 'package:pray_training/pray_list.dart';
 import 'package:sqflite/sqflite.dart';
+
+import '../bottom_navi.dart';
 
 class PrayForSpouse extends StatefulWidget {
   final Future<Database> db;
@@ -32,8 +35,10 @@ class _PrayForSpouse extends State<PrayForSpouse> {
         title: Text('21. 부부간에 불화가 있을 때 드리는 기도'),
       ),
       drawer: PrayList(),
+      bottomNavigationBar: BottomNavi(21),
       body: Center(
           child: SingleChildScrollView(
+            padding: const EdgeInsets.all(8.0),
               scrollDirection: Axis.vertical,
               child: FutureBuilder(
                 future: getPray(),
@@ -99,7 +104,7 @@ class _PrayForSpouse extends State<PrayForSpouse> {
             '서로의 잘못을 인정하지 못하고 내 안의 분노를 다스리지 못하고 있습니다.\n'
             '모든 죄인들을 품으신 주님의 그 사랑을 받은 자들로서 행하지 못하고 악을 품고 있습니다.\n'
             '하나님! 용서하여 주옵소서.\n'
-            '하나님 아버지! 부부로 짝 지어주신 하나님의 듯을 올바로 깨닫게 하셔서 우리 부부가 서로 돕는 자가 되게 하옵소서.\n'
+            '하나님 아버지! 부부로 짝 지어주신 하나님의 뜻을 올바로 깨닫게 하셔서 우리 부부가 서로 돕는 자가 되게 하옵소서.\n'
             '서로를 신뢰하게 하옵소서.\n'
             '서로에게 지나친 기대를 하기보다는 섬기는 자가 되게 하여 주옵소서.\n'
             '남편에게 주께 하듯 하고, 아내를 자신의 몸과 같이 사랑하라고 하신 말씀을 깨닫게 하옵소서.\n'
@@ -131,17 +136,18 @@ class _PrayForSpouse extends State<PrayForSpouse> {
             '\n'
             '9) 하나님의 나라와 권세와 영광이 영원히 하나님 아버지께 있사오며,\n'
             '\n'
-            '10) 예수님의 이름으로 기도드립니다. 아멘';
+            '10) 예수님의 이름으로 기도드립니다. 아멘\n';
 
     final wordToStyle = param;
     final wordStyle = TextStyle(color: Colors.blue);
+    final wordTarget = TapGestureRecognizer()..onTapDown = (p) => {Navigator.pushNamed(context, '/conf/spouse')};
     // final leftOverStyle = Theme.of(context).textTheme.bodyText1!.copyWith(fontSize: 20, fontWeight: FontWeight.bold);
-    final spans = _getSpans(prayContent, wordToStyle, wordStyle);
+    final spans = _getSpans(prayContent, wordToStyle, wordStyle, wordTarget);
 
     return spans;
   }
 
-  List<TextSpan> _getSpans(String text, String matchWord, TextStyle style) {
+  List<TextSpan> _getSpans(String text, String matchWord, TextStyle style, TapGestureRecognizer recognizer) {
     List<TextSpan> spans = [];
     int spanBoundary = 0;
 
@@ -165,7 +171,7 @@ class _PrayForSpouse extends State<PrayForSpouse> {
       // 검색하고자 했던 키워드에 대한 textSpan 추가
       final endIndex = startIndex + matchWord.length;
       final spanText = text.substring(startIndex, endIndex);
-      spans.add(TextSpan(text: spanText, style: style));
+      spans.add(TextSpan(text: spanText, style: style, recognizer: recognizer));
 
       // mark the boundary to start the next search from
       spanBoundary = endIndex;

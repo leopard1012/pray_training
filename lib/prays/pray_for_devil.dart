@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:pray_training/pray_list.dart';
 import 'package:sqflite/sqflite.dart';
 
+import '../bottom_navi.dart';
 import '../params.dart';
 
 class PrayForDevil extends StatefulWidget {
@@ -33,8 +34,10 @@ class _PrayForDevil extends State<PrayForDevil> {
         title: Text('26. 마귀를 물리치는 기도'),
       ),
       drawer: PrayList(),
+      bottomNavigationBar: BottomNavi(26),
       body: Center(
         child: SingleChildScrollView(
+          padding: const EdgeInsets.all(8.0),
           scrollDirection: Axis.vertical,
           child: FutureBuilder(
               future: getPray(),
@@ -83,6 +86,8 @@ class _PrayForDevil extends State<PrayForDevil> {
 
     String? target = params.param1 == null ? "다른 사람(이름)" : params.param1.toString();
     String? accident = params.param3 == null ? "죄(구체적으로)" : params.param3.toString();
+    target = target == "" ? '다른 사람(이름)' : target;
+    accident = accident == "" ? '죄(구체적으로)' : accident;
 
     List<TextSpan> textSpanList = [];
     textSpanList.add(TextSpan(text: '1) 하나님은 거룩하신 분이십니다.\n'));
@@ -99,9 +104,9 @@ class _PrayForDevil extends State<PrayForDevil> {
     textSpanList.add(TextSpan(text: '계속하여 양식과 필요한 것들을 공급하여 주옵소서.\n'));
     textSpanList.add(TextSpan(text: '\n'));
     textSpanList.add(TextSpan(text: '5) 하나님! '));
-    textSpanList.add(TextSpan(text: target, style: TextStyle(color: Colors.blue), recognizer: TapGestureRecognizer()..onTapDown = (p) => {Navigator.popAndPushNamed(context, '/conf/devil')} ));
+    textSpanList.add(TextSpan(text: target, style: TextStyle(color: Colors.blue), recognizer: TapGestureRecognizer()..onTapDown = (p) => {Navigator.pushNamed(context, '/conf/devil')} ));
     textSpanList.add(TextSpan(text: '의 '));
-    textSpanList.add(TextSpan(text: accident, style: TextStyle(color: Colors.blue), recognizer: TapGestureRecognizer()..onTapDown = (p) => {Navigator.popAndPushNamed(context, '/conf/devil')} ));
+    textSpanList.add(TextSpan(text: accident, style: TextStyle(color: Colors.blue), recognizer: TapGestureRecognizer()..onTapDown = (p) => {Navigator.pushNamed(context, '/conf/devil')} ));
     textSpanList.add(TextSpan(text: '를 용서합니다.\n'));
     textSpanList.add(TextSpan(text: '예수님의 말씀에 순종하여 무조건 용서합니다.\n'));
     textSpanList.add(TextSpan(text: '그리고 그를 축복합니다.\n'));

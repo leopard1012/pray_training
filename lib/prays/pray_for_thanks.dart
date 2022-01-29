@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:pray_training/pray_list.dart';
 
+import '../bottom_navi.dart';
+
 class PrayForThanks extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -10,8 +12,10 @@ class PrayForThanks extends StatelessWidget {
         title: Text('19. 감사할 때 드리는 기도'),
       ),
       drawer: PrayList(),
+      bottomNavigationBar: BottomNavi(19),
       body: Center(
         child: SingleChildScrollView(
+          padding: const EdgeInsets.all(8.0),
           scrollDirection: Axis.vertical,
           child: FutureBuilder(
               future: getPray(),
@@ -59,7 +63,7 @@ class PrayForThanks extends StatelessWidget {
         '시련이나 육신의 아픔 중에 있을 때에라도 감사할 조건들을 찾을 수 있는 사람이 되게 하시고, 늘 감사가 나의 입에서 떠나지 않도록 하옵소서.\n'
         '\n'
         '5) 하나님! 다른 사람의 죄를 용서합니다.\n'
-        '나에게 상처를 주고 힘들게 했던 살맘을 용서합니다.\n'
+        '나에게 상처를 주고 힘들게 했던 사람을 용서합니다.\n'
         '그를 축복합니다.\n'
         '\n'
         '6) 하나님! 다른 사람의 죄를 용서해 준 것 같이 나의 죄를 용서하여 주옵소서.\n'

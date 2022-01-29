@@ -114,7 +114,7 @@ class _ConfDisease extends State<ConfDisease> {
                 onChanged: (value) {
                   setState(() {
                     _selectedPray = value.toString();
-                    Navigator.popAndPushNamed(context, '/conf/' + value.toString());
+                    Navigator.pushReplacementNamed(context, '/conf/' + value.toString());
                   });
                 },
               ),
@@ -188,6 +188,7 @@ class _ConfDisease extends State<ConfDisease> {
                     );
                     _insertData(param);
                     flutterToast();
+                    Navigator.pushReplacementNamed(context, '/'+_selectedPray);
                   },
               )
             )

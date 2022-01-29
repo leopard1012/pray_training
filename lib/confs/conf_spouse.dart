@@ -88,7 +88,7 @@ class _ConfSpouse extends State<ConfSpouse> {
                 onChanged: (value) {
                   setState(() {
                     _selectedPray = value.toString();
-                    Navigator.popAndPushNamed(context, '/conf/' + value.toString());
+                    Navigator.pushReplacementNamed(context, '/conf/' + value.toString());
                   });
                 },
               ),
@@ -96,37 +96,37 @@ class _ConfSpouse extends State<ConfSpouse> {
             Padding (
               padding: const EdgeInsets.all(8.0),
               child: Center(
-                // child: Column(
-                //   mainAxisAlignment: MainAxisAlignment.center,
-                //   children: <Widget>[
-                //     RadioListTile(
-                //       title: Text('남편'),
-                //       value: '남편',
-                //       groupValue: _selectedParam,
-                //       onChanged: (String? value) {
-                //         setState(() {
-                //           _selectedParam = value!;
-                //           // _value = false;
-                //         });
-                //       },
-                //       // selected: this._selectedParam == '남편',
-                //       selected: this._selectHusband
-                //     ),
-                //     RadioListTile(
-                //       title: Text('아내'),
-                //       value: '아내',
-                //       groupValue: _selectedParam,
-                //       onChanged: (String? value) {
-                //         setState(() {
-                //           _selectedParam = value??_selectedParam;
-                //         });
-                //       },
-                //       // selected: this._selectedParam == '아내',
-                //       selected: this._selectWife
-                //     ),
-                //   ],
-                // )
-                child: RadioGroup(),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    RadioListTile(
+                      title: Text('남편'),
+                      value: '남편',
+                      groupValue: _selectedParam,
+                      onChanged: (String? value) {
+                        setState(() {
+                          _selectedParam = value!;
+                          // _value = false;
+                        });
+                      },
+                      selected: this._selectedParam == '남편',
+                      // selected: this._selectHusband
+                    ),
+                    RadioListTile(
+                      title: Text('아내'),
+                      value: '아내',
+                      groupValue: _selectedParam,
+                      onChanged: (String? value) {
+                        setState(() {
+                          _selectedParam = value??_selectedParam;
+                        });
+                      },
+                      selected: this._selectedParam == '아내',
+                      // selected: this._selectWife
+                    ),
+                  ],
+                )
+                // child: RadioGroup(),
               ),
             ),
             Padding (
@@ -140,6 +140,7 @@ class _ConfSpouse extends State<ConfSpouse> {
                     );
                     _insertData(param);
                     flutterToast();
+                    Navigator.pushReplacementNamed(context, '/'+_selectedPray);
                   },
                 )
             )

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:pray_training/pray_list.dart';
 
+import '../bottom_navi.dart';
+
 class PrayForHealing extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -10,8 +12,10 @@ class PrayForHealing extends StatelessWidget {
         title: Text('20. 몸이 아플 때 드리는 기도'),
       ),
       drawer: PrayList(),
+      bottomNavigationBar: BottomNavi(20),
       body: Center(
         child: SingleChildScrollView(
+          padding: const EdgeInsets.all(8.0),
           scrollDirection: Axis.vertical,
           child: FutureBuilder(
               future: getPray(),
@@ -46,13 +50,13 @@ class PrayForHealing extends StatelessWidget {
         '\n'
         '3) 하나님의 뜻이 하늘에서 이루어진 것 같이 나를 통하여 이 땅에서 이루어지기를 원합니다.\n'
         '\n'
-        '4) 생명을 주신 하나님, 주님이 주신 몸을 잘 관리하지 못함으로 인해 공통받고 있습니다.\n'
-        '죄로 인해 건강을 해친 것이 아닌지 깩닫게 하여 주시고, 죄로 인한 것이라면 회개하오니 용서하여 주옵소서.\n'
+        '4) 생명을 주신 하나님, 주님이 주신 몸을 잘 관리하지 못함으로 인해 고통받고 있습니다.\n'
+        '죄로 인해 건강을 해친 것이 아닌지 깨닫게 하여 주시고, 죄로 인한 것이라면 회개하오니 용서하여 주옵소서.\n'
         '그리고 나의 질병을 치료하여 주옵소서.\n'
-        '사탄이 틈타서 질병이 생긴 것이라면 깨닫게 하시며 주님께서 말ㅆ므으로 물리쳐 주셔서 건강하게 하옵소서.\n'
+        '사탄이 틈타서 질병이 생긴 것이라면 깨닫게 하시며 주님께서 말씀으로 물리쳐 주셔서 건강하게 하옵소서.\n'
         '그리고 나도 기도로 이기게 하옵소서.\n'
         '불순종으로 질병이 생겼으면 나로 깨닫게 하시며 회개하고 순종하게 하옵소서.\n'
-        '하나님이 주신 육체의 관리를 잘못하여 질병이 생겼으면 깩닫게 하시고 치료하여 주옵소서.\n'
+        '하나님이 주신 육체의 관리를 잘못하여 질병이 생겼으면 깨닫게 하시고 치료하여 주옵소서.\n'
         '하나님은 치료의 하나님이심을 믿습닏다.\n'
         '하나님은 문둥병자를 치료하시고 죽은 자를 살리시는 치료의 하나님이심을 믿습니다.\n'
         '이 시간에 나의 병을 깨끗하게 하실 수 있나이다.\n'
@@ -85,7 +89,7 @@ class PrayForHealing extends StatelessWidget {
         '\n'
         '9) 하나님의 나라와 권세와 영광이 영원히 하나님 아버지께 있사오며,\n'
         '\n'
-        '10) 예수님의 이름으로 기도드립니다. 아멘';
+        '10) 예수님의 이름으로 기도드립니다. 아멘\n';
 
     final wordToStyle = param;
     final wordStyle = TextStyle(color: Colors.blue);

@@ -94,7 +94,7 @@ class _ConfPastor extends State<ConfPastor> {
                 onChanged: (value) {
                   setState(() {
                     _selectedPray = value.toString();
-                    Navigator.popAndPushNamed(context, '/conf/' + value.toString());
+                    Navigator.pushReplacementNamed(context, '/conf/' + value.toString());
                   });
                 },
               ),
@@ -105,7 +105,7 @@ class _ConfPastor extends State<ConfPastor> {
                 controller: _inputTextController1,
                 decoration: const InputDecoration(
                   border: OutlineInputBorder(),
-                  labelText: '죄 용성 대상자',
+                  labelText: '죄 용서 대상자',
                 ),
               ),
             ),
@@ -120,6 +120,7 @@ class _ConfPastor extends State<ConfPastor> {
                     );
                     _insertData(param);
                     flutterToast();
+                    Navigator.pushReplacementNamed(context, '/'+_selectedPray);
                   },
                 )
             )

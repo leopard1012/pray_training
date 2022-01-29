@@ -50,6 +50,7 @@ import 'confs/conf_cell.dart';
 import 'confs/conf_pastor.dart';
 import 'confs/conf_person.dart';
 import 'main_page.dart';
+import 'package:flutter_native_splash/flutter_native_splash.dart';
 
 
 void main() {
@@ -98,7 +99,7 @@ class MyApp extends StatelessWidget {
         '/personal_2': (context) => PrayForPersonal2(database),
         '/repentance': (context) => PrayForRepentance(database),
         '/spiritual_power': (context) => PrayForSpiritualPower(),
-        '/temtations': (context) => PrayForTemptations(),
+        '/temptations': (context) => PrayForTemptations(),
         '/tarry': (context) => PrayForTarry(),
         '/tired': (context) => PrayForTired(),
         '/thanks': (context) => PrayForThanks(),

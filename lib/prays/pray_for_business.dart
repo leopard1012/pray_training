@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:pray_training/pray_list.dart';
 
+import '../bottom_navi.dart';
+
 class PrayForBusiness extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -10,8 +12,10 @@ class PrayForBusiness extends StatelessWidget {
         title: Text('23. 사업을 위한 기도'),
       ),
       drawer: PrayList(),
+      bottomNavigationBar: BottomNavi(23),
       body: Center(
         child: SingleChildScrollView(
+          padding: const EdgeInsets.all(8.0),
           scrollDirection: Axis.vertical,
           child: FutureBuilder(
               future: getPray(),
@@ -96,7 +100,7 @@ class PrayForBusiness extends StatelessWidget {
         '\n'
         '9) 하나님의 나라와 권세와 영광이 영원히 하나님 아버지께 있사오며,\n'
         '\n'
-        '10) 예수님의 이름으로 기도드립니다. 아멘.';
+        '10) 예수님의 이름으로 기도드립니다. 아멘.\n';
 
     final wordToStyle = param;
     final wordStyle = TextStyle(color: Colors.blue);

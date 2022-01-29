@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:pray_training/pray_list.dart';
 
+import '../bottom_navi.dart';
+
 class PrayForNight extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -10,8 +12,10 @@ class PrayForNight extends StatelessWidget {
         title: Text('25. 하루를 마감하며 드리는 기도'),
       ),
       drawer: PrayList(),
+      bottomNavigationBar: BottomNavi(25),
       body: Center(
         child: SingleChildScrollView(
+          padding: const EdgeInsets.all(8.0),
           scrollDirection: Axis.vertical,
           child: FutureBuilder(
               future: getPray(),
@@ -56,7 +60,7 @@ class PrayForNight extends StatelessWidget {
         '이 밤에 평안한 안식의 시간을 주심을 감사드립니다.\n'
         '지친 우리의 몸과 마음이 주님이 주신 단잠을 통해 회복되게 하여 주옵소서.\n'
         '우리가 잠들어 있는 순간에도 천군 천사가 우리 가정을 지켜 주옵소서.\n'
-        '(시 127:2)\"여호와게서 그 사랑하시는 자에게는 잠을 주시는 도다.\"라고 하였사오니 누우면 잠을 주시어 좋은 꿈을 꾸게 하옵소서.\n'
+        '(시 127:2)\"여호와께서 그 사랑하시는 자에게는 잠을 주시는 도다.\"라고 하였사오니 누우면 잠을 주시어 좋은 꿈을 꾸게 하옵소서.\n'
         '오늘 하루도 하나님의 은혜를 진심으로 감사드립니다.\n'
         '내일은 하나님이 준비해 놓으신 새로운 세계가 되기를 원합니다.\n'
         '\n'

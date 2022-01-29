@@ -94,7 +94,7 @@ class _ConfHome extends State<ConfHome> {
                 onChanged: (value) {
                   setState(() {
                     _selectedPray = value.toString();
-                    Navigator.popAndPushNamed(context, '/conf/' + value.toString());
+                    Navigator.pushReplacementNamed(context, '/conf/' + value.toString());
                   });
                 },
               ),
@@ -120,6 +120,7 @@ class _ConfHome extends State<ConfHome> {
                     );
                     _insertData(param);
                     flutterToast();
+                    Navigator.pushReplacementNamed(context, '/'+_selectedPray);
                   },
                 )
             )

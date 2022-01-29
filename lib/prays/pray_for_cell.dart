@@ -1,7 +1,9 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:pray_training/pray_list.dart';
 import 'package:sqflite/sqflite.dart';
 
+import '../bottom_navi.dart';
 import '../params.dart';
 
 class PrayForCell extends StatefulWidget {
@@ -31,8 +33,10 @@ class _PrayForCell extends State<PrayForCell> {
         title: Text('04. 목장과 목장원을 위한 기도'),
       ),
       drawer: PrayList(),
+      bottomNavigationBar: BottomNavi(4),
       body: Center(
         child: SingleChildScrollView(
+          padding: const EdgeInsets.all(8.0),
           scrollDirection: Axis.vertical,
           child: FutureBuilder(
               future: getPray(),
@@ -80,6 +84,7 @@ class _PrayForCell extends State<PrayForCell> {
   Future<List<TextSpan>> getPray() async {
     Params params = await getParams('cell');
     String? withPray = params.param1 ?? '(목장을 위한 중보기도)';
+    withPray = withPray == "" ? '(목장을 위한 중보기도)' : withPray;
 
     final String prayContent =
         '1) 하나님은 거룩하신 분이십니다.\n'
@@ -100,7 +105,7 @@ class _PrayForCell extends State<PrayForCell> {
             '또한 예수님의 전도법과 관계법을 실천하여 자신이 변화되게 하옵소서.\n'
             '\n'
             '4) 하나님께서 우리 목장과 목장원에게 필요한 것을 공급해 주시기를 원합니다.\n'
-            '우리 목장의 목자에게 은혜와 능력을 주옵시고, 목장원들에게 성령 충만과 말슴 충만을 주옵소서.\n'
+            '우리 목장의 목자에게 은혜와 능력을 주옵시고, 목장원들에게 성령 충만과 말씀 충만을 주옵소서.\n'
             '우리 목장이 전도하여 크게 부흥하게 하옵소서.\n'
             '전 목장원이 매일 전도하게 하옵소서.\n'
             '그리고 목장원들이 서로 뜨겁게 기도하고 도와주며 사랑하게 하옵소서.\n'
@@ -114,7 +119,7 @@ class _PrayForCell extends State<PrayForCell> {
                 '우리 목자와 목장원들에게 상처를 주고 힘들게 하였던 '+'사람을'+' 용서합니다.\n'
             '예수님의 이름으로 용서합니다.\n'
             '그리고 그를 축복해 주옵소서.\n'
-            '그가 하나님을 겨오이하고 복 받기를 원합니다.\n'
+            '그가 하나님을 경외하고 복 받기를 원합니다.\n'
             '\n'
             '6) 하나님! 다른 사람의 죄를 용서하여 준 것 같이 목자의 죄와 목장원의 죄를 사하여 주옵소서.\n'
             '하나님만이 죄를 사하는 권세가 있는 줄 믿습니다.\n'
@@ -139,17 +144,18 @@ class _PrayForCell extends State<PrayForCell> {
             '\n'
             '9) 하나님의 나라와 권세와 영광이 영원히, 영원히 하나님 아버지께 있사오며,\n'
             '\n'
-            '10) 예수님의 이름으로 기도드립니다. 아멘.';
+            '10) 예수님의 이름으로 기도드립니다. 아멘.\n';
 
     final wordToStyle = withPray;
     final wordStyle = TextStyle(color: Colors.blue);
+    final wordTarget = TapGestureRecognizer()..onTapDown = (p) => {Navigator.pushNamed(context, '/conf/cell')};
     // final leftOverStyle = Theme.of(context).textTheme.bodyText1!.copyWith(fontSize: 20, fontWeight: FontWeight.bold);
-    final spans = _getSpans(prayContent, wordToStyle, wordStyle);
+    final spans = _getSpans(prayContent, wordToStyle, wordStyle, wordTarget);
 
     return spans;
   }
 
-  List<TextSpan> _getSpans(String text, String matchWord, TextStyle style) {
+  List<TextSpan> _getSpans(String text, String matchWord, TextStyle style, TapGestureRecognizer recognizer) {
     List<TextSpan> spans = [];
     int spanBoundary = 0;
 
@@ -173,7 +179,7 @@ class _PrayForCell extends State<PrayForCell> {
       // 검색하고자 했던 키워드에 대한 textSpan 추가
       final endIndex = startIndex + matchWord.length;
       final spanText = text.substring(startIndex, endIndex);
-      spans.add(TextSpan(text: spanText, style: style));
+      spans.add(TextSpan(text: spanText, style: style, recognizer: recognizer));
 
       // mark the boundary to start the next search from
       spanBoundary = endIndex;

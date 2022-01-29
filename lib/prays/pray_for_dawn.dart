@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:pray_training/pray_list.dart';
 
+import '../bottom_navi.dart';
+
 class PrayForDawn extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -10,8 +12,10 @@ class PrayForDawn extends StatelessWidget {
         title: Text('24. 하루를 시작하며 드리는 기도'),
       ),
       drawer: PrayList(),
+      bottomNavigationBar: BottomNavi(24),
       body: Center(
         child: SingleChildScrollView(
+          padding: const EdgeInsets.all(8.0),
           scrollDirection: Axis.vertical,
           child: FutureBuilder(
               future: getPray(),

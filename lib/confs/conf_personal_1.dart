@@ -99,7 +99,7 @@ class _ConfPersonal1 extends State<ConfPersonal1> {
                 onChanged: (value) {
                   setState(() {
                     _selectedPray = value.toString();
-                    Navigator.popAndPushNamed(context, '/conf/' + value.toString());
+                    Navigator.pushReplacementNamed(context, '/conf/' + value.toString());
                   });
                 },
               ),
@@ -138,6 +138,7 @@ class _ConfPersonal1 extends State<ConfPersonal1> {
                     );
                     _insertData(param);
                     flutterToast();
+                    Navigator.pushReplacementNamed(context, '/'+_selectedPray);
                   },
               )
             )

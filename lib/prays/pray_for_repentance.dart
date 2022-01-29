@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:pray_training/pray_list.dart';
 import 'package:sqflite/sqflite.dart';
 
+import '../bottom_navi.dart';
 import '../params.dart';
 
 class PrayForRepentance extends StatefulWidget {
@@ -33,8 +34,10 @@ class _PrayForRepentance extends State<PrayForRepentance> {
         title: Text('14. 회개기도'),
       ),
       drawer: PrayList(),
+      bottomNavigationBar: BottomNavi(14),
       body: Center(
         child: SingleChildScrollView(
+          padding: const EdgeInsets.all(8.0),
           scrollDirection: Axis.vertical,
           child: FutureBuilder(
               future: getPray(),
@@ -83,6 +86,8 @@ class _PrayForRepentance extends State<PrayForRepentance> {
 
     String? target = params.param1 == null ? "다른 사람(이름)" : params.param1.toString();
     String? accident = params.param3 == null ? "죄(구체적으로)" : params.param3.toString();
+    target = target == "" ? '다른 사람(이름)' : target;
+    accident = accident == "" ? '죄(구체적으로)' : accident;
 
     List<TextSpan> textSpanList = [];
     textSpanList.add(TextSpan(text : '1) 하나님은 거룩한 분이십니다.\n'));
@@ -130,9 +135,9 @@ class _PrayForRepentance extends State<PrayForRepentance> {
     textSpanList.add(TextSpan(text : '그리고 다시는 같은 죄를 범하지 않도록 믿음을 주옵소서.\n'));
     textSpanList.add(TextSpan(text : '\n'));
     textSpanList.add(TextSpan(text : '5) 하나님! '));
-    textSpanList.add(TextSpan(text: target, style: TextStyle(color: Colors.blue), recognizer: TapGestureRecognizer()..onTapDown = (p) => {Navigator.popAndPushNamed(context, '/conf/repentance')} ));
+    textSpanList.add(TextSpan(text: target, style: TextStyle(color: Colors.blue), recognizer: TapGestureRecognizer()..onTapDown = (p) => {Navigator.pushNamed(context, '/conf/repentance')} ));
     textSpanList.add(TextSpan(text : '의 '));
-    textSpanList.add(TextSpan(text: accident, style: TextStyle(color: Colors.blue), recognizer: TapGestureRecognizer()..onTapDown = (p) => {Navigator.popAndPushNamed(context, '/conf/repentance')} ));
+    textSpanList.add(TextSpan(text: accident, style: TextStyle(color: Colors.blue), recognizer: TapGestureRecognizer()..onTapDown = (p) => {Navigator.pushNamed(context, '/conf/repentance')} ));
     textSpanList.add(TextSpan(text : '를 용서합니다.\n'));
     textSpanList.add(TextSpan(text : '나에게 상처를 주고 힘들게 하였던 사람들을 용서합니다.\n'));
     textSpanList.add(TextSpan(text : '예수님의 이름으로 용서합니다.\n'));

@@ -1,7 +1,9 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:pray_training/pray_list.dart';
 import 'package:sqflite/sqflite.dart';
 
+import '../bottom_navi.dart';
 import '../params.dart';
 
 class PrayForPastor extends StatefulWidget {
@@ -31,8 +33,10 @@ class _PrayForPastor extends State<PrayForPastor> {
         title: Text('03. 담임목사님을 위한 기도'),
       ),
       drawer: PrayList(),
+      bottomNavigationBar: BottomNavi(3),
       body: Center(
         child: SingleChildScrollView(
+          padding: const EdgeInsets.all(8.0),
           scrollDirection: Axis.vertical,
           child: FutureBuilder(
               future: getPray(),
@@ -80,6 +84,7 @@ class _PrayForPastor extends State<PrayForPastor> {
   Future<List<TextSpan>> getPray() async {
     Params params = await getParams('pastor');
     String? target = params.param1 ?? '그들(이름)';
+    target = target == "" ? '그들(이름)' : target;
 
     final String prayContent =
         '1) 하나님 아버지는 거룩하신 분이십니다.\n'
@@ -93,13 +98,13 @@ class _PrayForPastor extends State<PrayForPastor> {
             '\n'
             '3) 하나님의 뜻이 하늘에서 이루어진 것 같이 땅에서 우리 담임목사님과 가정에 이루어지기를 원합니다.\n'
             '또한 우리 담임목사님과 가족을 통하여 하나님의 선하신 뜻이 이루어지기를 기도합니다.\n'
-            '하나님의 뜻이 우리 담임목사님과 가정을 통하여 온 당에 전파되기를 원합니다.\n'
+            '하나님의 뜻이 우리 담임목사님과 가정을 통하여 온 땅에 전파되기를 원합니다.\n'
             '\n'
             '4) 하나님께서 우리 담임목사님의 가정에 평생 동안 일용할 양식을 공급해 주시기를 원합니다.\n'
             '또 세상에서 살아가는데 필요한 것을 풍족하게 공급해 주시기를 원합니다.\n'
             '우리 담임목사님의 가정에 현재 필요한 것들이 많이 있습니다.\n'
-            '하나님게서 공급하여 주옵소서.\n'
-            '또 풍성하여 이웃들에게 나우어 주며 살게 하옵소서.\n'
+            '하나님께서 공급하여 주옵소서.\n'
+            '또 풍성하여 이웃들에게 나누어 주며 살게 하옵소서.\n'
             '또한 우리 담임목사님과 가정의 주변 사람들이 모두 구원받기를 원합니다.\n'
             '그들을 구원하시어 하나님의 일꾼으로 사용해 주옵소서.\n'
             '그리고 담임목사님에게 크신 능력을 주어 큰 일꾼으로 사용하여 주옵소서.\n'
@@ -108,7 +113,7 @@ class _PrayForPastor extends State<PrayForPastor> {
             '5) 하나님! 다른 사람들의 죄를 용서해 주시기를 원합니다.\n'
             '우리 담임목사님과 가정에 상처를 주고 힘들게 했던 사람들을 용서해 주시기 원합니다.\n'
             '예수님의 이름으로 용서해 주옵소서.\n'
-            '그리고 ' + target + '을 축복해 주옵소서.'
+            '그리고 ' + target + '을(를) 축복해 주옵소서.'
             '그들이 하나님을 경외하고 복 받기를 원합니다.\n'
             '\n'
             '6) 하나님! 다른 사람들의 죄를 용서해 준 것 같이 우리 담임목사님과 가정의 죄도 십자가의 보혈로 사하여 주옵소서.\n'
@@ -130,7 +135,7 @@ class _PrayForPastor extends State<PrayForPastor> {
             '그리하여 하나님의 법을 지키는 선한 가정이 되게 하옵소서.\n'
             '우리 담임목사님과 가정이 세상의 악에 물들지 않도록 지켜 주옵소서.\n'
             '악은 모양이라도 보지 않게 하옵소서.\n'
-            '우리 담임목사님과 가정은 연약하오니 하나님게서 악을 이길 수 있는 힘과 능력을 공급하여 주옵소서.\n'
+            '우리 담임목사님과 가정은 연약하오니 하나님께서 악을 이길 수 있는 힘과 능력을 공급하여 주옵소서.\n'
             '\n'
             '9) 하나님의 나라와 권세와 영광히 영원히, 영원히 하나님 아버지께 있사오며,\n'
             '\n'
@@ -138,13 +143,14 @@ class _PrayForPastor extends State<PrayForPastor> {
 
     final wordToStyle = target;
     final wordStyle = TextStyle(color: Colors.blue);
+    final wordTarget = TapGestureRecognizer()..onTapDown = (p) => {Navigator.pushNamed(context, '/conf/pastor')};
     // final leftOverStyle = Theme.of(context).textTheme.bodyText1!.copyWith(fontSize: 20, fontWeight: FontWeight.bold);
-    final spans = _getSpans(prayContent, wordToStyle, wordStyle);
+    final spans = _getSpans(prayContent, wordToStyle, wordStyle, wordTarget);
 
     return spans;
   }
 
-  List<TextSpan> _getSpans(String text, String matchWord, TextStyle style) {
+  List<TextSpan> _getSpans(String text, String matchWord, TextStyle style, TapGestureRecognizer recognizer) {
     List<TextSpan> spans = [];
     int spanBoundary = 0;
 
@@ -168,7 +174,7 @@ class _PrayForPastor extends State<PrayForPastor> {
       // 검색하고자 했던 키워드에 대한 textSpan 추가
       final endIndex = startIndex + matchWord.length;
       final spanText = text.substring(startIndex, endIndex);
-      spans.add(TextSpan(text: spanText, style: style));
+      spans.add(TextSpan(text: spanText, style: style, recognizer: recognizer));
 
       // mark the boundary to start the next search from
       spanBoundary = endIndex;

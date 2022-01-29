@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:pray_training/pray_list.dart';
 import 'package:sqflite/sqflite.dart';
 
+import '../bottom_navi.dart';
 import '../params.dart';
 
 class PrayForHusband extends StatefulWidget {
@@ -33,8 +34,10 @@ class _PrayForHusband extends State<PrayForHusband> {
         title: Text('08. 남편을 위한 기도'),
       ),
       drawer: PrayList(),
+      bottomNavigationBar: BottomNavi(8),
       body: Center(
         child: SingleChildScrollView(
+          padding: const EdgeInsets.all(8.0),
           scrollDirection: Axis.vertical,
           child: FutureBuilder(
               future: getPray(),
@@ -82,13 +85,15 @@ class _PrayForHusband extends State<PrayForHusband> {
     Params params = await getParams('husband');
 
     String? target = params.param1 == null ? "OOO" : params.param1.toString();
-    String? withPray = params.param2 == null ? "(남편 위한 중보기도)" : params.param2.toString();
+    String? withPray = params.param2 == null ? "(남편을 위한 중보기도)" : params.param2.toString();
+    target = target == "" ? 'OOO' : target;
+    withPray = withPray == "" ? '(남편을 위한 중보기도)' : withPray;
 
     List<TextSpan> textSpanList = [];
     textSpanList.add(TextSpan(text: '1) 하나님 아버지는 거룩하십니다.\n하나님 아버지의 이름이 남편('));
     textSpanList.add(TextSpan(text: target, style: TextStyle(color: Colors.blue),
-        recognizer: TapGestureRecognizer()..onTapDown = (p) => {Navigator.popAndPushNamed(context, '/conf/husband')} ));
-    textSpanList.add(TextSpan(text: ')을 통하여 거룩히 여김 받으시기를 원합니다.\n'));
+        recognizer: TapGestureRecognizer()..onTapDown = (p) => {Navigator.pushNamed(context, '/conf/husband')} ));
+    textSpanList.add(TextSpan(text: ')을(를) 통하여 거룩히 여김 받으시기를 원합니다.\n'));
     textSpanList.add(TextSpan(text: '그리고 남편이'));
     textSpanList.add(TextSpan(text: ' 하나님의 이름을 거룩히 여기는 일을 찾아서 하기를 원합니다.\n'));
     textSpanList.add(TextSpan(text: '\n'));
@@ -103,11 +108,12 @@ class _PrayForHusband extends State<PrayForHusband> {
     textSpanList.add(TextSpan(text: '3) 하나님의 뜻이 하늘에서 이루어진 것 같이 땅에서 남편에게 이루어지기를 원합니다.\n'));
     textSpanList.add(TextSpan(text: '또 남편이 하나님의 뜻을 깨닫고 이루어드리기를 기도합니다.\n'));
     textSpanList.add(TextSpan(text: '하나님의 뜻이 남편을 통하여 온 땅에 전파되기를 원합니다.\n\n'));
-    textSpanList.add(TextSpan(text: '4) 하나님게서 남편에게 평생동안 일용할 양식을 공급해 주시기를 원합니다.\n'));
+    textSpanList.add(TextSpan(text: '4) 하나님께서 남편에게 평생동안 일용할 양식을 공급해 주시기를 원합니다.\n'));
     textSpanList.add(TextSpan(text: '또 세상에서 살아가는데 필요한 것을 공급하여 주시기를 원합니다.\n'));
     textSpanList.add(TextSpan(text: '남편이 하는 일들을 축복하여 주옵소서.\n'));
     textSpanList.add(TextSpan(text: '큰 믿음과 건강을 주옵시며, 항상 하나님을 기쁘게 하는 사람이 되게 하옵소서.\n\n'));
-    textSpanList.add(TextSpan(text: withPray, style: TextStyle(color: Colors.blue)));
+    textSpanList.add(TextSpan(text: withPray, style: TextStyle(color: Colors.blue),
+        recognizer: TapGestureRecognizer()..onTapDown = (p) => {Navigator.pushNamed(context, '/conf/husband')} ));
     textSpanList.add(TextSpan(text: '\n남편에게 풍성한 물질을 주셔서 하나님을 위하여 언제나 마음껏 드리게 하옵시며 교회에서 모범적으로 충성하고 헌신하는 사람이 되게 하옵소서.'));
     textSpanList.add(TextSpan(text: '\n목사님께 순종하며 섬기는 믿음을 주옵시고, 성도를 사랑하며 겸손히 섬기는 신앙을 주옵소서.'));
     textSpanList.add(TextSpan(text: '\n가정에 충실하고 믿음의 제사장이 되어 가정을 신앙으로 이끌게 하옵소서.'));

@@ -1,7 +1,9 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:pray_training/pray_list.dart';
 import 'package:sqflite/sqflite.dart';
 
+import '../bottom_navi.dart';
 import '../params.dart';
 
 class PrayForChurch extends StatefulWidget {
@@ -32,8 +34,10 @@ class _PrayForChurch extends State<PrayForChurch> {
         title: Text('02. 교회를 위한 기도'),
       ),
       drawer: PrayList(),
+      bottomNavigationBar: BottomNavi(2),
       body: Center(
         child: SingleChildScrollView(
+          padding: const EdgeInsets.all(8.0),
           scrollDirection: Axis.vertical,
           child: FutureBuilder(
               future: getPray(),
@@ -81,6 +85,7 @@ class _PrayForChurch extends State<PrayForChurch> {
   Future<List<TextSpan>> getPray() async {
     Params params = await getParams('church');
     String? withPray = params.param1 ?? '(교회를 위한 중보기도)';
+    withPray = withPray == "" ? '(교회를 위한 중보기도)' : withPray;
 
     final String prayContent =
         '1) 하나님 아버지는 거룩하십니다.\n'
@@ -96,14 +101,14 @@ class _PrayForChurch extends State<PrayForChurch> {
             '또 우리 교회가 하나님의 뜻을 알고 이루어 드리기를 기도합니다.\n'
             '하나님의 뜻이 우리 교회를 통하여 모든 민족에게 증거되기를 원합니다.\n'
             '\n'
-            '4) 하나님게서 우리 교회에 필요한 것을 공급해 주시기를 원합니다.\n'
-            '우리 교회 다임목사님의 건강을 지켜 주옵소서.\n'
+            '4) 하나님께서 우리 교회에 필요한 것을 공급해 주시기를 원합니다.\n'
+            '우리 교회 담임목사님의 건강을 지켜 주옵소서.\n'
             '하나님의 뜻을 이루어 드리는 능력의 사자로 사용하여 주옵소서.\n'
             '또 우리 교회의 목표가 이루어지게 하옵소서.\n'
             '\n'
             + withPray +
             '\n우리 교회가 지역의 영혼들을 많이 구원하는 교회가 되기를 원합니다.\n'
-                '그리고 영적 추수할 릭더를 만들고 번식하는 교회가 되게 하옵소서.\n'
+                '그리고 영적 추수할 리더를 만들고 번식하는 교회가 되게 하옵소서.\n'
                 '우리 교회 부교역자들과 중진들이 담임목사님을 도와서 하나님의 뜻을 이루게 하옵소서.\n'
                 '또한 그들이 성령 충만하고 말씀에 충만하여 능력으로 하나님의 큰 뜻을 이루게 하옵소서.\n'
                 '우리 교인들이 하나님을 잘 섬기고 복 받는 사람들이 되기를 원합니다.\n'
@@ -114,7 +119,7 @@ class _PrayForChurch extends State<PrayForChurch> {
                 '그리고 그들의 영혼을 축복해 주옵소서.\n'
                 '그들이 하나님을 경외하고 복 받기를 원합니다.\n'
                 '\n'
-                '6) 하나님! 다른 살마의 죄를 용서해 준 것 같이 우리 교회의 죄를 사하여 주옵소서.\n'
+                '6) 하나님! 다른 사람의 죄를 용서해 준 것 같이 우리 교회의 죄를 사하여 주옵소서.\n'
                 '하나님만이 죄를 사하는 권세가 있는 줄 믿습니다.\n'
                 '\n'
                 '7) 하나님! 우리 교회가 시험에 들지 않기를 원합니다.\n'
@@ -131,22 +136,23 @@ class _PrayForChurch extends State<PrayForChurch> {
                 '8) 하나님! 우리 교회를 악에서 구원하여 주옵소서.\n'
                 '우리 교회가 하나님의 법을 어기는 악을 행하지 않게 하옵소서.\n'
                 '우리 교회가 하나님의 말씀대로 행하여 선과 의를 행하게 하옵소서.\n'
-                '우리 교회는 연약하오니 하나님게서 악을 이길 수 있는 힘과 능력을 공급하여 주옵소서.\n'
+                '우리 교회는 연약하오니 하나님께서 악을 이길 수 있는 힘과 능력을 공급하여 주옵소서.\n'
                 '언제나 악에서 지켜주시고 악이 들어올 때 구원하여 주옵소서.\n'
                 '\n'
                 '9) 하나님의 나라와 권세와 영광이 영원히, 영원히 하나님 아버지께 있사오며,\n'
                 '\n'
-                '10) 예수님의 이름으로 기도드립니다. 아멘.';
+                '10) 예수님의 이름으로 기도드립니다. 아멘.\n';
 
     final wordToStyle = withPray;
     final wordStyle = TextStyle(color: Colors.blue);
+    final wordTarget = TapGestureRecognizer()..onTapDown = (p) => {Navigator.pushNamed(context, '/conf/church')};
     // final leftOverStyle = Theme.of(context).textTheme.bodyText1!.copyWith(fontSize: 20, fontWeight: FontWeight.bold);
-    final spans = _getSpans(prayContent, wordToStyle, wordStyle);
+    final spans = _getSpans(prayContent, wordToStyle, wordStyle, wordTarget);
 
     return spans;
   }
 
-  List<TextSpan> _getSpans(String text, String matchWord, TextStyle style) {
+  List<TextSpan> _getSpans(String text, String matchWord, TextStyle style, TapGestureRecognizer recognizer) {
     List<TextSpan> spans = [];
     int spanBoundary = 0;
 
@@ -170,7 +176,7 @@ class _PrayForChurch extends State<PrayForChurch> {
       // 검색하고자 했던 키워드에 대한 textSpan 추가
       final endIndex = startIndex + matchWord.length;
       final spanText = text.substring(startIndex, endIndex);
-      spans.add(TextSpan(text: spanText, style: style));
+      spans.add(TextSpan(text: spanText, style: style, recognizer: recognizer));
 
       // mark the boundary to start the next search from
       spanBoundary = endIndex;
