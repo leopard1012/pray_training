@@ -1,11 +1,64 @@
 import 'package:flutter/material.dart';
 import 'package:pray_training/pray_list.dart';
+import 'package:pray_training/bottom_navi.dart';
 
-class PrayForHomeland extends StatelessWidget {
+class PrayForHomeland extends StatefulWidget {
+  List<Map<String,dynamic>> list;
+
+  PrayForHomeland(this.list);
+
+  @override
+  State<StatefulWidget> createState() => _PrayForHomeland();
+}
+
+class _PrayForHomeland extends State<PrayForHomeland> {
+  late List<Map<String,dynamic>> list;
+  int index = -1;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    list = widget.list;
+    index = getIndex(list, 'homeland');
+  }
+
   @override
   Widget build(BuildContext context) {
     // TODO: implement build
-    final Object? args = ModalRoute.of(context)!.settings.arguments;
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('01. 나라를 위한 기도'),
+      ),
+      drawer: PrayList(),
+      bottomNavigationBar: BottomNavi(list, index),
+      body: Center(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(8.0),
+          scrollDirection: Axis.vertical,
+          child: FutureBuilder(
+              future: getPray(),
+              builder: (BuildContext context, AsyncSnapshot<List<TextSpan>> snapshot) {
+                return Text.rich(
+                    TextSpan(
+                      style: Theme
+                          .of(context)
+                          .textTheme
+                          .bodyText1!
+                          .copyWith(
+                          fontSize: 20, fontWeight: FontWeight.bold),
+                      children: snapshot.data,
+                    )
+                );
+              }
+          ),
+       ),
+      ),
+    );
+  }
+
+  Future<List<TextSpan>> getPray() async {
+    String? param = 'NONE';
 
     final String prayContent =
         '1) 하나님 아버지는 거룩하십니다.\n'
@@ -18,7 +71,7 @@ class PrayForHomeland extends StatelessWidget {
         '그리고 우리나라를 통하여 하나님 나라가 세상 모든 나라에 전파되기를 원합니다.\n'
         '\n'
         '3) 하나님의 뜻이 하늘에서 이루어진 것 같이 땅에서 우리나라에 이루어지기를 원합니다.\n'
-        '또 우리나라를 통하여 하나님의 선하고 의로운 듯이 이루어지기를 기도합니다.\n'
+        '또 우리나라를 통하여 하나님의 선하고 의로운 뜻이 이루어지기를 기도합니다.\n'
         '그리고 하나님의 뜻이 우리나라를 통하여 세계 만민에게 전파되기를 원합니다.\n'
         '\n'
         '4) 하나님께서 우리나라에 언제나 일용할 양식을 공급해 주시기를 원합니다.\n'
@@ -28,7 +81,7 @@ class PrayForHomeland extends StatelessWidget {
         '정치가 안정되게 하옵시고 노사가 안정되게 하옵소서.\n'
         '이기적인 마음을 버리고 서로 이해하고 사랑하는 풍토가 조성되게 하옵소서.\n'
         '또 경제 대국이 되어 믿는 사람들이 잘 살아 더 많은 선교를 할 수 있도록 축복하여 주옵소서.\n'
-        '한국의 교ㅕ회가 바르게 성장하게 하옵시고 많은 영혼을 구원하도록 하여 주옵소서.\n'
+        '한국의 교회가 바르게 성장하게 하옵시고 많은 영혼을 구원하도록 하여 주옵소서.\n'
         '이 민족을 모두 구원하여 주옵소서.\n'
         '\n'
         '5) 하나님! 다른나라의 죄를 용서해 주시기 원합니다.\n'
@@ -61,16 +114,55 @@ class PrayForHomeland extends StatelessWidget {
         '\n'
         '10) 예수님의 이름으로 기도드립니다. 아멘.';
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('nation appbar'),
-      ),
-      drawer: PrayList(),
-      body: Container(
-        child: Center(
-          child: Text(args.toString()),
-       ),
-      ),
-    );
+    final wordToStyle = param;
+    final wordStyle = TextStyle(color: Colors.blue);
+    // final leftOverStyle = Theme.of(context).textTheme.bodyText1!.copyWith(fontSize: 20, fontWeight: FontWeight.bold);
+    final spans = _getSpans(prayContent, wordToStyle, wordStyle);
+
+    return spans;
+  }
+
+  List<TextSpan> _getSpans(String text, String matchWord, TextStyle style) {
+    List<TextSpan> spans = [];
+    int spanBoundary = 0;
+
+    do {
+
+      // 전체 String 에서 키워드 검색
+      final startIndex = text.indexOf(matchWord, spanBoundary);
+
+      // 전체 String 에서 해당 키워드가 더 이상 없을때 마지막 KeyWord부터 끝까지의 TextSpan 추가
+      if (startIndex == -1) {
+        spans.add(TextSpan(text: text.substring(spanBoundary)));
+        return spans;
+      }
+
+      // 전체 String 사이에서 발견한 키워드들 사이의 text에 대한 textSpan 추가
+      if (startIndex > spanBoundary) {
+        print(text.substring(spanBoundary, startIndex));
+        spans.add(TextSpan(text: text.substring(spanBoundary, startIndex)));
+      }
+
+      // 검색하고자 했던 키워드에 대한 textSpan 추가
+      final endIndex = startIndex + matchWord.length;
+      final spanText = text.substring(startIndex, endIndex);
+      spans.add(TextSpan(text: spanText, style: style));
+
+      // mark the boundary to start the next search from
+      spanBoundary = endIndex;
+
+      // continue until there are no more matches
+    }
+    //String 전체 검사
+    while (spanBoundary < text.length);
+
+    return spans;
+  }
+
+  int getIndex(List<Map<String,dynamic>> list, String pray) {
+    for(int i = 0 ; i < list.length ; i++) {
+      if(list[i].keys.first == pray) return i;
+    }
+    return -1;
   }
 }

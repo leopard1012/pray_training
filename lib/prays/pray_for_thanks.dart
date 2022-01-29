@@ -1,11 +1,65 @@
 import 'package:flutter/material.dart';
 import 'package:pray_training/pray_list.dart';
 
-class PrayForThanks extends StatelessWidget {
+import '../bottom_navi.dart';
+
+class PrayForThanks extends StatefulWidget {
+  List<Map<String, dynamic>> list;
+
+  PrayForThanks(this.list);
+
+  @override
+  State<StatefulWidget> createState() => _PrayForThanks();
+}
+
+class _PrayForThanks extends State<PrayForThanks> {
+  late List<Map<String,dynamic>> list;
+  int index = -1;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    list = widget.list;
+    index = getIndex(list, 'thanks');
+  }
+
   @override
   Widget build(BuildContext context) {
     // TODO: implement build
-    final Object? args = ModalRoute.of(context)!.settings.arguments;
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('19. 감사할 때 드리는 기도'),
+      ),
+      drawer: PrayList(),
+      bottomNavigationBar: BottomNavi(list, index),
+      body: Center(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(8.0),
+          scrollDirection: Axis.vertical,
+          child: FutureBuilder(
+              future: getPray(),
+              builder: (BuildContext context, AsyncSnapshot<List<TextSpan>> snapshot) {
+                return Text.rich(
+                    TextSpan(
+                      style: Theme
+                          .of(context)
+                          .textTheme
+                          .bodyText1!
+                          .copyWith(
+                          fontSize: 20, fontWeight: FontWeight.bold),
+                      children: snapshot.data,
+                    )
+                );
+              }
+          ),
+        ),
+      ),
+    );
+  }
+
+  Future<List<TextSpan>> getPray() async {
+    String? param = 'NONE';
 
     final String prayContent =
         '1) 하나님은 거룩하신 분이십니다.\n'
@@ -29,7 +83,7 @@ class PrayForThanks extends StatelessWidget {
         '시련이나 육신의 아픔 중에 있을 때에라도 감사할 조건들을 찾을 수 있는 사람이 되게 하시고, 늘 감사가 나의 입에서 떠나지 않도록 하옵소서.\n'
         '\n'
         '5) 하나님! 다른 사람의 죄를 용서합니다.\n'
-        '나에게 상처를 주고 힘들게 했던 살맘을 용서합니다.\n'
+        '나에게 상처를 주고 힘들게 했던 사람을 용서합니다.\n'
         '그를 축복합니다.\n'
         '\n'
         '6) 하나님! 다른 사람의 죄를 용서해 준 것 같이 나의 죄를 용서하여 주옵소서.\n'
@@ -46,16 +100,55 @@ class PrayForThanks extends StatelessWidget {
         '\n'
         '10) 예수님의 이름으로 기도드립니다. 아멘';
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('19. 감사할 때 드리는 기도'),
-      ),
-      drawer: PrayList(),
-      body: Container(
-        child: Center(
-          child: Text(args.toString()),
-        ),
-      ),
-    );
+    final wordToStyle = param;
+    final wordStyle = TextStyle(color: Colors.blue);
+    // final leftOverStyle = Theme.of(context).textTheme.bodyText1!.copyWith(fontSize: 20, fontWeight: FontWeight.bold);
+    final spans = _getSpans(prayContent, wordToStyle, wordStyle);
+
+    return spans;
+  }
+
+  List<TextSpan> _getSpans(String text, String matchWord, TextStyle style) {
+    List<TextSpan> spans = [];
+    int spanBoundary = 0;
+
+    do {
+
+      // 전체 String 에서 키워드 검색
+      final startIndex = text.indexOf(matchWord, spanBoundary);
+
+      // 전체 String 에서 해당 키워드가 더 이상 없을때 마지막 KeyWord부터 끝까지의 TextSpan 추가
+      if (startIndex == -1) {
+        spans.add(TextSpan(text: text.substring(spanBoundary)));
+        return spans;
+      }
+
+      // 전체 String 사이에서 발견한 키워드들 사이의 text에 대한 textSpan 추가
+      if (startIndex > spanBoundary) {
+        print(text.substring(spanBoundary, startIndex));
+        spans.add(TextSpan(text: text.substring(spanBoundary, startIndex)));
+      }
+
+      // 검색하고자 했던 키워드에 대한 textSpan 추가
+      final endIndex = startIndex + matchWord.length;
+      final spanText = text.substring(startIndex, endIndex);
+      spans.add(TextSpan(text: spanText, style: style));
+
+      // mark the boundary to start the next search from
+      spanBoundary = endIndex;
+
+      // continue until there are no more matches
+    }
+    //String 전체 검사
+    while (spanBoundary < text.length);
+
+    return spans;
+  }
+
+  int getIndex(List<Map<String,dynamic>> list, String pray) {
+    for(int i = 0 ; i < list.length ; i++) {
+      if(list[i].keys.first == pray) return i;
+    }
+    return -1;
   }
 }
