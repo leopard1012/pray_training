@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'main.dart';
 
 class BottomNavi extends StatelessWidget {
   // SharedPreferences pref = SharedPreferences.getInstance() as SharedPreferences;
@@ -9,9 +10,12 @@ class BottomNavi extends StatelessWidget {
     'thanks','healing','spouse','money','business','dawn','night','devil','disease'
   ];
 
+  List<Map<String,dynamic>> prayList = [];
+
   int _index = 0;
 
-  BottomNavi(int i) {
+  BottomNavi(List<Map<String,dynamic>> list, int i) {
+    prayList = list;
     _index = i;
   }
 
@@ -24,7 +28,7 @@ class BottomNavi extends StatelessWidget {
       selectedItemColor: Colors.black,
       unselectedItemColor: Colors.black,
       onTap: (int index) {
-        int targetIdx = 0;
+        int targetIdx = -1;
         bool goMain = false;
         switch (index) {
           case 0:
@@ -39,10 +43,10 @@ class BottomNavi extends StatelessWidget {
             break;
         }
 
-        if (!goMain && (targetIdx <= 0 || targetIdx >= 28)) {
+        if (!goMain && (targetIdx < 0 || targetIdx >= 27)) {
           Fluttertoast.showToast(msg: '더이상 이동할 수 없습니다.');
         } else if (!goMain) {
-          Navigator.pushReplacementNamed(context, '/' + _prayCodeList[targetIdx]);
+          Navigator.pushReplacementNamed(context, '/' + prayList[targetIdx].keys.first);
         }
       },
       items: const [

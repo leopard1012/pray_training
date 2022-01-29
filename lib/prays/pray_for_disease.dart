@@ -8,8 +8,9 @@ import '../params.dart';
 
 class PrayForDisease extends StatefulWidget {
   final Future<Database> db;
+  List<Map<String,dynamic>> list;
 
-  PrayForDisease(this.db);
+  PrayForDisease(this.db, this.list);
 
   @override
   State<StatefulWidget> createState() => _PrayForDisease();
@@ -17,12 +18,16 @@ class PrayForDisease extends StatefulWidget {
 
 class _PrayForDisease extends State<PrayForDisease> {
   // late TextEditingController dataController;
+  late List<Map<String,dynamic>> list;
+  int index = -1;
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
     // dataController = TextEditingController();
+    list = widget.list;
+    index = getIndex(list, 'disease');
   }
 
   @override
@@ -34,7 +39,7 @@ class _PrayForDisease extends State<PrayForDisease> {
         title: Text('27. 질병을 치료하는 기도'),
       ),
       drawer: PrayList(),
-      bottomNavigationBar: BottomNavi(27),
+      bottomNavigationBar: BottomNavi(list, index),
       body: Center(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(8.0),
@@ -214,5 +219,12 @@ class _PrayForDisease extends State<PrayForDisease> {
     while (spanBoundary < text.length);
 
     return spans;
+  }
+
+  int getIndex(List<Map<String,dynamic>> list, String pray) {
+    for(int i = 0 ; i < list.length ; i++) {
+      if(list[i].keys.first == pray) return i;
+    }
+    return -1;
   }
 }

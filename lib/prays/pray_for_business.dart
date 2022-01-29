@@ -3,7 +3,27 @@ import 'package:pray_training/pray_list.dart';
 
 import '../bottom_navi.dart';
 
-class PrayForBusiness extends StatelessWidget {
+class PrayForBusiness extends StatefulWidget {
+  List<Map<String, dynamic>> list;
+
+  PrayForBusiness(this.list);
+
+  @override
+  State<StatefulWidget> createState() => _PrayForBusiness();
+}
+
+class _PrayForBusiness extends State<PrayForBusiness> {
+  late List<Map<String,dynamic>> list;
+  int index = -1;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    list = widget.list;
+    index = getIndex(list, 'business');
+  }
+
   @override
   Widget build(BuildContext context) {
     // TODO: implement build
@@ -12,7 +32,7 @@ class PrayForBusiness extends StatelessWidget {
         title: Text('23. 사업을 위한 기도'),
       ),
       drawer: PrayList(),
-      bottomNavigationBar: BottomNavi(23),
+      bottomNavigationBar: BottomNavi(list, index),
       body: Center(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(8.0),
@@ -145,5 +165,12 @@ class PrayForBusiness extends StatelessWidget {
     while (spanBoundary < text.length);
 
     return spans;
+  }
+
+  int getIndex(List<Map<String,dynamic>> list, String pray) {
+    for(int i = 0 ; i < list.length ; i++) {
+      if(list[i].keys.first == pray) return i;
+    }
+    return -1;
   }
 }

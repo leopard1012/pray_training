@@ -8,7 +8,9 @@ import '../params.dart';
 
 class PrayForHome extends StatefulWidget {
   final Future<Database> db;
-  PrayForHome(this.db);
+  List<Map<String,dynamic>> list;
+
+  PrayForHome(this.db, this.list);
 
   @override
   State<StatefulWidget> createState() => _PrayForHome();
@@ -16,7 +18,8 @@ class PrayForHome extends StatefulWidget {
 
 class _PrayForHome extends State<PrayForHome> {
   late TextEditingController dataController;
-  // Future<Params>? params;
+  late List<Map<String,dynamic>> list;
+  int index = -1;
 
   @override
   void initState() {
@@ -24,6 +27,8 @@ class _PrayForHome extends State<PrayForHome> {
     super.initState();
     // params = getParams('spouse');
     dataController = TextEditingController();
+    list = widget.list;
+    index = getIndex(list, 'home');
   }
 
   @override
@@ -34,7 +39,7 @@ class _PrayForHome extends State<PrayForHome> {
         title: Text('07. 가정을 위한 기도'),
       ),
       drawer: PrayList(),
-      bottomNavigationBar: BottomNavi(7),
+      bottomNavigationBar: BottomNavi(list, index),
       body: Center(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(8.0),
@@ -189,5 +194,12 @@ class _PrayForHome extends State<PrayForHome> {
     while (spanBoundary < text.length);
 
     return spans;
+  }
+
+  int getIndex(List<Map<String,dynamic>> list, String pray) {
+    for(int i = 0 ; i < list.length ; i++) {
+      if(list[i].keys.first == pray) return i;
+    }
+    return -1;
   }
 }

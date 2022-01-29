@@ -8,7 +8,9 @@ import '../bottom_navi.dart';
 
 class PrayForSpouse extends StatefulWidget {
   final Future<Database> db;
-  PrayForSpouse(this.db);
+  List<Map<String,dynamic>> list;
+
+  PrayForSpouse(this.db, this.list);
 
   @override
   State<StatefulWidget> createState() => _PrayForSpouse();
@@ -16,7 +18,8 @@ class PrayForSpouse extends StatefulWidget {
 
 class _PrayForSpouse extends State<PrayForSpouse> {
   late TextEditingController dataController;
-  // Future<Params>? params;
+  late List<Map<String,dynamic>> list;
+  int index = -1;
 
   @override
   void initState() {
@@ -24,6 +27,8 @@ class _PrayForSpouse extends State<PrayForSpouse> {
     super.initState();
     // params = getParams('spouse');
     dataController = TextEditingController();
+    list = widget.list;
+    index = getIndex(list, 'spouse');
   }
 
   @override
@@ -35,7 +40,7 @@ class _PrayForSpouse extends State<PrayForSpouse> {
         title: Text('21. 부부간에 불화가 있을 때 드리는 기도'),
       ),
       drawer: PrayList(),
-      bottomNavigationBar: BottomNavi(21),
+      bottomNavigationBar: BottomNavi(list, index),
       body: Center(
           child: SingleChildScrollView(
             padding: const EdgeInsets.all(8.0),
@@ -184,5 +189,10 @@ class _PrayForSpouse extends State<PrayForSpouse> {
     return spans;
   }
 
-
+  int getIndex(List<Map<String,dynamic>> list, String pray) {
+    for(int i = 0 ; i < list.length ; i++) {
+      if(list[i].keys.first == pray) return i;
+    }
+    return -1;
+  }
 }

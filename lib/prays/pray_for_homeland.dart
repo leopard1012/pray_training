@@ -2,7 +2,27 @@ import 'package:flutter/material.dart';
 import 'package:pray_training/pray_list.dart';
 import 'package:pray_training/bottom_navi.dart';
 
-class PrayForHomeland extends StatelessWidget {
+class PrayForHomeland extends StatefulWidget {
+  List<Map<String,dynamic>> list;
+
+  PrayForHomeland(this.list);
+
+  @override
+  State<StatefulWidget> createState() => _PrayForHomeland();
+}
+
+class _PrayForHomeland extends State<PrayForHomeland> {
+  late List<Map<String,dynamic>> list;
+  int index = -1;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    list = widget.list;
+    index = getIndex(list, 'homeland');
+  }
+
   @override
   Widget build(BuildContext context) {
     // TODO: implement build
@@ -11,7 +31,7 @@ class PrayForHomeland extends StatelessWidget {
         title: Text('01. 나라를 위한 기도'),
       ),
       drawer: PrayList(),
-      bottomNavigationBar: BottomNavi(1),
+      bottomNavigationBar: BottomNavi(list, index),
       body: Center(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(8.0),
@@ -137,5 +157,12 @@ class PrayForHomeland extends StatelessWidget {
     while (spanBoundary < text.length);
 
     return spans;
+  }
+
+  int getIndex(List<Map<String,dynamic>> list, String pray) {
+    for(int i = 0 ; i < list.length ; i++) {
+      if(list[i].keys.first == pray) return i;
+    }
+    return -1;
   }
 }

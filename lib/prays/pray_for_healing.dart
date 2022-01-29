@@ -3,7 +3,27 @@ import 'package:pray_training/pray_list.dart';
 
 import '../bottom_navi.dart';
 
-class PrayForHealing extends StatelessWidget {
+class PrayForHealing extends StatefulWidget {
+  List<Map<String, dynamic>> list;
+
+  PrayForHealing(this.list);
+
+  @override
+  State<StatefulWidget> createState() => _PrayForHealing();
+}
+
+class _PrayForHealing extends State<PrayForHealing> {
+  late List<Map<String,dynamic>> list;
+  int index = -1;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    list = widget.list;
+    index = getIndex(list, 'healing');
+  }
+
   @override
   Widget build(BuildContext context) {
     // TODO: implement build
@@ -12,7 +32,7 @@ class PrayForHealing extends StatelessWidget {
         title: Text('20. 몸이 아플 때 드리는 기도'),
       ),
       drawer: PrayList(),
-      bottomNavigationBar: BottomNavi(20),
+      bottomNavigationBar: BottomNavi(list, index),
       body: Center(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(8.0),
@@ -134,5 +154,12 @@ class PrayForHealing extends StatelessWidget {
     while (spanBoundary < text.length);
 
     return spans;
+  }
+
+  int getIndex(List<Map<String,dynamic>> list, String pray) {
+    for(int i = 0 ; i < list.length ; i++) {
+      if(list[i].keys.first == pray) return i;
+    }
+    return -1;
   }
 }

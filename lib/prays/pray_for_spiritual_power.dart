@@ -3,7 +3,27 @@ import 'package:pray_training/pray_list.dart';
 
 import '../bottom_navi.dart';
 
-class PrayForSpiritualPower extends StatelessWidget {
+class PrayForSpiritualPower extends StatefulWidget {
+  List<Map<String, dynamic>> list;
+
+  PrayForSpiritualPower(this.list);
+
+  @override
+  State<StatefulWidget> createState() => _PrayForSpiritualPower();
+}
+
+class _PrayForSpiritualPower extends State<PrayForSpiritualPower> {
+  late List<Map<String,dynamic>> list;
+  int index = -1;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    list = widget.list;
+    index = getIndex(list, 'spiritual_power');
+  }
+
   @override
   Widget build(BuildContext context) {
     // TODO: implement build
@@ -12,7 +32,7 @@ class PrayForSpiritualPower extends StatelessWidget {
         title: Text('15. 영적인 힘을 얻기 위한 기도'),
       ),
       drawer: PrayList(),
-      bottomNavigationBar: BottomNavi(15),
+      bottomNavigationBar: BottomNavi(list, index),
       body: Center(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(8.0),
@@ -128,5 +148,12 @@ class PrayForSpiritualPower extends StatelessWidget {
     while (spanBoundary < text.length);
 
     return spans;
+  }
+
+  int getIndex(List<Map<String,dynamic>> list, String pray) {
+    for(int i = 0 ; i < list.length ; i++) {
+      if(list[i].keys.first == pray) return i;
+    }
+    return -1;
   }
 }

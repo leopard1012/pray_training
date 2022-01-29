@@ -8,7 +8,9 @@ import '../params.dart';
 
 class PrayForBeliever extends StatefulWidget {
   final Future<Database> db;
-  PrayForBeliever(this.db);
+  List<Map<String,dynamic>> list;
+
+  PrayForBeliever(this.db, this.list);
 
   @override
   State<StatefulWidget> createState() => _PrayForBeliever();
@@ -16,7 +18,8 @@ class PrayForBeliever extends StatefulWidget {
 
 class _PrayForBeliever extends State<PrayForBeliever> {
   late TextEditingController dataController;
-  // Future<Params>? params;
+  late List<Map<String,dynamic>> list;
+  int index = -1;
 
   @override
   void initState() {
@@ -24,6 +27,8 @@ class _PrayForBeliever extends State<PrayForBeliever> {
     super.initState();
     // params = getParams('spouse');
     dataController = TextEditingController();
+    list = widget.list;
+    index = getIndex(list, 'believer');
   }
 
   @override
@@ -35,7 +40,7 @@ class _PrayForBeliever extends State<PrayForBeliever> {
         title: Text('05. 태신자를 위한 기도'),
       ),
       drawer: PrayList(),
-      bottomNavigationBar: BottomNavi(5),
+      bottomNavigationBar: BottomNavi(list, index),
       body: Center(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(8.0),
@@ -185,5 +190,12 @@ class _PrayForBeliever extends State<PrayForBeliever> {
     while (spanBoundary < text.length);
 
     return spans;
+  }
+
+  int getIndex(List<Map<String,dynamic>> list, String pray) {
+    for(int i = 0 ; i < list.length ; i++) {
+      if(list[i].keys.first == pray) return i;
+    }
+    return -1;
   }
 }

@@ -1,8 +1,6 @@
 import 'dart:convert';
-import 'dart:developer';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:path/path.dart';
 import 'package:pray_training/params.dart';
 import 'package:pray_training/pray_list.dart';
@@ -11,9 +9,7 @@ import 'package:drag_and_drop_gridview/devdrag.dart';
 import 'package:flutter/rendering.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import 'package:flutter/services.dart';
-
-import 'package:pray_training/prays/pray_for_Tarry.dart';
+import 'package:pray_training/prays/pray_for_tarry.dart';
 import 'package:pray_training/prays/pray_for_believer.dart';
 import 'package:pray_training/prays/pray_for_business.dart';
 import 'package:pray_training/prays/pray_for_cell.dart';
@@ -41,23 +37,41 @@ import 'package:pray_training/prays/pray_for_thanks.dart';
 import 'package:pray_training/prays/pray_for_tired.dart';
 import 'package:pray_training/prays/pray_for_wife.dart';
 
+import 'confs/conf_believer.dart';
+import 'confs/conf_cell.dart';
+import 'confs/conf_children.dart';
+import 'confs/conf_church.dart';
+import 'confs/conf_devil.dart';
+import 'confs/conf_disease.dart';
+import 'confs/conf_home.dart';
+import 'confs/conf_husband.dart';
+import 'confs/conf_parents.dart';
+import 'confs/conf_pastor.dart';
+import 'confs/conf_person.dart';
+import 'confs/conf_personal_1.dart';
+import 'confs/conf_personal_2.dart';
+import 'confs/conf_repentance.dart';
+import 'confs/conf_spouse.dart';
+import 'confs/conf_wife.dart';
+
 
 
 class MainPage extends StatefulWidget {
   final Future<Database> db;
-  MainPage(this.db);
+  List<Map<String,dynamic>> list;
+  MainPage(this.db, this.list);
 
   @override
   State<StatefulWidget> createState() => _MainPage();
 }
 
 class _MainPage extends State<MainPage> {
-  late List<Map<String,String>> list = getInitList();
+  late List<Map<String,dynamic>> list = widget.list;
 
   Future<List<Params>>? params;
 
   int pos = -1;
-  late List<Map<String,String>> tmpList;
+  late List<Map<String,dynamic>> tmpList;
   ScrollController? _scrollController;
   int variableSet = 0;
   late double width;
@@ -67,7 +81,7 @@ class _MainPage extends State<MainPage> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    _readListMap();
+    // _readListMap();
     params = getParams();
     tmpList = [...list];
   }
@@ -77,34 +91,58 @@ class _MainPage extends State<MainPage> {
     Future<Database> database = initDatabase();
     // TODO: implement build
     return MaterialApp(
+        theme: ThemeData(
+          primarySwatch: Colors.blue,
+          brightness: Brightness.light,
+        ),
+        darkTheme: ThemeData(
+            brightness: Brightness.dark,
+            primarySwatch: Colors.blue
+        ),
         routes: {
-          '/homeland': (context) => PrayForHomeland(),
-          '/church': (context) => PrayForChurch(database),
-          '/pastor': (context) => PrayForPastor(database),
-          '/cell': (context) => PrayForCell(database),
-          '/believer': (context) => PrayForBeliever(database),
-          '/person': (context) => PrayForPerson(database),
-          '/home': (context) => PrayForHome(database),
-          '/husband': (context) => PrayForHusband(database),
-          '/wife': (context) => PrayForWife(database),
-          '/parents': (context) => PrayForParents(database),
-          '/children': (context) => PrayForChildren(database),
-          '/personal_1': (context) => PrayForPersonal1(database),
-          '/personal_2': (context) => PrayForPersonal2(database),
-          '/repentance': (context) => PrayForRepentance(database),
-          '/spiritual_power': (context) => PrayForSpiritualPower(),
-          '/temptations': (context) => PrayForTemptations(),
-          '/tarry': (context) => PrayForTarry(),
-          '/tired': (context) => PrayForTired(),
-          '/thanks': (context) => PrayForThanks(),
-          '/healing': (context) => PrayForHealing(),
-          '/spouse': (context) => PrayForSpouse(database),
-          '/money': (context) => PrayForMoney(),
-          '/business': (context) => PrayForBusiness(),
-          '/dawn': (context) => PrayForDawn(),
-          '/night': (context) => PrayForNight(),
-          '/devil': (context) => PrayForDevil(database),
-          '/disease': (context) => PrayForDisease(database),
+          '/homeland': (context) => PrayForHomeland(list),
+          '/church': (context) => PrayForChurch(database,list),
+          '/pastor': (context) => PrayForPastor(database,list),
+          '/cell': (context) => PrayForCell(database,list),
+          '/believer': (context) => PrayForBeliever(database,list),
+          '/person': (context) => PrayForPerson(database,list),
+          '/home': (context) => PrayForHome(database,list),
+          '/husband': (context) => PrayForHusband(database,list),
+          '/wife': (context) => PrayForWife(database,list),
+          '/parents': (context) => PrayForParents(database,list),
+          '/children': (context) => PrayForChildren(database,list),
+          '/personal_1': (context) => PrayForPersonal1(database,list),
+          '/personal_2': (context) => PrayForPersonal2(database,list),
+          '/repentance': (context) => PrayForRepentance(database,list),
+          '/spiritual_power': (context) => PrayForSpiritualPower(list),
+          '/temptations': (context) => PrayForTemptations(list),
+          '/tarry': (context) => PrayForTarry(list),
+          '/tired': (context) => PrayForTired(list),
+          '/thanks': (context) => PrayForThanks(list),
+          '/healing': (context) => PrayForHealing(list),
+          '/spouse': (context) => PrayForSpouse(database,list),
+          '/money': (context) => PrayForMoney(list),
+          '/business': (context) => PrayForBusiness(list),
+          '/dawn': (context) => PrayForDawn(list),
+          '/night': (context) => PrayForNight(list),
+          '/devil': (context) => PrayForDevil(database,list),
+          '/disease': (context) => PrayForDisease(database,list),
+          '/conf/church': (context) => ConfChurch(database),
+          '/conf/pastor': (context) => ConfPastor(database),
+          '/conf/person': (context) => ConfPerson(database),
+          '/conf/cell': (context) => ConfCell(database),
+          '/conf/believer': (context) => ConfBeliever(database),
+          '/conf/home': (context) => ConfHome(database),
+          '/conf/husband': (context) => ConfHusband(database),
+          '/conf/parents': (context) => ConfParents(database),
+          '/conf/wife': (context) => ConfWife(database),
+          '/conf/children': (context) => ConfChildren(database),
+          '/conf/personal_1': (context) => ConfPersonal1(database),
+          '/conf/personal_2': (context) => ConfPersonal2(database),
+          '/conf/repentance': (context) => ConfRepentance(database),
+          '/conf/spouse': (context) => ConfSpouse(database),
+          '/conf/devil': (context) => ConfDevil(database),
+          '/conf/disease': (context) => ConfDisease(database),
         },
         home: Scaffold(
             appBar: AppBar(
@@ -248,78 +286,78 @@ class _MainPage extends State<MainPage> {
   }
 
 // List<Map>를 List<String>으로 변환해주는 함수
-  List<String> toStringList(List<Map<String,String>> data) {
+  List<String> toStringList(List<Map<String,dynamic>> data) {
     List<String> ret = [];
     for (int i = 0; i < data.length; i++) {
       ret.add(json.encode(data[i]));
     }
     return ret;
   }
-// List<String>을 List<Map>으로 변환해주는 함수
-  List<Map<String,String>> toListMap(List<String> data) {
-    List<Map<String,String>> ret = [];
-    for (int i = 0; i < data.length; i++) {
-      ret.add(json.decode(data[i]));
-    }
-    return ret;
-  }
+// // List<String>을 List<Map>으로 변환해주는 함수
+//   List<Map<String,String>> toListMap(List<String> data) {
+//     List<Map<String,String>> ret = [];
+//     for (int i = 0; i < data.length; i++) {
+//       ret.add(json.decode(data[i]));
+//     }
+//     return ret;
+//   }
 
 //로컬에 저장해주는 함수
-  _saveListMap(List<Map<String,String>> listMap) async {
+  _saveListMap(List<Map<String,dynamic>> listMap) async {
     final prefs = await SharedPreferences.getInstance();
     const key = 'listMap';
     final value = toStringList(listMap);
     prefs.setStringList(key, value);
   }
 
-//로컬에 있는 데이터를 읽는 함수
-  _readListMap() async {
-    final prefs = await SharedPreferences.getInstance();
-    const key = 'listMap';
-    final value = prefs.getStringList(key);
-    try {
-      if (value!.isNotEmpty) {
-        log("TEST Log1 : " + value[0]);
-        list = toListMap(value);
-        log("TEST Log1-1 : " + list[0].toString());
-      } else {
-        log("TEST Log2");
-        list = getInitList();
-      }
-    } catch (e) {
-      return 0;
-    }
-  }
+// //로컬에 있는 데이터를 읽는 함수
+//   _readListMap() async {
+//     final prefs = await SharedPreferences.getInstance();
+//     const key = 'listMap';
+//     final value = prefs.getStringList(key);
+//     try {
+//       if (value!.isNotEmpty) {
+//         log("TEST Log1 : " + value[0]);
+//         list = toListMap(value);
+//         log("TEST Log1-1 : " + list[0].toString());
+//       } else {
+//         log("TEST Log2");
+//         list = getInitList();
+//       }
+//     } catch (e) {
+//       return 0;
+//     }
+//   }
 
-  static List<Map<String,String>> getInitList() {
-    return [
-      {'homeland':'1. 나라를 위한 기도'},
-      {'church':'2. 교회를 위한 기도'},
-      {'pastor':'3. 담임목사님을 위한 기도'},
-      {'cell':'4. 목장과 목장원을 위한 기도'},
-      {'believer':'5. 태신자를 위한 기도'},
-      {'person':'6. 사람을 위한 기도'},
-      {'home':'7. 가정을 위한 기도'},
-      {'husband':'8. 남편을 위한 기도'},
-      {'wife':'9. 아내를 위한 기도'},
-      {'parents':'10. 부모님을 위한 기도'},
-      {'children':'11. 자녀를 위한 기도'},
-      {'personal_1':'12. 개인기도'},
-      {'personal_2':'13. 개인기도2'},
-      {'repentance':'14. 회개기도'},
-      {'spiritual_power':'15. 영적인 힘을 얻기 위한 기도'},
-      {'temptations':'16. 시험이 있을 때 드리는 기도'},
-      {'tarry':'17. 기도가 잘 되지 않을 때 드리는 기도'},
-      {'tired':'18. 삶에 지칠 때 드리는 기도'},
-      {'thanks':'19. 감사할 때 드리는 기도'},
-      {'healing':'20. 몸이 아플 때 드리는 기도'},
-      {'spouse':'21. 부부간에 불화가 있을 때 드리는 기도'},
-      {'money':'22. 물질적인 어려움에 있을 때 드리는 기도'},
-      {'business':'23. 사업을 위한 기도'},
-      {'dawn':'24. 하루를 시작하며 드리는 기도'},
-      {'night':'25. 하루를 마감하며 드리는 기도'},
-      {'devil':'26. 마귀를 물리치는 기도'},
-      {'disease':'27. 질병을 치료하는 기도'}
-    ];
-  }
+  // static List<Map<String,String>> getInitList() {
+  //   return [
+  //     {'homeland':'1. 나라를 위한 기도'},
+  //     {'church':'2. 교회를 위한 기도'},
+  //     {'pastor':'3. 담임목사님을 위한 기도'},
+  //     {'cell':'4. 목장과 목장원을 위한 기도'},
+  //     {'believer':'5. 태신자를 위한 기도'},
+  //     {'person':'6. 사람을 위한 기도'},
+  //     {'home':'7. 가정을 위한 기도'},
+  //     {'husband':'8. 남편을 위한 기도'},
+  //     {'wife':'9. 아내를 위한 기도'},
+  //     {'parents':'10. 부모님을 위한 기도'},
+  //     {'children':'11. 자녀를 위한 기도'},
+  //     {'personal_1':'12. 개인기도'},
+  //     {'personal_2':'13. 개인기도2'},
+  //     {'repentance':'14. 회개기도'},
+  //     {'spiritual_power':'15. 영적인 힘을 얻기 위한 기도'},
+  //     {'temptations':'16. 시험이 있을 때 드리는 기도'},
+  //     {'tarry':'17. 기도가 잘 되지 않을 때 드리는 기도'},
+  //     {'tired':'18. 삶에 지칠 때 드리는 기도'},
+  //     {'thanks':'19. 감사할 때 드리는 기도'},
+  //     {'healing':'20. 몸이 아플 때 드리는 기도'},
+  //     {'spouse':'21. 부부간에 불화가 있을 때 드리는 기도'},
+  //     {'money':'22. 물질적인 어려움에 있을 때 드리는 기도'},
+  //     {'business':'23. 사업을 위한 기도'},
+  //     {'dawn':'24. 하루를 시작하며 드리는 기도'},
+  //     {'night':'25. 하루를 마감하며 드리는 기도'},
+  //     {'devil':'26. 마귀를 물리치는 기도'},
+  //     {'disease':'27. 질병을 치료하는 기도'}
+  //   ];
+  // }
 }
