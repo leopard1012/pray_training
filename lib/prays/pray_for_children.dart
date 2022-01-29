@@ -1,6 +1,9 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:pray_training/main_page.dart';
 import 'package:pray_training/pray_list.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sqflite/sqflite.dart';
 
 import '../bottom_navi.dart';
@@ -9,8 +12,9 @@ import '../params.dart';
 class PrayForChildren extends StatefulWidget {
   final Future<Database> db;
   List<Map<String,dynamic>> list;
+  Function callback;
 
-  PrayForChildren(this.db, this.list);
+  PrayForChildren(this.db, this.list, this.callback);
 
   @override
   State<StatefulWidget> createState() => _PrayForChildren();
@@ -40,28 +44,45 @@ class _PrayForChildren extends State<PrayForChildren> {
       ),
       drawer: PrayList(),
       bottomNavigationBar: BottomNavi(list, index),
-      body: Center(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(8.0),
-          scrollDirection: Axis.vertical,
-          child: FutureBuilder(
-              future: getPray(),
-              builder: (BuildContext context,
-                  AsyncSnapshot<List<TextSpan>> snapshot) {
-                return Text.rich(
-                    TextSpan(
-                      style: Theme
-                          .of(context)
-                          .textTheme
-                          .bodyText1!
-                          .copyWith(
-                          fontSize: 20, fontWeight: FontWeight.bold),
-                      children: snapshot.data,
-                    )
-                );
-              }
+      body: Column(
+        children: <Widget>[
+          Expanded(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.all(8.0),
+              scrollDirection: Axis.vertical,
+              child: FutureBuilder(
+                  future: getPray(),
+                  builder: (BuildContext context,
+                      AsyncSnapshot<List<TextSpan>> snapshot) {
+                    return Text.rich(
+                        TextSpan(
+                          style: Theme
+                              .of(context)
+                              .textTheme
+                              .bodyText1!
+                              .copyWith(
+                              fontSize: 20, fontWeight: FontWeight.bold),
+                          children: snapshot.data,
+                        )
+                    );
+                  }
+              ),
+            ),
           ),
-        ),
+          OutlinedButton(
+            onPressed: (){
+              _saveWinList(index);
+              Fluttertoast.showToast(msg: '기도승리');
+              if (index < 26) {
+                Navigator.pushReplacementNamed(context, '/' + list[index+1].keys.first);
+              }
+            },
+            child: Text("기도승리"),
+            style: OutlinedButton.styleFrom(
+              fixedSize: Size(300,10)
+            )
+          )
+        ]
       ),
     );
   }
@@ -207,47 +228,19 @@ class _PrayForChildren extends State<PrayForChildren> {
     return textSpanList;
   }
 
-  List<TextSpan> _getSpans(String text, String matchWord, TextStyle style) {
-    List<TextSpan> spans = [];
-    int spanBoundary = 0;
-
-    do {
-
-      // 전체 String 에서 키워드 검색
-      final startIndex = text.indexOf(matchWord, spanBoundary);
-
-      // 전체 String 에서 해당 키워드가 더 이상 없을때 마지막 KeyWord부터 끝까지의 TextSpan 추가
-      if (startIndex == -1) {
-        spans.add(TextSpan(text: text.substring(spanBoundary)));
-        return spans;
-      }
-
-      // 전체 String 사이에서 발견한 키워드들 사이의 text에 대한 textSpan 추가
-      if (startIndex > spanBoundary) {
-        print(text.substring(spanBoundary, startIndex));
-        spans.add(TextSpan(text: text.substring(spanBoundary, startIndex)));
-      }
-
-      // 검색하고자 했던 키워드에 대한 textSpan 추가
-      final endIndex = startIndex + matchWord.length;
-      final spanText = text.substring(startIndex, endIndex);
-      spans.add(TextSpan(text: spanText, style: style));
-
-      // mark the boundary to start the next search from
-      spanBoundary = endIndex;
-
-      // continue until there are no more matches
-    }
-    //String 전체 검사
-    while (spanBoundary < text.length);
-
-    return spans;
-  }
-
   int getIndex(List<Map<String,dynamic>> list, String pray) {
     for(int i = 0 ; i < list.length ; i++) {
       if(list[i].keys.first == pray) return i;
     }
     return -1;
+  }
+
+  _saveWinList(int index) async {
+    final prefs = await SharedPreferences.getInstance();
+    const key = 'winList';
+    List<String>? value = prefs.getStringList(key) ?? [];
+    value.add(index.toString());
+    prefs.setStringList(key, value);
+    widget.callback(value);
   }
 }

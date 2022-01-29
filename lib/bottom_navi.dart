@@ -36,7 +36,8 @@ class BottomNavi extends StatelessWidget {
             break;
           case 1:
             goMain = true;
-            Navigator.pushReplacementNamed(context, '/', arguments: 'MainPage');
+            // Navigator.pushReplacementNamed(context, '/', arguments: 'MainPage');
+            Navigator.pop(context, true);
             break;
           case 2:
             targetIdx = _index+1;

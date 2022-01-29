@@ -1,7 +1,9 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:pray_training/params.dart';
 import 'package:pray_training/pray_list.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sqflite/sqflite.dart';
 
 import '../bottom_navi.dart';
@@ -9,8 +11,9 @@ import '../bottom_navi.dart';
 class PrayForSpouse extends StatefulWidget {
   final Future<Database> db;
   List<Map<String,dynamic>> list;
+  Function callback;
 
-  PrayForSpouse(this.db, this.list);
+  PrayForSpouse(this.db, this.list, this.callback);
 
   @override
   State<StatefulWidget> createState() => _PrayForSpouse();
@@ -41,27 +44,44 @@ class _PrayForSpouse extends State<PrayForSpouse> {
       ),
       drawer: PrayList(),
       bottomNavigationBar: BottomNavi(list, index),
-      body: Center(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.all(8.0),
-              scrollDirection: Axis.vertical,
-              child: FutureBuilder(
-                future: getPray(),
-                builder: (BuildContext context, AsyncSnapshot<List<TextSpan>> snapshot) {
-                  return Text.rich(
-                      TextSpan(
-                        style: Theme
-                            .of(context)
-                            .textTheme
-                            .bodyText1!
-                            .copyWith(
-                            fontSize: 20, fontWeight: FontWeight.bold),
-                        children: snapshot.data,
-                      )
-                  );
+      body: Column(
+          children: <Widget>[
+          Expanded(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.all(8.0),
+                  scrollDirection: Axis.vertical,
+                  child: FutureBuilder(
+                    future: getPray(),
+                    builder: (BuildContext context, AsyncSnapshot<List<TextSpan>> snapshot) {
+                      return Text.rich(
+                          TextSpan(
+                            style: Theme
+                                .of(context)
+                                .textTheme
+                                .bodyText1!
+                                .copyWith(
+                                fontSize: 20, fontWeight: FontWeight.bold),
+                            children: snapshot.data,
+                          )
+                      );
+                    }
+                  ),
+                ),
+          ),
+          OutlinedButton(
+              onPressed: (){
+                _saveWinList(index);
+                Fluttertoast.showToast(msg: '기도승리');
+                if (index < 26) {
+                  Navigator.pushReplacementNamed(context, '/' + list[index+1].keys.first);
                 }
-              ),
-            ),
+              },
+              child: Text("기도승리"),
+              style: OutlinedButton.styleFrom(
+                  fixedSize: Size(300,10)
+              )
+          )
+        ]
       ),
     );
   }
@@ -194,5 +214,14 @@ class _PrayForSpouse extends State<PrayForSpouse> {
       if(list[i].keys.first == pray) return i;
     }
     return -1;
+  }
+
+  _saveWinList(int index) async {
+    final prefs = await SharedPreferences.getInstance();
+    const key = 'winList';
+    List<String>? value = prefs.getStringList(key) ?? [];
+    value.add(index.toString());
+    prefs.setStringList(key, value);
+    widget.callback(value);
   }
 }

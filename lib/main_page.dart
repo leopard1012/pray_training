@@ -3,7 +3,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:path/path.dart';
 import 'package:pray_training/params.dart';
-import 'package:pray_training/pray_list.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:drag_and_drop_gridview/devdrag.dart';
 import 'package:flutter/rendering.dart';
@@ -53,35 +52,47 @@ import 'confs/conf_personal_2.dart';
 import 'confs/conf_repentance.dart';
 import 'confs/conf_spouse.dart';
 import 'confs/conf_wife.dart';
-
-
+import 'main.dart';
 
 class MainPage extends StatefulWidget {
   final Future<Database> db;
   List<Map<String,dynamic>> list;
-  MainPage(this.db, this.list);
+  List<String> winList;
+  MainPage(this.db, this.list, this.winList);
 
   @override
   State<StatefulWidget> createState() => _MainPage();
 }
 
 class _MainPage extends State<MainPage> {
-  late List<Map<String,dynamic>> list = widget.list;
+  late List<Map<String, dynamic>> list = widget.list;
+  late List<String> winList = widget.winList;
 
   Future<List<Params>>? params;
 
   int pos = -1;
-  late List<Map<String,dynamic>> tmpList;
+  late List<Map<String, dynamic>> tmpList;
   ScrollController? _scrollController;
   int variableSet = 0;
   late double width;
   late double height;
 
+  // set mainPageWinList(List<String> wl) {
+  //   setState(() {
+  //     winList = wl;
+  //   });
+  // }
+
+  void callback(List<String> winList) {
+    setState(() {
+      this.winList = winList;
+    });
+  }
+
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-    // _readListMap();
     params = getParams();
     tmpList = [...list];
   }
@@ -100,33 +111,33 @@ class _MainPage extends State<MainPage> {
             primarySwatch: Colors.blue
         ),
         routes: {
-          '/homeland': (context) => PrayForHomeland(list),
-          '/church': (context) => PrayForChurch(database,list),
-          '/pastor': (context) => PrayForPastor(database,list),
-          '/cell': (context) => PrayForCell(database,list),
-          '/believer': (context) => PrayForBeliever(database,list),
-          '/person': (context) => PrayForPerson(database,list),
-          '/home': (context) => PrayForHome(database,list),
-          '/husband': (context) => PrayForHusband(database,list),
-          '/wife': (context) => PrayForWife(database,list),
-          '/parents': (context) => PrayForParents(database,list),
-          '/children': (context) => PrayForChildren(database,list),
-          '/personal_1': (context) => PrayForPersonal1(database,list),
-          '/personal_2': (context) => PrayForPersonal2(database,list),
-          '/repentance': (context) => PrayForRepentance(database,list),
-          '/spiritual_power': (context) => PrayForSpiritualPower(list),
-          '/temptations': (context) => PrayForTemptations(list),
-          '/tarry': (context) => PrayForTarry(list),
-          '/tired': (context) => PrayForTired(list),
-          '/thanks': (context) => PrayForThanks(list),
-          '/healing': (context) => PrayForHealing(list),
-          '/spouse': (context) => PrayForSpouse(database,list),
-          '/money': (context) => PrayForMoney(list),
-          '/business': (context) => PrayForBusiness(list),
-          '/dawn': (context) => PrayForDawn(list),
-          '/night': (context) => PrayForNight(list),
-          '/devil': (context) => PrayForDevil(database,list),
-          '/disease': (context) => PrayForDisease(database,list),
+          '/homeland': (context) => PrayForHomeland(list, callback),
+          '/church': (context) => PrayForChurch(database, list, callback),
+          '/pastor': (context) => PrayForPastor(database, list, callback),
+          '/cell': (context) => PrayForCell(database, list, callback),
+          '/believer': (context) => PrayForBeliever(database, list, callback),
+          '/person': (context) => PrayForPerson(database, list, callback),
+          '/home': (context) => PrayForHome(database, list, callback),
+          '/husband': (context) => PrayForHusband(database, list, callback),
+          '/wife': (context) => PrayForWife(database, list, callback),
+          '/parents': (context) => PrayForParents(database, list, callback),
+          '/children': (context) => PrayForChildren(database, list, callback),
+          '/personal_1': (context) => PrayForPersonal1(database, list, callback),
+          '/personal_2': (context) => PrayForPersonal2(database, list, callback),
+          '/repentance': (context) => PrayForRepentance(database, list, callback),
+          '/spiritual_power': (context) => PrayForSpiritualPower(list, callback),
+          '/temptations': (context) => PrayForTemptations(list, callback),
+          '/tarry': (context) => PrayForTarry(list, callback),
+          '/tired': (context) => PrayForTired(list, callback),
+          '/thanks': (context) => PrayForThanks(list, callback),
+          '/healing': (context) => PrayForHealing(list, callback),
+          '/spouse': (context) => PrayForSpouse(database, list, callback),
+          '/money': (context) => PrayForMoney(list, callback),
+          '/business': (context) => PrayForBusiness(list, callback),
+          '/dawn': (context) => PrayForDawn(list, callback),
+          '/night': (context) => PrayForNight(list, callback),
+          '/devil': (context) => PrayForDevil(database, list, callback),
+          '/disease': (context) => PrayForDisease(database, list, callback),
           '/conf/church': (context) => ConfChurch(database),
           '/conf/pastor': (context) => ConfPastor(database),
           '/conf/person': (context) => ConfPerson(database),
@@ -160,55 +171,61 @@ class _MainPage extends State<MainPage> {
                     crossAxisSpacing: 10,
                   ),
                   padding: const EdgeInsets.all(8.0),
-                  itemBuilder: (context, index) => Opacity(
-                      opacity: pos < 0 ? pos == index ? 0.6 : 1 : 1,
-                      child: Card(
-                        elevation: 2,
-                        child: LayoutBuilder(builder: (context, costrains) {
-                          if (variableSet == 0) {
-                            width = costrains.maxWidth;
-                            height = costrains.maxHeight;
-                            variableSet++;
-                          }
-                          return GridTile(
-                              child: GestureDetector(
-                                onTap: () {
-                                  Navigator.pushNamed(context, '/' + list[index].keys.first);
-                                },
-                                child: Container(
-                                  padding: const EdgeInsets.all(3.0),
-                                  decoration: BoxDecoration(
-                                      border: Border.all(
-                                          width: 2,
-                                          color: Colors.orange
-                                      )
-                                  ),
-                                  // color: Colors.redAccent,
-                                  child: Text(
-                                    list[index].values.first,
-                                    style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
-                                  ),
-                                ),
-                              )
-                          );
-                        }),
-                      )
-                  ),
+                  itemBuilder: (context, index) =>
+                      Opacity(
+                          opacity: pos < 0 ? pos == index ? 0.6 : 1 : 1,
+                          child: Card(
+                            elevation: 2,
+                            child: LayoutBuilder(builder: (context, costrains) {
+                              if (variableSet == 0) {
+                                width = costrains.maxWidth;
+                                height = costrains.maxHeight;
+                                variableSet++;
+                              }
+                              return GridTile(
+                                  child: GestureDetector(
+                                    onTap: () {
+                                      Navigator.pushNamed(context,
+                                          '/' + list[index].keys.first);
+                                    },
+                                    child: Container(
+                                      padding: const EdgeInsets.all(3.0),
+                                      decoration: BoxDecoration(
+                                          border: Border.all(
+                                              width: 2,
+                                              color: ((winList).contains(index.toString()))
+                                                  ? Colors.lightGreen
+                                                  : Colors.orange
+                                          )
+                                      ),
+                                      child: Text(
+                                        list[index].values.first,
+                                        style: const TextStyle(fontSize: 15,
+                                            fontWeight: FontWeight.bold),
+                                      ),
+                                    ),
+                                  )
+                              );
+                            }),
+                          )
+                      ),
                   onWillAccept: (oldIndex, newIndex) {
                     list = [...tmpList];
                     int indexOfFirstItem = list.indexOf(list[oldIndex]);
                     int indexOfSecondItem = list.indexOf(list[newIndex]);
 
                     if (indexOfFirstItem > indexOfSecondItem) {
-                      for (int i = list.indexOf(list[oldIndex]) ; i > list.indexOf(list[newIndex]) ; i--) {
-                        var tmp = list[i-1];
-                        list[i-1] = list[i];
+                      for (int i = list.indexOf(list[oldIndex]); i >
+                          list.indexOf(list[newIndex]); i--) {
+                        var tmp = list[i - 1];
+                        list[i - 1] = list[i];
                         list[i] = tmp;
                       }
                     } else {
-                      for (int i = list.indexOf(list[oldIndex]) ; i < list.indexOf(list[newIndex]) ; i++) {
-                        var tmp = list[i+1];
-                        list[i+1] = list[i];
+                      for (int i = list.indexOf(list[oldIndex]); i <
+                          list.indexOf(list[newIndex]); i++) {
+                        var tmp = list[i + 1];
+                        list[i + 1] = list[i];
                         list[i] = tmp;
                       }
                     }
@@ -224,15 +241,17 @@ class _MainPage extends State<MainPage> {
                     int indexOfSecondItem = list.indexOf(list[newIndex]);
 
                     if (indexOfFirstItem > indexOfSecondItem) {
-                      for (int i = list.indexOf(list[oldIndex]) ; i > list.indexOf(list[newIndex]) ; i--) {
-                        var tmp = list[i-1];
-                        list[i-1] = list[i];
+                      for (int i = list.indexOf(list[oldIndex]); i >
+                          list.indexOf(list[newIndex]); i--) {
+                        var tmp = list[i - 1];
+                        list[i - 1] = list[i];
                         list[i] = tmp;
                       }
                     } else {
-                      for (int i = list.indexOf(list[oldIndex]) ; i < list.indexOf(list[newIndex]) ; i++) {
-                        var tmp = list[i+1];
-                        list[i+1] = list[i];
+                      for (int i = list.indexOf(list[oldIndex]); i <
+                          list.indexOf(list[newIndex]); i++) {
+                        var tmp = list[i + 1];
+                        list[i + 1] = list[i];
                         list[i] = tmp;
                       }
                     }
@@ -244,14 +263,9 @@ class _MainPage extends State<MainPage> {
                   },
                 )
             )
-        )
+      )
     );
   }
-
-  // void _insertData(Params param) async {
-  //   final Database database = await widget.db;
-  //   await database.insert('params', param.toMap(), conflictAlgorithm: ConflictAlgorithm.replace);
-  // }
 
   Future<List<Params>> getParams() async {
     final Database database = await widget.db;
@@ -293,14 +307,6 @@ class _MainPage extends State<MainPage> {
     }
     return ret;
   }
-// // List<String>을 List<Map>으로 변환해주는 함수
-//   List<Map<String,String>> toListMap(List<String> data) {
-//     List<Map<String,String>> ret = [];
-//     for (int i = 0; i < data.length; i++) {
-//       ret.add(json.decode(data[i]));
-//     }
-//     return ret;
-//   }
 
 //로컬에 저장해주는 함수
   _saveListMap(List<Map<String,dynamic>> listMap) async {
@@ -309,55 +315,4 @@ class _MainPage extends State<MainPage> {
     final value = toStringList(listMap);
     prefs.setStringList(key, value);
   }
-
-// //로컬에 있는 데이터를 읽는 함수
-//   _readListMap() async {
-//     final prefs = await SharedPreferences.getInstance();
-//     const key = 'listMap';
-//     final value = prefs.getStringList(key);
-//     try {
-//       if (value!.isNotEmpty) {
-//         log("TEST Log1 : " + value[0]);
-//         list = toListMap(value);
-//         log("TEST Log1-1 : " + list[0].toString());
-//       } else {
-//         log("TEST Log2");
-//         list = getInitList();
-//       }
-//     } catch (e) {
-//       return 0;
-//     }
-//   }
-
-  // static List<Map<String,String>> getInitList() {
-  //   return [
-  //     {'homeland':'1. 나라를 위한 기도'},
-  //     {'church':'2. 교회를 위한 기도'},
-  //     {'pastor':'3. 담임목사님을 위한 기도'},
-  //     {'cell':'4. 목장과 목장원을 위한 기도'},
-  //     {'believer':'5. 태신자를 위한 기도'},
-  //     {'person':'6. 사람을 위한 기도'},
-  //     {'home':'7. 가정을 위한 기도'},
-  //     {'husband':'8. 남편을 위한 기도'},
-  //     {'wife':'9. 아내를 위한 기도'},
-  //     {'parents':'10. 부모님을 위한 기도'},
-  //     {'children':'11. 자녀를 위한 기도'},
-  //     {'personal_1':'12. 개인기도'},
-  //     {'personal_2':'13. 개인기도2'},
-  //     {'repentance':'14. 회개기도'},
-  //     {'spiritual_power':'15. 영적인 힘을 얻기 위한 기도'},
-  //     {'temptations':'16. 시험이 있을 때 드리는 기도'},
-  //     {'tarry':'17. 기도가 잘 되지 않을 때 드리는 기도'},
-  //     {'tired':'18. 삶에 지칠 때 드리는 기도'},
-  //     {'thanks':'19. 감사할 때 드리는 기도'},
-  //     {'healing':'20. 몸이 아플 때 드리는 기도'},
-  //     {'spouse':'21. 부부간에 불화가 있을 때 드리는 기도'},
-  //     {'money':'22. 물질적인 어려움에 있을 때 드리는 기도'},
-  //     {'business':'23. 사업을 위한 기도'},
-  //     {'dawn':'24. 하루를 시작하며 드리는 기도'},
-  //     {'night':'25. 하루를 마감하며 드리는 기도'},
-  //     {'devil':'26. 마귀를 물리치는 기도'},
-  //     {'disease':'27. 질병을 치료하는 기도'}
-  //   ];
-  // }
 }

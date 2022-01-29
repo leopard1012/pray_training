@@ -4,57 +4,9 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:path/path.dart';
-import 'package:pray_training/confs/conf_believer.dart';
-import 'package:pray_training/confs/conf_children.dart';
-import 'package:pray_training/confs/conf_church.dart';
-import 'package:pray_training/confs/conf_devil.dart';
-import 'package:pray_training/confs/conf_disease.dart';
-import 'package:pray_training/confs/conf_home.dart';
-import 'package:pray_training/confs/conf_husband.dart';
-import 'package:pray_training/confs/conf_parents.dart';
-import 'package:pray_training/confs/conf_personal_1.dart';
-import 'package:pray_training/confs/conf_personal_2.dart';
-import 'package:pray_training/confs/conf_repentance.dart';
-import 'package:pray_training/confs/conf_spouse.dart';
-import 'package:pray_training/confs/conf_wife.dart';
-import 'package:pray_training/params.dart';
-import 'dart:io';
-import 'package:pray_training/pray_list.dart';
-import 'package:pray_training/prays/pray_for_Tarry.dart';
-import 'package:pray_training/prays/pray_for_believer.dart';
-import 'package:pray_training/prays/pray_for_business.dart';
-import 'package:pray_training/prays/pray_for_cell.dart';
-import 'package:pray_training/prays/pray_for_children.dart';
-import 'package:pray_training/prays/pray_for_church.dart';
-import 'package:pray_training/prays/pray_for_dawn.dart';
-import 'package:pray_training/prays/pray_for_devil.dart';
-import 'package:pray_training/prays/pray_for_disease.dart';
-import 'package:pray_training/prays/pray_for_healing.dart';
-import 'package:pray_training/prays/pray_for_home.dart';
-import 'package:pray_training/prays/pray_for_homeland.dart';
-import 'package:pray_training/prays/pray_for_husband.dart';
-import 'package:pray_training/prays/pray_for_money.dart';
-import 'package:pray_training/prays/pray_for_night.dart';
-import 'package:pray_training/prays/pray_for_parents.dart';
-import 'package:pray_training/prays/pray_for_pastor.dart';
-import 'package:pray_training/prays/pray_for_person.dart';
-import 'package:pray_training/prays/pray_for_personal_1.dart';
-import 'package:pray_training/prays/pray_for_personal_2.dart';
-import 'package:pray_training/prays/pray_for_repentance.dart';
-import 'package:pray_training/prays/pray_for_spiritual_power.dart';
-import 'package:pray_training/prays/pray_for_spouse.dart';
-import 'package:pray_training/prays/pray_for_temptations.dart';
-import 'package:pray_training/prays/pray_for_thanks.dart';
-import 'package:pray_training/prays/pray_for_tired.dart';
-import 'package:pray_training/prays/pray_for_wife.dart';
 import 'package:sqflite/sqflite.dart';
-import 'package:flutter_native_splash/flutter_native_splash.dart';
-import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import 'confs/conf_cell.dart';
-import 'confs/conf_pastor.dart';
-import 'confs/conf_person.dart';
 import 'main_page.dart';
 
 void main() {
@@ -96,6 +48,8 @@ class MyApp extends StatelessWidget {
     {'disease':'27. 질병을 치료하는 기도'}
   ];
 
+  List<String> winList = [];
+
   @override
   Widget build(BuildContext context) {
     Future<Database> database = initDatabase();
@@ -105,6 +59,7 @@ class MyApp extends StatelessWidget {
       builder: (context, AsyncSnapshot snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           _readListMap();
+          _readWinList();
           return const MaterialApp(home: Splash());
         } else {
 
@@ -118,7 +73,7 @@ class MyApp extends StatelessWidget {
                 brightness: Brightness.dark,
                 primarySwatch: Colors.blue
             ),
-            home: MainPage(database, list),
+            home: MainPage(database, list, winList),
           );
         }
       },
@@ -156,6 +111,21 @@ class MyApp extends StatelessWidget {
         list = toListMap(value);
       } else {
         list = getInitList();
+      }
+    } catch (e) {
+      return 0;
+    }
+  }
+
+  _readWinList() async {
+    final prefs = await SharedPreferences.getInstance();
+    const key = 'winList';
+    final value = prefs.getStringList(key);
+    try {
+      if (value!.isNotEmpty) {
+        winList = value;
+      } else {
+        winList = [];
       }
     } catch (e) {
       return 0;
@@ -231,7 +201,7 @@ class Init {
     // This is where you can initialize the resources needed by your app while
     // the splash screen is displayed.  Remove the following example because
     // delaying the user experience is a bad design practice!
-    await Future.delayed(const Duration(seconds: 3));
+    await Future.delayed(const Duration(seconds: 2));
   }
 }
 
