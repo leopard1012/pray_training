@@ -49,6 +49,7 @@ class MyApp extends StatelessWidget {
   ];
 
   List<String> winList = [];
+  int winCounter = 0;
 
   @override
   Widget build(BuildContext context) {
@@ -73,7 +74,7 @@ class MyApp extends StatelessWidget {
                 brightness: Brightness.dark,
                 primarySwatch: Colors.blue
             ),
-            home: MainPage(database, list, winList),
+            home: MainPage(database, list, winList, winCounter),
           );
         }
       },
@@ -119,13 +120,18 @@ class MyApp extends StatelessWidget {
 
   _readWinList() async {
     final prefs = await SharedPreferences.getInstance();
-    const key = 'winList';
-    final value = prefs.getStringList(key);
+    const listKey = 'winList';
+    final value = prefs.getStringList(listKey);
+    final win = prefs.getInt('winCounter');
     try {
       if (value!.isNotEmpty) {
         winList = value;
       } else {
         winList = [];
+      }
+
+      if (win != null) {
+        winCounter = win;
       }
     } catch (e) {
       return 0;

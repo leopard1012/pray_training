@@ -58,7 +58,8 @@ class MainPage extends StatefulWidget {
   final Future<Database> db;
   List<Map<String,dynamic>> list;
   List<String> winList;
-  MainPage(this.db, this.list, this.winList);
+  int winCounter;
+  MainPage(this.db, this.list, this.winList, this.winCounter);
 
   @override
   State<StatefulWidget> createState() => _MainPage();
@@ -67,6 +68,7 @@ class MainPage extends StatefulWidget {
 class _MainPage extends State<MainPage> {
   late List<Map<String, dynamic>> list = widget.list;
   late List<String> winList = widget.winList;
+  late int winCounter = widget.winCounter;
 
   Future<List<Params>>? params;
 
@@ -160,108 +162,135 @@ class _MainPage extends State<MainPage> {
                 title: const Text('Main'),
                 automaticallyImplyLeading: false
             ),
-            body: Center(
-                child: DragAndDropGridView(
-                  controller: _scrollController,
-                  itemCount: 27,
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 3,
-                    childAspectRatio: 5 / 3,
-                    mainAxisSpacing: 10,
-                    crossAxisSpacing: 10,
+            body: Column(
+                children: <Widget> [
+                  Text('기도승리 $winCounter독'),
+                  Expanded(
+                    child: DragAndDropGridView(
+                      controller: _scrollController,
+                      itemCount: 27,
+                      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 3,
+                        childAspectRatio: 5 / 3,
+                        mainAxisSpacing: 10,
+                        crossAxisSpacing: 10,
+                      ),
+                      padding: const EdgeInsets.all(8.0),
+                      itemBuilder: (context, index) =>
+                          Opacity(
+                              opacity: pos < 0 ? pos == index ? 0.6 : 1 : 1,
+                              child: Card(
+                                elevation: 2,
+                                child: LayoutBuilder(builder: (context, costrains) {
+                                  if (variableSet == 0) {
+                                    width = costrains.maxWidth;
+                                    height = costrains.maxHeight;
+                                    variableSet++;
+                                  }
+                                  return GridTile(
+                                      child: GestureDetector(
+                                        onTap: () {
+                                          Navigator.pushNamed(context,
+                                              '/' + list[index].keys.first);
+                                        },
+                                        child: Container(
+                                          padding: const EdgeInsets.all(3.0),
+                                          decoration: BoxDecoration(
+                                              border: Border.all(
+                                                  width: 2,
+                                                  color: ((winList).contains(index.toString()))
+                                                      ? Colors.lightGreen
+                                                      : Colors.orange
+                                              )
+                                          ),
+                                          child: Text(
+                                            list[index].values.first,
+                                            style: const TextStyle(fontSize: 15,
+                                                fontWeight: FontWeight.bold),
+                                          ),
+                                        ),
+                                      )
+                                  );
+                                }),
+                              )
+                          ),
+                      onWillAccept: (oldIndex, newIndex) {
+                        list = [...tmpList];
+                        int indexOfFirstItem = list.indexOf(list[oldIndex]);
+                        int indexOfSecondItem = list.indexOf(list[newIndex]);
+
+                        if (indexOfFirstItem > indexOfSecondItem) {
+                          for (int i = list.indexOf(list[oldIndex]); i >
+                              list.indexOf(list[newIndex]); i--) {
+                            var tmp = list[i - 1];
+                            list[i - 1] = list[i];
+                            list[i] = tmp;
+                          }
+                        } else {
+                          for (int i = list.indexOf(list[oldIndex]); i <
+                              list.indexOf(list[newIndex]); i++) {
+                            var tmp = list[i + 1];
+                            list[i + 1] = list[i];
+                            list[i] = tmp;
+                          }
+                        }
+                        setState(() {
+                          pos = newIndex;
+                          _saveListMap(list);
+                        });
+                        return true;
+                      },
+                      onReorder: (oldIndex, newIndex) {
+                        list = [...tmpList];
+                        int indexOfFirstItem = list.indexOf(list[oldIndex]);
+                        int indexOfSecondItem = list.indexOf(list[newIndex]);
+
+                        if (indexOfFirstItem > indexOfSecondItem) {
+                          for (int i = list.indexOf(list[oldIndex]); i >
+                              list.indexOf(list[newIndex]); i--) {
+                            var tmp = list[i - 1];
+                            list[i - 1] = list[i];
+                            list[i] = tmp;
+                          }
+                        } else {
+                          for (int i = list.indexOf(list[oldIndex]); i <
+                              list.indexOf(list[newIndex]); i++) {
+                            var tmp = list[i + 1];
+                            list[i + 1] = list[i];
+                            list[i] = tmp;
+                          }
+                        }
+                        tmpList = [...list];
+                        setState(() {
+                          pos = -1;
+                          _saveListMap(list);
+                        });
+                      },
+                    )
                   ),
-                  padding: const EdgeInsets.all(8.0),
-                  itemBuilder: (context, index) =>
-                      Opacity(
-                          opacity: pos < 0 ? pos == index ? 0.6 : 1 : 1,
-                          child: Card(
-                            elevation: 2,
-                            child: LayoutBuilder(builder: (context, costrains) {
-                              if (variableSet == 0) {
-                                width = costrains.maxWidth;
-                                height = costrains.maxHeight;
-                                variableSet++;
-                              }
-                              return GridTile(
-                                  child: GestureDetector(
-                                    onTap: () {
-                                      Navigator.pushNamed(context,
-                                          '/' + list[index].keys.first);
-                                    },
-                                    child: Container(
-                                      padding: const EdgeInsets.all(3.0),
-                                      decoration: BoxDecoration(
-                                          border: Border.all(
-                                              width: 2,
-                                              color: ((winList).contains(index.toString()))
-                                                  ? Colors.lightGreen
-                                                  : Colors.orange
-                                          )
-                                      ),
-                                      child: Text(
-                                        list[index].values.first,
-                                        style: const TextStyle(fontSize: 15,
-                                            fontWeight: FontWeight.bold),
-                                      ),
-                                    ),
-                                  )
-                              );
-                            }),
+                  Row(
+                    children: <Widget>[
+                      OutlinedButton(
+                          onPressed: (){
+                            FlutterDialog(context, 'reset');
+                          },
+                          child: Text("초기화"),
+                          style: OutlinedButton.styleFrom(
+                              fixedSize: Size(100,10)
                           )
                       ),
-                  onWillAccept: (oldIndex, newIndex) {
-                    list = [...tmpList];
-                    int indexOfFirstItem = list.indexOf(list[oldIndex]);
-                    int indexOfSecondItem = list.indexOf(list[newIndex]);
-
-                    if (indexOfFirstItem > indexOfSecondItem) {
-                      for (int i = list.indexOf(list[oldIndex]); i >
-                          list.indexOf(list[newIndex]); i--) {
-                        var tmp = list[i - 1];
-                        list[i - 1] = list[i];
-                        list[i] = tmp;
-                      }
-                    } else {
-                      for (int i = list.indexOf(list[oldIndex]); i <
-                          list.indexOf(list[newIndex]); i++) {
-                        var tmp = list[i + 1];
-                        list[i + 1] = list[i];
-                        list[i] = tmp;
-                      }
-                    }
-                    setState(() {
-                      pos = newIndex;
-                      _saveListMap(list);
-                    });
-                    return true;
-                  },
-                  onReorder: (oldIndex, newIndex) {
-                    list = [...tmpList];
-                    int indexOfFirstItem = list.indexOf(list[oldIndex]);
-                    int indexOfSecondItem = list.indexOf(list[newIndex]);
-
-                    if (indexOfFirstItem > indexOfSecondItem) {
-                      for (int i = list.indexOf(list[oldIndex]); i >
-                          list.indexOf(list[newIndex]); i--) {
-                        var tmp = list[i - 1];
-                        list[i - 1] = list[i];
-                        list[i] = tmp;
-                      }
-                    } else {
-                      for (int i = list.indexOf(list[oldIndex]); i <
-                          list.indexOf(list[newIndex]); i++) {
-                        var tmp = list[i + 1];
-                        list[i + 1] = list[i];
-                        list[i] = tmp;
-                      }
-                    }
-                    tmpList = [...list];
-                    setState(() {
-                      pos = -1;
-                      _saveListMap(list);
-                    });
-                  },
-                )
+                      OutlinedButton(
+                          onPressed: (){
+                            FlutterDialog(context, 'win');
+                          },
+                          child: Text("1독"),
+                          style: OutlinedButton.styleFrom(
+                              fixedSize: Size(100,10)
+                          )
+                      )
+                    ]
+                  )
+              ]
             )
       )
     );
@@ -314,5 +343,52 @@ class _MainPage extends State<MainPage> {
     const key = 'listMap';
     final value = toStringList(listMap);
     prefs.setStringList(key, value);
+  }
+
+  _saveWinListReset() async {
+    final prefs = await SharedPreferences.getInstance();
+    const key = 'winList';
+    prefs.setStringList(key, []);
+    callback([]);
+  }
+
+  _saveWin() async {
+    final prefs = await SharedPreferences.getInstance();
+    const listKey = 'winList';
+    const countKey = 'winCounter';
+    prefs.setStringList(listKey, []);
+    prefs.setInt(countKey, winCounter+1);
+    setState(() {
+      winList = [];
+      winCounter += 1;
+    });
+  }
+
+  void FlutterDialog(BuildContext context, String type) {
+    showDialog(
+        context: context,
+        //barrierDismissible - Dialog를 제외한 다른 화면 터치 x
+        barrierDismissible: false,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text(type == 'reset' ? "기도승리 초기화" : "전체1독 승리"),
+            content: Text(type == 'reset' ? "기도승리 체크를 초기화 하시겠습니까?" : "전체1독 하셨나요?"),
+            actions: <Widget>[
+              FlatButton(
+                child: Text("네"),
+                onPressed: () {
+                  type == 'reset' ? _saveWinListReset() : _saveWin();
+                  Navigator.pop(context);
+                },
+              ),
+              FlatButton(
+                child: Text("아니요"),
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+              ),
+            ],
+          );
+        });
   }
 }
