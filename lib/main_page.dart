@@ -117,7 +117,7 @@ class _MainPage extends State<MainPage> {
           '/church': (context) => PrayForChurch(database, list, callback),
           '/pastor': (context) => PrayForPastor(database, list, callback),
           '/cell': (context) => PrayForCell(database, list, callback),
-          '/believer': (context) => PrayForBeliever(database, list, callback),
+          '/believer': (context) => PrayForBeliever(database, list, winList, callback),
           '/person': (context) => PrayForPerson(database, list, callback),
           '/home': (context) => PrayForHome(database, list, callback),
           '/husband': (context) => PrayForHusband(database, list, callback),
@@ -198,7 +198,7 @@ class _MainPage extends State<MainPage> {
                                           decoration: BoxDecoration(
                                               border: Border.all(
                                                   width: 2,
-                                                  color: ((winList).contains(index.toString()))
+                                                  color: ((winList).contains(list[index].keys.first))
                                                       ? Colors.lightGreen
                                                       : Colors.orange
                                               )

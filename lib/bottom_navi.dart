@@ -3,13 +3,6 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'main.dart';
 
 class BottomNavi extends StatelessWidget {
-  // SharedPreferences pref = SharedPreferences.getInstance() as SharedPreferences;
-  final _prayCodeList = ['',
-    'homeland','church','pastor','cell','believer','person','home','husband','wife',
-    'parents','children','personal_1','personal_2','repentance','spiritual_power','temptations','tarry','tired',
-    'thanks','healing','spouse','money','business','dawn','night','devil','disease'
-  ];
-
   List<Map<String,dynamic>> prayList = [];
 
   int _index = 0;

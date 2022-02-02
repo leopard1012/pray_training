@@ -1,19 +1,22 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:pray_training/pray_bottom_button.dart';
 import 'package:pray_training/pray_list.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sqflite/sqflite.dart';
 
 import '../bottom_navi.dart';
 import '../params.dart';
+import '../pray_body.dart';
 
 class PrayForBeliever extends StatefulWidget {
   final Future<Database> db;
   List<Map<String,dynamic>> list;
+  List<String> winList;
   Function callback;
 
-  PrayForBeliever(this.db, this.list, this.callback);
+  PrayForBeliever(this.db, this.list, this.winList, this.callback);
 
   @override
   State<StatefulWidget> createState() => _PrayForBeliever();
@@ -44,45 +47,7 @@ class _PrayForBeliever extends State<PrayForBeliever> {
       ),
       drawer: PrayList(),
       bottomNavigationBar: BottomNavi(list, index),
-      body: Column(
-          children: <Widget>[
-          Expanded(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.all(8.0),
-              scrollDirection: Axis.vertical,
-              child: FutureBuilder(
-                  future: getPray(),
-                  builder: (BuildContext context, AsyncSnapshot<List<TextSpan>> snapshot) {
-                    return Text.rich(
-                        TextSpan(
-                          style: Theme
-                              .of(context)
-                              .textTheme
-                              .bodyText1!
-                              .copyWith(
-                              fontSize: 20, fontWeight: FontWeight.bold),
-                          children: snapshot.data,
-                        )
-                    );
-                  }
-              ),
-            ),
-          ),
-          OutlinedButton(
-              onPressed: (){
-                _saveWinList(index);
-                Fluttertoast.showToast(msg: '기도승리');
-                if (index < 26) {
-                  Navigator.pushReplacementNamed(context, '/' + list[index+1].keys.first);
-                }
-              },
-              child: Text("기도승리"),
-              style: OutlinedButton.styleFrom(
-                  fixedSize: Size(300,10)
-              )
-          )
-        ]
-      ),
+      body: PrayBody(widget.winList, 'believer', 0, getPray(), widget.callback),
     );
   }
 
@@ -217,14 +182,5 @@ class _PrayForBeliever extends State<PrayForBeliever> {
       if(list[i].keys.first == pray) return i;
     }
     return -1;
-  }
-
-  _saveWinList(int index) async {
-    final prefs = await SharedPreferences.getInstance();
-    const key = 'winList';
-    List<String>? value = prefs.getStringList(key) ?? [];
-    value.add(index.toString());
-    prefs.setStringList(key, value);
-    widget.callback(value);
   }
 }
