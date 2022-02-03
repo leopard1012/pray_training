@@ -1,16 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'main.dart';
 
 class PrayBody extends StatefulWidget {
   List<String> winList;
   String pray;
-  int counter;
   Future<List<TextSpan>> prayContents;
   Function callback;
 
-  PrayBody(this.winList, this.pray, this.counter, this.prayContents, this.callback);
+  PrayBody(this.winList, this.pray, this.prayContents, this.callback);
 
   @override
   State<StatefulWidget> createState() => _PrayBody();
@@ -20,6 +17,7 @@ class _PrayBody extends State<PrayBody> {
   List<String> winList = [];
   String pray = '';
   int counter = 0;
+  bool isSwitched = false;
   late Future<List<TextSpan>> prayContents;
 
   final _inputTextController = TextEditingController();
@@ -30,14 +28,8 @@ class _PrayBody extends State<PrayBody> {
     super.initState();
     winList = widget.winList;
     pray = widget.pray;
-    counter = widget.counter;
     prayContents = widget.prayContents;
-
-    if (counter > 0) {
-      _inputTextController.text = counter.toString();
-    } else {
-      _inputTextController.text = '0';
-    }
+    isSwitched = winList.contains(pray) ? true : false;
   }
 
   @override
@@ -50,8 +42,6 @@ class _PrayBody extends State<PrayBody> {
   @override
   Widget build(BuildContext context) {
     // TODO: implement build
-    // var isSwitched = winList.contains(pray) ? true : false;
-    var isSwitched = false;
     return Column(
         children: <Widget>[
         Expanded(
@@ -77,41 +67,127 @@ class _PrayBody extends State<PrayBody> {
           ),
         ),
         Row(
-          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: <Widget>[
             Switch(
               value: isSwitched,
               onChanged: (value) {
                 setState(() {
                   isSwitched = value;
-                  // value = !isSwitched;
-
                 });
-                // _saveWinList(pray);
+                _saveWinList(pray);
               },
               activeColor: Colors.green,
             ),
-            FloatingActionButton(
-              child: Icon(Icons.remove),
-              onPressed: () {
-                setState(() {
-                  counter--;
-                });
-              }
+            SizedBox(
+              width: 50,
+              height: 30,
+              child: FloatingActionButton.extended(
+                label: Text('- 100'),
+                onPressed: () {
+                  setState(() {
+                    counter = counter - 100;
+                    counter = counter < 0 ? 0 : counter;
+                    _saveWinCounter(pray, counter);
+                  });
+                }
+              )
             ),
-            const SizedBox(
-              width: 100,
-              child: TextField(
-                keyboardType: TextInputType.number,
+            SizedBox(
+                width: 40,
+                height: 30,
+                child: FloatingActionButton.extended(
+                    label: Text('- 10'),
+                    onPressed: () {
+                      setState(() {
+                        counter = counter - 10;
+                        counter = counter < 0 ? 0 : counter;
+                        _saveWinCounter(pray, counter);
+                      });
+                    }
+                )
+            ),
+            SizedBox(
+                width: 30,
+                height: 30,
+                child: FloatingActionButton.extended(
+                    label: Text('- 1'),
+                    onPressed: () {
+                      setState(() {
+                        counter = counter - 1;
+                        counter = counter < 0 ? 0 : counter;
+                        _saveWinCounter(pray, counter);
+                      });
+                    }
+                )
+            ),
+            SizedBox(
+              width: 60,
+              // child: TextField(
+              //   keyboardType: TextInputType.number,
+              //   controller: _inputTextController,
+              //   // onChanged: _saveWinCounter(pray, int.parse(_inputTextController.text)),
+              //   onChanged: _saveWinCounter(pray, 1),
+              // ),
+              child: FutureBuilder(
+                  future: _loadWinCounter(pray),
+                  builder: (BuildContext context, AsyncSnapshot<int> snapshot) {
+                    counter = snapshot.data ?? 0;
+                    return Text(
+                      '${snapshot.data}',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    );
+                    // _inputTextController.text = '${snapshot.data}';
+                    // return TextField(
+                    //   keyboardType: TextInputType.number,
+                    //   controller: _inputTextController,
+                    //   onChanged: _saveWinCounter(pray, int.parse(_inputTextController.text)),
+                    // );
+                  }
               ),
             ),
-            FloatingActionButton(
-              child: Icon(Icons.add),
-              onPressed: () {
-                setState(() {
-                  counter++;
-                });
-              }
+            SizedBox(
+                width: 30,
+                height: 30,
+                child: FloatingActionButton.extended(
+                    label: Text('+ 1'),
+                    onPressed: () {
+                      setState(() {
+                        counter = counter + 1;
+                        counter = counter < 0 ? 0 : counter;
+                        _saveWinCounter(pray, counter);
+                      });
+                    }
+                )
+            ),
+            SizedBox(
+                width: 40,
+                height: 30,
+                child: FloatingActionButton.extended(
+                    label: Text('+ 10'),
+                    onPressed: () {
+                      setState(() {
+                        counter = counter + 10;
+                        counter = counter < 0 ? 0 : counter;
+                        _saveWinCounter(pray, counter);
+                      });
+                    }
+                )
+            ),
+            SizedBox(
+                width: 50,
+                height: 30,
+                child: FloatingActionButton.extended(
+                    label: Text('+ 100'),
+                    onPressed: () {
+                      setState(() {
+                        counter = counter + 100;
+                        counter = counter < 0 ? 0 : counter;
+                        _saveWinCounter(pray, counter);
+                      });
+                    }
+                )
             ),
           ],
         )
@@ -132,4 +208,21 @@ class _PrayBody extends State<PrayBody> {
     widget.callback(value);
   }
 
+  _saveWinCounter(String pray, int counter) async {
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    pref.setInt(pray, counter);
+  }
+
+  Future<int> _loadWinCounter(String pray) async {
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    var value = pref.getInt(pray) ?? 0;
+    setState(() {
+      // if (value == null) {
+      //   _inputTextController.text = '0';
+      // } else {
+      //   _inputTextController.text = value.toString();
+      // }
+    });
+    return value;
+  }
 }

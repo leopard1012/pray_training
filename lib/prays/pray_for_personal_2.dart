@@ -7,13 +7,15 @@ import 'package:sqflite/sqflite.dart';
 
 import '../bottom_navi.dart';
 import '../params.dart';
+import '../pray_body.dart';
 
 class PrayForPersonal2 extends StatefulWidget {
   final Future<Database> db;
   List<Map<String,dynamic>> list;
+  List<String> winList;
   Function callback;
 
-  PrayForPersonal2(this.db, this.list, this.callback);
+  PrayForPersonal2(this.db, this.list, this.winList, this.callback);
 
   @override
   State<StatefulWidget> createState() => _PrayForPersonal2();
@@ -43,46 +45,7 @@ class _PrayForPersonal2 extends State<PrayForPersonal2> {
       ),
       drawer: PrayList(),
       bottomNavigationBar: BottomNavi(list, index),
-      body: Column(
-          children: <Widget>[
-          Expanded(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.all(8.0),
-              scrollDirection: Axis.vertical,
-              child: FutureBuilder(
-                  future: getPray(),
-                  builder: (BuildContext context,
-                      AsyncSnapshot<List<TextSpan>> snapshot) {
-                    return Text.rich(
-                        TextSpan(
-                          style: Theme
-                              .of(context)
-                              .textTheme
-                              .bodyText1!
-                              .copyWith(
-                              fontSize: 20, fontWeight: FontWeight.bold),
-                          children: snapshot.data,
-                        )
-                    );
-                  }
-              ),
-            ),
-          ),
-          OutlinedButton(
-              onPressed: (){
-                _saveWinList(index);
-                Fluttertoast.showToast(msg: '기도승리');
-                if (index < 26) {
-                  Navigator.pushReplacementNamed(context, '/' + list[index+1].keys.first);
-                }
-              },
-              child: Text("기도승리"),
-              style: OutlinedButton.styleFrom(
-                  fixedSize: Size(300,10)
-              )
-          )
-        ]
-      ),
+      body: PrayBody(widget.winList, 'personal_2', getPray(), widget.callback),
     );
   }
 

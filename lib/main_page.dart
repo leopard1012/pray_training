@@ -113,33 +113,33 @@ class _MainPage extends State<MainPage> {
             primarySwatch: Colors.blue
         ),
         routes: {
-          '/homeland': (context) => PrayForHomeland(list, callback),
-          '/church': (context) => PrayForChurch(database, list, callback),
-          '/pastor': (context) => PrayForPastor(database, list, callback),
-          '/cell': (context) => PrayForCell(database, list, callback),
+          '/homeland': (context) => PrayForHomeland(list, winList, callback),
+          '/church': (context) => PrayForChurch(database, list, winList, callback),
+          '/pastor': (context) => PrayForPastor(database, list, winList, callback),
+          '/cell': (context) => PrayForCell(database, list, winList, callback),
           '/believer': (context) => PrayForBeliever(database, list, winList, callback),
-          '/person': (context) => PrayForPerson(database, list, callback),
-          '/home': (context) => PrayForHome(database, list, callback),
-          '/husband': (context) => PrayForHusband(database, list, callback),
-          '/wife': (context) => PrayForWife(database, list, callback),
-          '/parents': (context) => PrayForParents(database, list, callback),
-          '/children': (context) => PrayForChildren(database, list, callback),
-          '/personal_1': (context) => PrayForPersonal1(database, list, callback),
-          '/personal_2': (context) => PrayForPersonal2(database, list, callback),
-          '/repentance': (context) => PrayForRepentance(database, list, callback),
-          '/spiritual_power': (context) => PrayForSpiritualPower(list, callback),
-          '/temptations': (context) => PrayForTemptations(list, callback),
-          '/tarry': (context) => PrayForTarry(list, callback),
-          '/tired': (context) => PrayForTired(list, callback),
-          '/thanks': (context) => PrayForThanks(list, callback),
-          '/healing': (context) => PrayForHealing(list, callback),
-          '/spouse': (context) => PrayForSpouse(database, list, callback),
-          '/money': (context) => PrayForMoney(list, callback),
-          '/business': (context) => PrayForBusiness(list, callback),
-          '/dawn': (context) => PrayForDawn(list, callback),
-          '/night': (context) => PrayForNight(list, callback),
-          '/devil': (context) => PrayForDevil(database, list, callback),
-          '/disease': (context) => PrayForDisease(database, list, callback),
+          '/person': (context) => PrayForPerson(database, list, winList, callback),
+          '/home': (context) => PrayForHome(database, list, winList, callback),
+          '/husband': (context) => PrayForHusband(database, list, winList, callback),
+          '/wife': (context) => PrayForWife(database, list, winList, callback),
+          '/parents': (context) => PrayForParents(database, list, winList, callback),
+          '/children': (context) => PrayForChildren(database, list, winList, callback),
+          '/personal_1': (context) => PrayForPersonal1(database, list, winList, callback),
+          '/personal_2': (context) => PrayForPersonal2(database, list, winList, callback),
+          '/repentance': (context) => PrayForRepentance(database, list, winList, callback),
+          '/spiritual_power': (context) => PrayForSpiritualPower(list, winList, callback),
+          '/temptations': (context) => PrayForTemptations(list, winList, callback),
+          '/tarry': (context) => PrayForTarry(list, winList, callback),
+          '/tired': (context) => PrayForTired(list, winList, callback),
+          '/thanks': (context) => PrayForThanks(list, winList, callback),
+          '/healing': (context) => PrayForHealing(list, winList, callback),
+          '/spouse': (context) => PrayForSpouse(database, list, winList, callback),
+          '/money': (context) => PrayForMoney(list, winList, callback),
+          '/business': (context) => PrayForBusiness(list, winList, callback),
+          '/dawn': (context) => PrayForDawn(list, winList, callback),
+          '/night': (context) => PrayForNight(list, winList, callback),
+          '/devil': (context) => PrayForDevil(database, list, winList, callback),
+          '/disease': (context) => PrayForDisease(database, list, winList, callback),
           '/conf/church': (context) => ConfChurch(database),
           '/conf/pastor': (context) => ConfPastor(database),
           '/conf/person': (context) => ConfPerson(database),
@@ -164,7 +164,10 @@ class _MainPage extends State<MainPage> {
             ),
             body: Column(
                 children: <Widget> [
-                  Text('기도승리 $winCounter독'),
+                  Text(
+                    '기도승리 $winCounter독',
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+                  ),
                   Expanded(
                     child: DragAndDropGridView(
                       controller: _scrollController,
@@ -269,6 +272,7 @@ class _MainPage extends State<MainPage> {
                     )
                   ),
                   Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
                     children: <Widget>[
                       OutlinedButton(
                           onPressed: (){
@@ -276,16 +280,16 @@ class _MainPage extends State<MainPage> {
                           },
                           child: Text("초기화"),
                           style: OutlinedButton.styleFrom(
-                              fixedSize: Size(100,10)
+                              fixedSize: Size(150,10)
                           )
                       ),
                       OutlinedButton(
                           onPressed: (){
                             FlutterDialog(context, 'win');
                           },
-                          child: Text("1독"),
+                          child: Text("전체1독"),
                           style: OutlinedButton.styleFrom(
-                              fixedSize: Size(100,10)
+                              fixedSize: Size(150,10)
                           )
                       )
                     ]

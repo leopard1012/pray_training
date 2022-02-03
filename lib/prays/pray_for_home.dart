@@ -7,13 +7,15 @@ import 'package:sqflite/sqflite.dart';
 
 import '../bottom_navi.dart';
 import '../params.dart';
+import '../pray_body.dart';
 
 class PrayForHome extends StatefulWidget {
   final Future<Database> db;
   List<Map<String,dynamic>> list;
+  List<String> winList;
   Function callback;
 
-  PrayForHome(this.db, this.list, this.callback);
+  PrayForHome(this.db, this.list, this.winList, this.callback);
 
   @override
   State<StatefulWidget> createState() => _PrayForHome();
@@ -37,51 +39,14 @@ class _PrayForHome extends State<PrayForHome> {
   @override
   Widget build(BuildContext context) {
     // TODO: implement build
+    bool? isSwitched = false;
     return Scaffold(
       appBar: AppBar(
         title: Text('07. 가정을 위한 기도'),
       ),
       drawer: PrayList(),
       bottomNavigationBar: BottomNavi(list, index),
-      body: Column(
-          children: <Widget>[
-          Expanded(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.all(8.0),
-              scrollDirection: Axis.vertical,
-              child: FutureBuilder(
-                  future: getPray(),
-                  builder: (BuildContext context, AsyncSnapshot<List<TextSpan>> snapshot) {
-                    return Text.rich(
-                        TextSpan(
-                          style: Theme
-                              .of(context)
-                              .textTheme
-                              .bodyText1!
-                              .copyWith(
-                              fontSize: 20, fontWeight: FontWeight.bold),
-                          children: snapshot.data,
-                        )
-                    );
-                  }
-              ),
-            ),
-          ),
-          OutlinedButton(
-              onPressed: (){
-                _saveWinList(index);
-                Fluttertoast.showToast(msg: '기도승리');
-                if (index < 26) {
-                  Navigator.pushReplacementNamed(context, '/' + list[index+1].keys.first);
-                }
-              },
-              child: Text("기도승리"),
-              style: OutlinedButton.styleFrom(
-                  fixedSize: Size(300,10)
-              )
-          )
-        ]
-      ),
+      body: PrayBody(widget.winList, 'home', getPray(), widget.callback),
     );
   }
 

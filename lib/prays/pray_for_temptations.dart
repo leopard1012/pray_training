@@ -4,12 +4,14 @@ import 'package:pray_training/pray_list.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../bottom_navi.dart';
+import '../pray_body.dart';
 
 class PrayForTemptations extends StatefulWidget {
   List<Map<String, dynamic>> list;
+  List<String> winList;
   Function callback;
 
-  PrayForTemptations(this.list, this.callback);
+  PrayForTemptations(this.list, this.winList, this.callback);
 
   @override
   State<StatefulWidget> createState() => _PrayForTemptations();
@@ -36,45 +38,7 @@ class _PrayForTemptations extends State<PrayForTemptations> {
       ),
       drawer: PrayList(),
       bottomNavigationBar: BottomNavi(list, index),
-      body: Column(
-          children: <Widget>[
-          Expanded(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.all(8.0),
-              scrollDirection: Axis.vertical,
-              child: FutureBuilder(
-                  future: getPray(),
-                  builder: (BuildContext context, AsyncSnapshot<List<TextSpan>> snapshot) {
-                    return Text.rich(
-                        TextSpan(
-                          style: Theme
-                              .of(context)
-                              .textTheme
-                              .bodyText1!
-                              .copyWith(
-                              fontSize: 20, fontWeight: FontWeight.bold),
-                          children: snapshot.data,
-                        )
-                    );
-                  }
-              ),
-            ),
-          ),
-          OutlinedButton(
-              onPressed: (){
-                _saveWinList(index);
-                Fluttertoast.showToast(msg: '기도승리');
-                if (index < 26) {
-                  Navigator.pushReplacementNamed(context, '/' + list[index+1].keys.first);
-                }
-              },
-              child: Text("기도승리"),
-              style: OutlinedButton.styleFrom(
-                  fixedSize: Size(300,10)
-              )
-          )
-        ]
-      ),
+      body: PrayBody(widget.winList, 'temptations', getPray(), widget.callback),
     );
   }
 

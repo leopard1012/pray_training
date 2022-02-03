@@ -1,7 +1,6 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:pray_training/pray_bottom_button.dart';
 import 'package:pray_training/pray_list.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sqflite/sqflite.dart';
@@ -47,7 +46,7 @@ class _PrayForBeliever extends State<PrayForBeliever> {
       ),
       drawer: PrayList(),
       bottomNavigationBar: BottomNavi(list, index),
-      body: PrayBody(widget.winList, 'believer', 0, getPray(), widget.callback),
+      body: PrayBody(widget.winList, 'believer', getPray(), widget.callback),
     );
   }
 
