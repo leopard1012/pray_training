@@ -92,9 +92,9 @@ class _PrayForDevil extends State<PrayForDevil> {
     textSpanList.add(TextSpan(text: '계속하여 양식과 필요한 것들을 공급하여 주옵소서.\n'));
     textSpanList.add(TextSpan(text: '\n'));
     textSpanList.add(TextSpan(text: '5) 하나님! '));
-    textSpanList.add(TextSpan(text: target, style: TextStyle(color: Colors.blue), recognizer: TapGestureRecognizer()..onTapDown = (p) => {Navigator.pushNamed(context, '/conf/devil')} ));
+    textSpanList.add(TextSpan(text: target, style: TextStyle(color: Colors.blue) )); //, recognizer: TapGestureRecognizer()..onTapDown = (p) => {Navigator.pushNamed(context, '/conf/devil')} ));
     textSpanList.add(TextSpan(text: '의 '));
-    textSpanList.add(TextSpan(text: accident, style: TextStyle(color: Colors.blue), recognizer: TapGestureRecognizer()..onTapDown = (p) => {Navigator.pushNamed(context, '/conf/devil')} ));
+    textSpanList.add(TextSpan(text: accident, style: TextStyle(color: Colors.blue) )); //, recognizer: TapGestureRecognizer()..onTapDown = (p) => {Navigator.pushNamed(context, '/conf/devil')} ));
     textSpanList.add(TextSpan(text: '를 용서합니다.\n'));
     textSpanList.add(TextSpan(text: '예수님의 말씀에 순종하여 무조건 용서합니다.\n'));
     textSpanList.add(TextSpan(text: '그리고 그를 축복합니다.\n'));

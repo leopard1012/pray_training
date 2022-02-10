@@ -111,9 +111,9 @@ class _PrayForPersonal1 extends State<PrayForPersonal1> {
     textSpanList.add(TextSpan(text: '그들을 구원하시어 하나님의 일꾼으로 사용하여 주옵소서.\n'));
     textSpanList.add(TextSpan(text: '\n'));
     textSpanList.add(TextSpan(text: '5) 하나님! '));
-    textSpanList.add(TextSpan(text: target, style: TextStyle(color: Colors.blue), recognizer: TapGestureRecognizer()..onTapDown = (p) => {Navigator.pushNamed(context, '/conf/personal_1')} ));
+    textSpanList.add(TextSpan(text: target, style: TextStyle(color: Colors.blue) )); //, recognizer: TapGestureRecognizer()..onTapDown = (p) => {Navigator.pushNamed(context, '/conf/personal_1')} ));
     textSpanList.add(TextSpan(text: '의 '));
-    textSpanList.add(TextSpan(text: accident, style: TextStyle(color: Colors.blue), recognizer: TapGestureRecognizer()..onTapDown = (p) => {Navigator.pushNamed(context, '/conf/personal_1')} ));
+    textSpanList.add(TextSpan(text: accident, style: TextStyle(color: Colors.blue) )); //, recognizer: TapGestureRecognizer()..onTapDown = (p) => {Navigator.pushNamed(context, '/conf/personal_1')} ));
     textSpanList.add(TextSpan(text: '를 용서합니다.\n'));
     textSpanList.add(TextSpan(text: '나에게 상처를 주고 힘들게 했던 사람을 용서합니다.\n'));
     textSpanList.add(TextSpan(text: '나를 무시하고 멸시한 사람들을 용서합니다.\n'));

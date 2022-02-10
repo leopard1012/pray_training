@@ -79,11 +79,14 @@ class _MainPage extends State<MainPage> {
   late double width;
   late double height;
 
-  // set mainPageWinList(List<String> wl) {
-  //   setState(() {
-  //     winList = wl;
-  //   });
-  // }
+  final _inputTextController = TextEditingController();
+
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    _inputTextController.dispose();
+    super.dispose();
+  }
 
   void callback(List<String> winList) {
     setState(() {
@@ -159,14 +162,42 @@ class _MainPage extends State<MainPage> {
         },
         home: Scaffold(
             appBar: AppBar(
-                title: const Text('Main'),
+                title: const Text('기도훈련집'),
                 automaticallyImplyLeading: false
             ),
             body: Column(
+
                 children: <Widget> [
-                  Text(
-                    '기도승리 $winCounter독',
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                      Text(
+                        '기도승리',
+                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+                      ),
+                      SizedBox(
+                        width: 60,
+                        child: FutureBuilder(
+                            future: _loadWin(),
+                            builder: (BuildContext context, AsyncSnapshot<int> snapshot) {
+                              _inputTextController.text = '${snapshot.data}';
+                              return TextField(
+                                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+                                textAlign: TextAlign.end,
+                                keyboardType: TextInputType.number,
+                                controller: _inputTextController,
+                                onChanged: (text) {
+                                  _saveWin(int.parse(text));
+                                },
+                              );
+                            }
+                        ),
+                      ),
+                      Text(
+                        '독',
+                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+                      ),
+                    ]
                   ),
                   Expanded(
                     child: DragAndDropGridView(
@@ -272,24 +303,24 @@ class _MainPage extends State<MainPage> {
                     )
                   ),
                   Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      mainAxisAlignment: MainAxisAlignment.center,
                     children: <Widget>[
-                      OutlinedButton(
-                          onPressed: (){
-                            FlutterDialog(context, 'reset');
-                          },
-                          child: Text("초기화"),
-                          style: OutlinedButton.styleFrom(
-                              fixedSize: Size(150,10)
-                          )
-                      ),
+                      // OutlinedButton(
+                      //     onPressed: (){
+                      //       FlutterDialog(context, 'reset');
+                      //     },
+                      //     child: Text("초기화"),
+                      //     style: OutlinedButton.styleFrom(
+                      //         fixedSize: Size(150,10)
+                      //     )
+                      // ),
                       OutlinedButton(
                           onPressed: (){
                             FlutterDialog(context, 'win');
                           },
                           child: Text("전체1독"),
                           style: OutlinedButton.styleFrom(
-                              fixedSize: Size(150,10)
+                              fixedSize: Size(200,10)
                           )
                       )
                     ]
@@ -356,16 +387,25 @@ class _MainPage extends State<MainPage> {
     callback([]);
   }
 
-  _saveWin() async {
+  _saveWin(int cnt) async {
     final prefs = await SharedPreferences.getInstance();
     const listKey = 'winList';
     const countKey = 'winCounter';
-    prefs.setStringList(listKey, []);
-    prefs.setInt(countKey, winCounter+1);
-    setState(() {
-      winList = [];
-      winCounter += 1;
-    });
+    var prefInt = cnt == -1 ? winCounter+1 : cnt;
+    prefs.setInt(countKey, prefInt);
+    if (cnt == -1) {
+      prefs.setStringList(listKey, []);
+      setState(() {
+        winList = [];
+        winCounter = prefInt;
+      });
+    }
+  }
+
+  Future<int> _loadWin() async {
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    var value = pref.getInt('winCounter') ?? 0;
+    return value;
   }
 
   void FlutterDialog(BuildContext context, String type) {
@@ -381,7 +421,7 @@ class _MainPage extends State<MainPage> {
               FlatButton(
                 child: Text("네"),
                 onPressed: () {
-                  type == 'reset' ? _saveWinListReset() : _saveWin();
+                  type == 'reset' ? _saveWinListReset() : _saveWin(-1);
                   Navigator.pop(context);
                 },
               ),

@@ -189,7 +189,7 @@ class Splash extends StatelessWidget {
       body: Container(
         decoration: BoxDecoration(
           image: DecorationImage(
-            image: AssetImage('repo/screen.PNG'),
+            image: AssetImage('repo/imgmain_praytrainingbookN.png'),
             fit: BoxFit.cover
           )
         ),

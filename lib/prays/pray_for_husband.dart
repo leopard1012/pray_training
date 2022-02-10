@@ -79,8 +79,7 @@ class _PrayForHusband extends State<PrayForHusband> {
 
     List<TextSpan> textSpanList = [];
     textSpanList.add(TextSpan(text: '1) 하나님 아버지는 거룩하십니다.\n하나님 아버지의 이름이 남편('));
-    textSpanList.add(TextSpan(text: target, style: TextStyle(color: Colors.blue),
-        recognizer: TapGestureRecognizer()..onTapDown = (p) => {Navigator.pushNamed(context, '/conf/husband')} ));
+    textSpanList.add(TextSpan(text: target, style: TextStyle(color: Colors.blue) )); //, recognizer: TapGestureRecognizer()..onTapDown = (p) => {Navigator.pushNamed(context, '/conf/husband')} ));
     textSpanList.add(TextSpan(text: ')을(를) 통하여 거룩히 여김 받으시기를 원합니다.\n'));
     textSpanList.add(TextSpan(text: '그리고 남편이'));
     textSpanList.add(TextSpan(text: ' 하나님의 이름을 거룩히 여기는 일을 찾아서 하기를 원합니다.\n'));
@@ -100,8 +99,7 @@ class _PrayForHusband extends State<PrayForHusband> {
     textSpanList.add(TextSpan(text: '또 세상에서 살아가는데 필요한 것을 공급하여 주시기를 원합니다.\n'));
     textSpanList.add(TextSpan(text: '남편이 하는 일들을 축복하여 주옵소서.\n'));
     textSpanList.add(TextSpan(text: '큰 믿음과 건강을 주옵시며, 항상 하나님을 기쁘게 하는 사람이 되게 하옵소서.\n\n'));
-    textSpanList.add(TextSpan(text: withPray, style: TextStyle(color: Colors.blue),
-        recognizer: TapGestureRecognizer()..onTapDown = (p) => {Navigator.pushNamed(context, '/conf/husband')} ));
+    textSpanList.add(TextSpan(text: withPray, style: TextStyle(color: Colors.blue) )); //, recognizer: TapGestureRecognizer()..onTapDown = (p) => {Navigator.pushNamed(context, '/conf/husband')} ));
     textSpanList.add(TextSpan(text: '\n남편에게 풍성한 물질을 주셔서 하나님을 위하여 언제나 마음껏 드리게 하옵시며 교회에서 모범적으로 충성하고 헌신하는 사람이 되게 하옵소서.'));
     textSpanList.add(TextSpan(text: '\n목사님께 순종하며 섬기는 믿음을 주옵시고, 성도를 사랑하며 겸손히 섬기는 신앙을 주옵소서.'));
     textSpanList.add(TextSpan(text: '\n가정에 충실하고 믿음의 제사장이 되어 가정을 신앙으로 이끌게 하옵소서.'));

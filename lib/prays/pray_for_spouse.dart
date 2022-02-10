@@ -160,7 +160,7 @@ class _PrayForSpouse extends State<PrayForSpouse> {
       // 검색하고자 했던 키워드에 대한 textSpan 추가
       final endIndex = startIndex + matchWord.length;
       final spanText = text.substring(startIndex, endIndex);
-      spans.add(TextSpan(text: spanText, style: style, recognizer: recognizer));
+      spans.add(TextSpan(text: spanText, style: style)); //, recognizer: recognizer));
 
       // mark the boundary to start the next search from
       spanBoundary = endIndex;

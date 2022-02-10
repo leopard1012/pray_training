@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_switch/flutter_switch.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class PrayBody extends StatefulWidget {
@@ -19,6 +20,7 @@ class _PrayBody extends State<PrayBody> {
   int counter = 0;
   bool isSwitched = false;
   late Future<List<TextSpan>> prayContents;
+  List<String> confList = ['believer','cell','children','church','devil','disease','home','husband','parents','pastor','person','personal_1','personal_2','repentance','spouse','wife'];
 
   final _inputTextController = TextEditingController();
 
@@ -67,132 +69,112 @@ class _PrayBody extends State<PrayBody> {
           ),
         ),
         Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            Switch(
-              value: isSwitched,
-              onChanged: (value) {
-                setState(() {
-                  isSwitched = value;
-                });
-                _saveWinList(pray);
-              },
-              activeColor: Colors.green,
-            ),
-            SizedBox(
-              width: 50,
-              height: 30,
-              child: FloatingActionButton.extended(
-                label: Text('- 100'),
-                onPressed: () {
+            _inputButton(confList.contains(pray)),
+            Padding(
+            padding: EdgeInsets.fromLTRB(20, 0, 10, 0),
+              child: FlutterSwitch(
+                value: isSwitched,
+                onToggle: (value) {
                   setState(() {
-                    counter = counter - 100;
-                    counter = counter < 0 ? 0 : counter;
-                    _saveWinCounter(pray, counter);
+                    isSwitched = value;
                   });
-                }
+                  _saveWinList(pray);
+                },
+                activeColor: Colors.green,
+              ),
+            ),
+            Padding(
+              padding: EdgeInsets.fromLTRB(30, 0, 10, 0),
+                child: SizedBox(
+                  width: 30,
+                  height: 30,
+                  child: FloatingActionButton(
+                      child: Icon(Icons.remove),
+                      onPressed: () {
+                        setState(() {
+                          counter = counter - 1;
+                          counter = counter < 0 ? 0 : counter;
+                          _inputTextController.text = '$counter';
+                          _saveWinCounter(pray, counter);
+                        });
+                      }
+                  )
               )
             ),
             SizedBox(
-                width: 40,
-                height: 30,
-                child: FloatingActionButton.extended(
-                    label: Text('- 10'),
-                    onPressed: () {
-                      setState(() {
-                        counter = counter - 10;
-                        counter = counter < 0 ? 0 : counter;
-                        _saveWinCounter(pray, counter);
-                      });
-                    }
-                )
-            ),
-            SizedBox(
-                width: 30,
-                height: 30,
-                child: FloatingActionButton.extended(
-                    label: Text('- 1'),
-                    onPressed: () {
-                      setState(() {
-                        counter = counter - 1;
-                        counter = counter < 0 ? 0 : counter;
-                        _saveWinCounter(pray, counter);
-                      });
-                    }
-                )
-            ),
-            SizedBox(
-              width: 60,
-              // child: TextField(
-              //   keyboardType: TextInputType.number,
-              //   controller: _inputTextController,
-              //   // onChanged: _saveWinCounter(pray, int.parse(_inputTextController.text)),
-              //   onChanged: _saveWinCounter(pray, 1),
-              // ),
+              width: 50,
               child: FutureBuilder(
                   future: _loadWinCounter(pray),
                   builder: (BuildContext context, AsyncSnapshot<int> snapshot) {
                     counter = snapshot.data ?? 0;
-                    return Text(
-                      '${snapshot.data}',
+                    // return Text(
+                    //   '${snapshot.data}',
+                    //   textAlign: TextAlign.center,
+                    //   style: TextStyle(fontWeight: FontWeight.bold),
+                    // );
+                    _inputTextController.text = '${snapshot.data}';
+                    return TextField(
                       textAlign: TextAlign.center,
-                      style: TextStyle(fontWeight: FontWeight.bold),
+                      keyboardType: TextInputType.number,
+                      // controller: _inputTextController.text = counter.toString(),
+                      // controller: _inputTextController..text = '$counter',
+                      controller: _inputTextController,
+                      onChanged: (text) {
+                        _saveWinCounter(pray, int.parse(text));
+                      },
                     );
-                    // _inputTextController.text = '${snapshot.data}';
-                    // return TextField(
-                    //   keyboardType: TextInputType.number,
-                    //   controller: _inputTextController,
-                    //   onChanged: _saveWinCounter(pray, int.parse(_inputTextController.text)),
+                    // return TextFormField(
+                    //   initialValue: '$counter',
                     // );
                   }
               ),
             ),
-            SizedBox(
-                width: 30,
-                height: 30,
-                child: FloatingActionButton.extended(
-                    label: Text('+ 1'),
-                    onPressed: () {
-                      setState(() {
-                        counter = counter + 1;
-                        counter = counter < 0 ? 0 : counter;
-                        _saveWinCounter(pray, counter);
-                      });
-                    }
-                )
-            ),
-            SizedBox(
-                width: 40,
-                height: 30,
-                child: FloatingActionButton.extended(
-                    label: Text('+ 10'),
-                    onPressed: () {
-                      setState(() {
-                        counter = counter + 10;
-                        counter = counter < 0 ? 0 : counter;
-                        _saveWinCounter(pray, counter);
-                      });
-                    }
-                )
-            ),
-            SizedBox(
-                width: 50,
-                height: 30,
-                child: FloatingActionButton.extended(
-                    label: Text('+ 100'),
-                    onPressed: () {
-                      setState(() {
-                        counter = counter + 100;
-                        counter = counter < 0 ? 0 : counter;
-                        _saveWinCounter(pray, counter);
-                      });
-                    }
-                )
+            Padding(
+              padding: EdgeInsets.fromLTRB(10, 0, 30, 0),
+              child: SizedBox(
+                  width: 30,
+                  height: 30,
+                  child: FloatingActionButton(
+                      child: Icon(Icons.add),
+                      onPressed: () {
+                        setState(() {
+                          counter = counter + 1;
+                          counter = counter < 0 ? 0 : counter;
+                          _inputTextController.text = '$counter';
+                          _saveWinCounter(pray, counter);
+                        });
+                      }
+                  )
+              ),
             ),
           ],
         )
       ]
     );
+  }
+
+  Widget _inputButton(bool contains) {
+    if (contains) {
+      return Padding(
+          padding: EdgeInsets.fromLTRB(10, 0, 0, 0),
+          child: OutlinedButton(
+            // backgroundColor: Colors.grey,
+            style: OutlinedButton.styleFrom(side: BorderSide(color:Colors.blue)),
+            child: Text("기도\n입력", style: TextStyle(color: Colors.blue, fontWeight: FontWeight.bold),),
+            onPressed: () {
+              if (confList.contains(pray)) {
+                Navigator.pushNamed(context, '/conf/' + pray);
+              }
+            },
+          )
+      );
+    } else {
+      return Padding(
+        padding: EdgeInsets.fromLTRB(10, 0, 0, 0),
+      );
+    }
   }
 
   _saveWinList(String pray) async {
@@ -216,13 +198,6 @@ class _PrayBody extends State<PrayBody> {
   Future<int> _loadWinCounter(String pray) async {
     SharedPreferences pref = await SharedPreferences.getInstance();
     var value = pref.getInt(pray) ?? 0;
-    setState(() {
-      // if (value == null) {
-      //   _inputTextController.text = '0';
-      // } else {
-      //   _inputTextController.text = value.toString();
-      // }
-    });
     return value;
   }
 }
