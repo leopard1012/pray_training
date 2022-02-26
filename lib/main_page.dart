@@ -35,6 +35,7 @@ import 'package:pray_training/prays/pray_for_temptations.dart';
 import 'package:pray_training/prays/pray_for_thanks.dart';
 import 'package:pray_training/prays/pray_for_tired.dart';
 import 'package:pray_training/prays/pray_for_wife.dart';
+import 'package:pray_training/link_list.dart';
 
 import 'confs/conf_believer.dart';
 import 'confs/conf_cell.dart';
@@ -163,8 +164,10 @@ class _MainPage extends State<MainPage> {
         home: Scaffold(
             appBar: AppBar(
                 title: const Text('기도훈련집'),
-                automaticallyImplyLeading: false
+                // automaticallyImplyLeading: false
             ),
+            drawer: LinkList(),
+            // bottomNavigationBar: SelectBottom(0),
             body: Column(
 
                 children: <Widget> [
