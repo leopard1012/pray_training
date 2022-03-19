@@ -14,22 +14,11 @@ class PrayList extends StatelessWidget {
               Icons.adjust,
               color: Colors.grey[850],
             ),
-            title: Text('MainPage'),
-            onTap: () {
-              Navigator.popAndPushNamed(context, '/', arguments: 'MainPage');
-            },
-            trailing: Icon(Icons.arrow_forward_ios),
-          ),
-          ListTile(
-            leading: Icon(
-              Icons.adjust,
-              color: Colors.grey[850],
-            ),
             title: Text('01. 나라를 위한 기도'),
             onTap: () {
               // Navigator.of(context).pushNamed(context, '/nation', arguments: '나라를 위한 기도');
               // Navigator.pushReplacementNamed(context, '/nation', arguments: '나라를 위한 기도');
-              Navigator.popAndPushNamed(context, '/homeland', arguments: '나라를 위한 기도');
+              Navigator.pushReplacementNamed(context, '/homeland', arguments: '나라를 위한 기도');
             },
             trailing: Icon(Icons.arrow_forward_ios),
           ),
@@ -41,7 +30,7 @@ class PrayList extends StatelessWidget {
             title: Text('02. 교회를 위한 기도'),
             onTap: () {
               // Navigator.of(context).pushReplacementNamed('/church', arguments: '교회를 위한 기도');\
-              Navigator.popAndPushNamed(context, '/church', arguments: '교회를 위한 기도');
+              Navigator.pushReplacementNamed(context, '/church', arguments: '교회를 위한 기도');
             },
             trailing: Icon(Icons.arrow_forward_ios),
           ),
@@ -52,7 +41,7 @@ class PrayList extends StatelessWidget {
             ),
             title: Text('03. 담임목사님을 위한 기도'),
             onTap: () {
-              Navigator.popAndPushNamed(context, '/pastor');
+              Navigator.pushReplacementNamed(context, '/pastor');
             },
             trailing: Icon(Icons.arrow_forward_ios),
           ),
@@ -63,7 +52,7 @@ class PrayList extends StatelessWidget {
             ),
             title: Text('04. 목장과 목장원을 위한 기도'),
             onTap: () {
-              Navigator.popAndPushNamed(context, '/cell');
+              Navigator.pushReplacementNamed(context, '/cell');
             },
             trailing: Icon(Icons.arrow_forward_ios),
           ),
@@ -74,7 +63,7 @@ class PrayList extends StatelessWidget {
             ),
             title: Text('05. 태신자를 위한 기도'),
             onTap: () {
-              Navigator.popAndPushNamed(context, '/believer');
+              Navigator.pushReplacementNamed(context, '/believer');
             },
             trailing: Icon(Icons.arrow_forward_ios),
           ),
@@ -85,7 +74,7 @@ class PrayList extends StatelessWidget {
             ),
             title: Text('06. 사람을 위한 기도'),
             onTap: () {
-              Navigator.popAndPushNamed(context, '/person');
+              Navigator.pushReplacementNamed(context, '/person');
             },
             trailing: Icon(Icons.arrow_forward_ios),
           ),
@@ -96,7 +85,7 @@ class PrayList extends StatelessWidget {
             ),
             title: Text('07. 가정을 위한 기도'),
             onTap: () {
-              Navigator.popAndPushNamed(context, '/home');
+              Navigator.pushReplacementNamed(context, '/home');
             },
             trailing: Icon(Icons.arrow_forward_ios),
           ),
@@ -107,7 +96,7 @@ class PrayList extends StatelessWidget {
             ),
             title: Text('08. 남편을 위한 기도'),
             onTap: () {
-              Navigator.popAndPushNamed(context, '/husband');
+              Navigator.pushReplacementNamed(context, '/husband');
             },
             trailing: Icon(Icons.arrow_forward_ios),
           ),
@@ -118,7 +107,7 @@ class PrayList extends StatelessWidget {
             ),
             title: Text('09. 아내를 위한 기도'),
             onTap: () {
-              Navigator.popAndPushNamed(context, '/wife');
+              Navigator.pushReplacementNamed(context, '/wife');
             },
             trailing: Icon(Icons.arrow_forward_ios),
           ),
@@ -129,7 +118,7 @@ class PrayList extends StatelessWidget {
             ),
             title: Text('10. 부모님을 위한 기도'),
             onTap: () {
-              Navigator.popAndPushNamed(context, '/parents');
+              Navigator.pushReplacementNamed(context, '/parents');
             },
             trailing: Icon(Icons.arrow_forward_ios),
           ),
@@ -140,7 +129,7 @@ class PrayList extends StatelessWidget {
             ),
             title: Text('11. 자녀를 위한 기도'),
             onTap: () {
-              Navigator.popAndPushNamed(context, '/children');
+              Navigator.pushReplacementNamed(context, '/children');
             },
             trailing: Icon(Icons.arrow_forward_ios),
           ),
@@ -151,7 +140,7 @@ class PrayList extends StatelessWidget {
             ),
             title: Text('12. 개인기도1'),
             onTap: () {
-              Navigator.popAndPushNamed(context, '/personal_1');
+              Navigator.pushReplacementNamed(context, '/personal_1');
             },
             trailing: Icon(Icons.arrow_forward_ios),
           ),
@@ -162,7 +151,7 @@ class PrayList extends StatelessWidget {
             ),
             title: Text('13. 개인기도2'),
             onTap: () {
-              Navigator.popAndPushNamed(context, '/personal_2');
+              Navigator.pushReplacementNamed(context, '/personal_2');
             },
             trailing: Icon(Icons.arrow_forward_ios),
           ),
@@ -173,7 +162,7 @@ class PrayList extends StatelessWidget {
             ),
             title: Text('14. 회개기도'),
             onTap: () {
-              Navigator.popAndPushNamed(context, '/repentance');
+              Navigator.pushReplacementNamed(context, '/repentance');
             },
             trailing: Icon(Icons.arrow_forward_ios),
           ),
@@ -184,7 +173,7 @@ class PrayList extends StatelessWidget {
             ),
             title: Text('15. 영적인 힘을 얻기 위한 기도'),
             onTap: () {
-              Navigator.popAndPushNamed(context, '/spiritual_power');
+              Navigator.pushReplacementNamed(context, '/spiritual_power');
             },
             trailing: Icon(Icons.arrow_forward_ios),
           ),
@@ -195,7 +184,7 @@ class PrayList extends StatelessWidget {
             ),
             title: Text('16. 시험이 있을 때 드리는 기도'),
             onTap: () {
-              Navigator.popAndPushNamed(context, '/temtations');
+              Navigator.pushReplacementNamed(context, '/temptations');
             },
             trailing: Icon(Icons.arrow_forward_ios),
           ),
@@ -206,7 +195,7 @@ class PrayList extends StatelessWidget {
             ),
             title: Text('17. 기도가 잘 되지 않을 때 드리는 기도'),
             onTap: () {
-              Navigator.popAndPushNamed(context, '/tarry');
+              Navigator.pushReplacementNamed(context, '/tarry');
             },
             trailing: Icon(Icons.arrow_forward_ios),
           ),
@@ -217,7 +206,7 @@ class PrayList extends StatelessWidget {
             ),
             title: Text('18. 삶에 지칠 때 드리는 기도'),
             onTap: () {
-              Navigator.popAndPushNamed(context, '/tired');
+              Navigator.pushReplacementNamed(context, '/tired');
             },
             trailing: Icon(Icons.arrow_forward_ios),
           ),
@@ -228,7 +217,7 @@ class PrayList extends StatelessWidget {
             ),
             title: Text('19. 감사할 때 드리는 기도'),
             onTap: () {
-              Navigator.popAndPushNamed(context, '/thanks');
+              Navigator.pushReplacementNamed(context, '/thanks');
             },
             trailing: Icon(Icons.arrow_forward_ios),
           ),
@@ -239,7 +228,7 @@ class PrayList extends StatelessWidget {
             ),
             title: Text('20. 몸이 아플 때 드리는 기도'),
             onTap: () {
-              Navigator.popAndPushNamed(context, '/healing');
+              Navigator.pushReplacementNamed(context, '/healing');
             },
             trailing: Icon(Icons.arrow_forward_ios),
           ),
@@ -250,7 +239,7 @@ class PrayList extends StatelessWidget {
             ),
             title: Text('21. 부부간에 불화가 있을 때 드리는 기도'),
             onTap: () {
-              Navigator.popAndPushNamed(context, '/spouse' ,arguments: '아내');//pref.get('/spouse'));
+              Navigator.pushReplacementNamed(context, '/spouse' ,arguments: '아내');//pref.get('/spouse'));
             },
             trailing: Icon(Icons.arrow_forward_ios),
           ),
@@ -261,7 +250,7 @@ class PrayList extends StatelessWidget {
             ),
             title: Text('22. 물질적인 어려움에 있을 때 드리는 기도'),
             onTap: () {
-              Navigator.popAndPushNamed(context, '/money');
+              Navigator.pushReplacementNamed(context, '/money');
             },
             trailing: Icon(Icons.arrow_forward_ios),
           ),
@@ -272,7 +261,7 @@ class PrayList extends StatelessWidget {
             ),
             title: Text('23. 사업을 위한 기도'),
             onTap: () {
-              Navigator.popAndPushNamed(context, '/business');
+              Navigator.pushReplacementNamed(context, '/business');
             },
             trailing: Icon(Icons.arrow_forward_ios),
           ),
@@ -283,7 +272,7 @@ class PrayList extends StatelessWidget {
             ),
             title: Text('24. 하루를 시작하며 드리는 기도'),
             onTap: () {
-              Navigator.popAndPushNamed(context, '/dawn');
+              Navigator.pushReplacementNamed(context, '/dawn');
             },
             trailing: Icon(Icons.arrow_forward_ios),
           ),
@@ -294,7 +283,7 @@ class PrayList extends StatelessWidget {
             ),
             title: Text('25. 하루를 마감하며 드리는 기도'),
             onTap: () {
-              Navigator.popAndPushNamed(context, '/night');
+              Navigator.pushReplacementNamed(context, '/night');
             },
             trailing: Icon(Icons.arrow_forward_ios),
           ),
@@ -305,7 +294,7 @@ class PrayList extends StatelessWidget {
             ),
             title: Text('26. 마귀를 물리치는 기도'),
             onTap: () {
-              Navigator.popAndPushNamed(context, '/devil');
+              Navigator.pushReplacementNamed(context, '/devil');
             },
             trailing: Icon(Icons.arrow_forward_ios),
           ),
@@ -316,7 +305,7 @@ class PrayList extends StatelessWidget {
             ),
             title: Text('27. 질병을 치료하는 기도'),
             onTap: () {
-              Navigator.popAndPushNamed(context, '/disease');
+              Navigator.pushReplacementNamed(context, '/disease');
             },
             trailing: Icon(Icons.arrow_forward_ios),
           ),

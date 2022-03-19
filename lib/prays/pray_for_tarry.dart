@@ -1,11 +1,49 @@
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:pray_training/pray_list.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-class PrayForTarry extends StatelessWidget {
+import '../bottom_navi.dart';
+import '../pray_body.dart';
+
+class PrayForTarry extends StatefulWidget {
+  List<Map<String, dynamic>> list;
+  List<String> winList;
+  Function callback;
+
+  PrayForTarry(this.list, this.winList, this.callback);
+
+  @override
+  State<StatefulWidget> createState() => _PrayForTarry();
+}
+
+class _PrayForTarry extends State<PrayForTarry> {
+  late List<Map<String,dynamic>> list;
+  int index = -1;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    list = widget.list;
+    index = getIndex(list, 'tarry');
+  }
+
   @override
   Widget build(BuildContext context) {
     // TODO: implement build
-    final Object? args = ModalRoute.of(context)!.settings.arguments;
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('17. 기도가 잘 되지 않을 때 드리는 기도'),
+      ),
+      drawer: PrayList(),
+      bottomNavigationBar: BottomNavi(list, index),
+      body: PrayBody(widget.winList, 'tarry', getPray(), widget.callback),
+    );
+  }
+
+  Future<List<TextSpan>> getPray() async {
+    String? param = 'NONE';
 
     final String prayContent =
         '1) 하나님은 거룩하신 분이십니다.\n'
@@ -17,9 +55,9 @@ class PrayForTarry extends StatelessWidget {
         '3) 하나님의 뜻이 하늘에서 이루어진 것 같이 나를 통하여 이 땅에서 이루어지기를 원합니다.\n'
         '\n'
         '4) 기도를 통해 하나님과의 대화의 길을 열어주신 주님, 기도의 말문이 막혀 기도하지 못하는 나의 입술을 열어 주시기를 간구합니다.\n'
-        '바쁘다는 핑꼐, 시간이 없다는 이유로, 여러 가지 다른 이유를 대고 하나님과 대화하는 기도 시간을 소홀히 하였습니다.\n'
+        '바쁘다는 핑계로, 시간이 없다는 이유로, 여러 가지 다른 이유를 대고 하나님과 대화하는 기도 시간을 소홀히 하였습니다.\n'
         '신앙생활의 우선순위를 잊어버리고 사탄으로 하여금 틈을 타게 한 나의 악을 용서하여 주옵소서.\n'
-        '영적인ㅇ 호흡인 기도를 멈춤으로 인해 내 영이 목마른 가운데 있습니다.\n'
+        '영적인 호흡인 기도를 멈춤으로 인해 내 영이 목마른 가운데 있습니다.\n'
         '주님! 이 영혼을 불쌍히 여겨 주옵소서.\n'
         '늘 깨어 기도하라고 하셨는데 순간의 피곤함과 유혹을 이기지 못하는 나의 연약함을 도와주옵소서.\n'
         '이 시간 이후로는 기도가 즐거워지고 행복하게 하옵소서.\n'
@@ -49,16 +87,64 @@ class PrayForTarry extends StatelessWidget {
         '\n'
         '10) 예수님의 이름으로 기도드립니다. 아멘';
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('17. 기도가 잘 되지 않을 때 드리는 기도'),
-      ),
-      drawer: PrayList(),
-      body: Container(
-        child: Center(
-          child: Text(args.toString()),
-        ),
-      ),
-    );
+    final wordToStyle = param;
+    final wordStyle = TextStyle(color: Colors.blue);
+    // final leftOverStyle = Theme.of(context).textTheme.bodyText1!.copyWith(fontSize: 20, fontWeight: FontWeight.bold);
+    final spans = _getSpans(prayContent, wordToStyle, wordStyle);
+
+    return spans;
+  }
+
+  List<TextSpan> _getSpans(String text, String matchWord, TextStyle style) {
+    List<TextSpan> spans = [];
+    int spanBoundary = 0;
+
+    do {
+
+      // 전체 String 에서 키워드 검색
+      final startIndex = text.indexOf(matchWord, spanBoundary);
+
+      // 전체 String 에서 해당 키워드가 더 이상 없을때 마지막 KeyWord부터 끝까지의 TextSpan 추가
+      if (startIndex == -1) {
+        spans.add(TextSpan(text: text.substring(spanBoundary)));
+        return spans;
+      }
+
+      // 전체 String 사이에서 발견한 키워드들 사이의 text에 대한 textSpan 추가
+      if (startIndex > spanBoundary) {
+        print(text.substring(spanBoundary, startIndex));
+        spans.add(TextSpan(text: text.substring(spanBoundary, startIndex)));
+      }
+
+      // 검색하고자 했던 키워드에 대한 textSpan 추가
+      final endIndex = startIndex + matchWord.length;
+      final spanText = text.substring(startIndex, endIndex);
+      spans.add(TextSpan(text: spanText, style: style));
+
+      // mark the boundary to start the next search from
+      spanBoundary = endIndex;
+
+      // continue until there are no more matches
+    }
+    //String 전체 검사
+    while (spanBoundary < text.length);
+
+    return spans;
+  }
+
+  int getIndex(List<Map<String,dynamic>> list, String pray) {
+    for(int i = 0 ; i < list.length ; i++) {
+      if(list[i].keys.first == pray) return i;
+    }
+    return -1;
+  }
+
+  _saveWinList(int index) async {
+    final prefs = await SharedPreferences.getInstance();
+    const key = 'winList';
+    List<String>? value = prefs.getStringList(key) ?? [];
+    value.add(index.toString());
+    prefs.setStringList(key, value);
+    widget.callback(value);
   }
 }

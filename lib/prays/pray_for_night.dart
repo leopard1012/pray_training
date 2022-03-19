@@ -1,11 +1,49 @@
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:pray_training/pray_list.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-class PrayForNight extends StatelessWidget {
+import '../bottom_navi.dart';
+import '../pray_body.dart';
+
+class PrayForNight extends StatefulWidget {
+  List<Map<String, dynamic>> list;
+  List<String> winList;
+  Function callback;
+
+  PrayForNight(this.list, this.winList, this.callback);
+
+  @override
+  State<StatefulWidget> createState() => _PrayForNight();
+}
+
+class _PrayForNight extends State<PrayForNight> {
+  late List<Map<String,dynamic>> list;
+  int index = -1;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    list = widget.list;
+    index = getIndex(list, 'night');
+  }
+
   @override
   Widget build(BuildContext context) {
     // TODO: implement build
-    final Object? args = ModalRoute.of(context)!.settings.arguments;
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('25. 하루를 마감하며 드리는 기도'),
+      ),
+      drawer: PrayList(),
+      bottomNavigationBar: BottomNavi(list, index),
+      body: PrayBody(widget.winList, 'night', getPray(), widget.callback),
+    );
+  }
+
+  Future<List<TextSpan>> getPray() async {
+    String? param = 'NONE';
 
     final String prayContent =
         '1) 하나님은 거룩하신 분이십니다.\n'
@@ -26,7 +64,7 @@ class PrayForNight extends StatelessWidget {
         '이 밤에 평안한 안식의 시간을 주심을 감사드립니다.\n'
         '지친 우리의 몸과 마음이 주님이 주신 단잠을 통해 회복되게 하여 주옵소서.\n'
         '우리가 잠들어 있는 순간에도 천군 천사가 우리 가정을 지켜 주옵소서.\n'
-        '(시 127:2)\"여호와게서 그 사랑하시는 자에게는 잠을 주시는 도다.\"라고 하였사오니 누우면 잠을 주시어 좋은 꿈을 꾸게 하옵소서.\n'
+        '(시 127:2)\"여호와께서 그 사랑하시는 자에게는 잠을 주시는 도다.\"라고 하였사오니 누우면 잠을 주시어 좋은 꿈을 꾸게 하옵소서.\n'
         '오늘 하루도 하나님의 은혜를 진심으로 감사드립니다.\n'
         '내일은 하나님이 준비해 놓으신 새로운 세계가 되기를 원합니다.\n'
         '\n'
@@ -51,16 +89,64 @@ class PrayForNight extends StatelessWidget {
         '\n'
         '10) 예수님의 이름으로 기도드립니다. 아멘';
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('25. 하루를 마감하며 드리는 기도'),
-      ),
-      drawer: PrayList(),
-      body: Container(
-        child: Center(
-          child: Text(args.toString()),
-        ),
-      ),
-    );
+    final wordToStyle = param;
+    final wordStyle = TextStyle(color: Colors.blue);
+    // final leftOverStyle = Theme.of(context).textTheme.bodyText1!.copyWith(fontSize: 20, fontWeight: FontWeight.bold);
+    final spans = _getSpans(prayContent, wordToStyle, wordStyle);
+
+    return spans;
+  }
+
+  List<TextSpan> _getSpans(String text, String matchWord, TextStyle style) {
+    List<TextSpan> spans = [];
+    int spanBoundary = 0;
+
+    do {
+
+      // 전체 String 에서 키워드 검색
+      final startIndex = text.indexOf(matchWord, spanBoundary);
+
+      // 전체 String 에서 해당 키워드가 더 이상 없을때 마지막 KeyWord부터 끝까지의 TextSpan 추가
+      if (startIndex == -1) {
+        spans.add(TextSpan(text: text.substring(spanBoundary)));
+        return spans;
+      }
+
+      // 전체 String 사이에서 발견한 키워드들 사이의 text에 대한 textSpan 추가
+      if (startIndex > spanBoundary) {
+        print(text.substring(spanBoundary, startIndex));
+        spans.add(TextSpan(text: text.substring(spanBoundary, startIndex)));
+      }
+
+      // 검색하고자 했던 키워드에 대한 textSpan 추가
+      final endIndex = startIndex + matchWord.length;
+      final spanText = text.substring(startIndex, endIndex);
+      spans.add(TextSpan(text: spanText, style: style));
+
+      // mark the boundary to start the next search from
+      spanBoundary = endIndex;
+
+      // continue until there are no more matches
+    }
+    //String 전체 검사
+    while (spanBoundary < text.length);
+
+    return spans;
+  }
+
+  int getIndex(List<Map<String,dynamic>> list, String pray) {
+    for(int i = 0 ; i < list.length ; i++) {
+      if(list[i].keys.first == pray) return i;
+    }
+    return -1;
+  }
+
+  _saveWinList(int index) async {
+    final prefs = await SharedPreferences.getInstance();
+    const key = 'winList';
+    List<String>? value = prefs.getStringList(key) ?? [];
+    value.add(index.toString());
+    prefs.setStringList(key, value);
+    widget.callback(value);
   }
 }

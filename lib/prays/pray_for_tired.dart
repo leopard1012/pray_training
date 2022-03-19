@@ -1,11 +1,49 @@
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:pray_training/pray_list.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-class PrayForTired extends StatelessWidget {
+import '../bottom_navi.dart';
+import '../pray_body.dart';
+
+class PrayForTired extends StatefulWidget {
+  List<Map<String, dynamic>> list;
+  List<String> winList;
+  Function callback;
+
+  PrayForTired(this.list, this.winList, this.callback);
+
+  @override
+  State<StatefulWidget> createState() => _PrayForTired();
+}
+
+class _PrayForTired extends State<PrayForTired> {
+  late List<Map<String,dynamic>> list;
+  int index = -1;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    list = widget.list;
+    index = getIndex(list, 'tired');
+  }
+
   @override
   Widget build(BuildContext context) {
     // TODO: implement build
-    final Object? args = ModalRoute.of(context)!.settings.arguments;
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('18. 삶에 지칠 때 드리는 기도'),
+      ),
+      drawer: PrayList(),
+      bottomNavigationBar: BottomNavi(list, index),
+      body: PrayBody(widget.winList, 'tired', getPray(), widget.callback),
+    );
+  }
+
+  Future<List<TextSpan>> getPray() async {
+    String? param = 'NONE';
 
     final String prayContent =
         '1) 하나님은 거룩하신 분이십니다.\n'
@@ -46,16 +84,64 @@ class PrayForTired extends StatelessWidget {
         '\n'
         '10) 예수님의 이름으로 기도드립니다. 아멘';
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('18. 삶에 지칠 때 드리는 기도'),
-      ),
-      drawer: PrayList(),
-      body: Container(
-        child: Center(
-          child: Text(args.toString()),
-        ),
-      ),
-    );
+    final wordToStyle = param;
+    final wordStyle = TextStyle(color: Colors.blue);
+    // final leftOverStyle = Theme.of(context).textTheme.bodyText1!.copyWith(fontSize: 20, fontWeight: FontWeight.bold);
+    final spans = _getSpans(prayContent, wordToStyle, wordStyle);
+
+    return spans;
+  }
+
+  List<TextSpan> _getSpans(String text, String matchWord, TextStyle style) {
+    List<TextSpan> spans = [];
+    int spanBoundary = 0;
+
+    do {
+
+      // 전체 String 에서 키워드 검색
+      final startIndex = text.indexOf(matchWord, spanBoundary);
+
+      // 전체 String 에서 해당 키워드가 더 이상 없을때 마지막 KeyWord부터 끝까지의 TextSpan 추가
+      if (startIndex == -1) {
+        spans.add(TextSpan(text: text.substring(spanBoundary)));
+        return spans;
+      }
+
+      // 전체 String 사이에서 발견한 키워드들 사이의 text에 대한 textSpan 추가
+      if (startIndex > spanBoundary) {
+        print(text.substring(spanBoundary, startIndex));
+        spans.add(TextSpan(text: text.substring(spanBoundary, startIndex)));
+      }
+
+      // 검색하고자 했던 키워드에 대한 textSpan 추가
+      final endIndex = startIndex + matchWord.length;
+      final spanText = text.substring(startIndex, endIndex);
+      spans.add(TextSpan(text: spanText, style: style));
+
+      // mark the boundary to start the next search from
+      spanBoundary = endIndex;
+
+      // continue until there are no more matches
+    }
+    //String 전체 검사
+    while (spanBoundary < text.length);
+
+    return spans;
+  }
+
+  int getIndex(List<Map<String,dynamic>> list, String pray) {
+    for(int i = 0 ; i < list.length ; i++) {
+      if(list[i].keys.first == pray) return i;
+    }
+    return -1;
+  }
+
+  _saveWinList(int index) async {
+    final prefs = await SharedPreferences.getInstance();
+    const key = 'winList';
+    List<String>? value = prefs.getStringList(key) ?? [];
+    value.add(index.toString());
+    prefs.setStringList(key, value);
+    widget.callback(value);
   }
 }
