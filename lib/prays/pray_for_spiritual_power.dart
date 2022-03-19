@@ -1,12 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:pray_training/pray_list.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../bottom_navi.dart';
+import '../pray_body.dart';
 
 class PrayForSpiritualPower extends StatefulWidget {
   List<Map<String, dynamic>> list;
+  List<String> winList;
+  Function callback;
 
-  PrayForSpiritualPower(this.list);
+  PrayForSpiritualPower(this.list, this.winList, this.callback);
 
   @override
   State<StatefulWidget> createState() => _PrayForSpiritualPower();
@@ -33,28 +38,7 @@ class _PrayForSpiritualPower extends State<PrayForSpiritualPower> {
       ),
       drawer: PrayList(),
       bottomNavigationBar: BottomNavi(list, index),
-      body: Center(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(8.0),
-          scrollDirection: Axis.vertical,
-          child: FutureBuilder(
-              future: getPray(),
-              builder: (BuildContext context, AsyncSnapshot<List<TextSpan>> snapshot) {
-                return Text.rich(
-                    TextSpan(
-                      style: Theme
-                          .of(context)
-                          .textTheme
-                          .bodyText1!
-                          .copyWith(
-                          fontSize: 20, fontWeight: FontWeight.bold),
-                      children: snapshot.data,
-                    )
-                );
-              }
-          ),
-        ),
-      ),
+      body: PrayBody(widget.winList, 'spiritual_power', getPray(), widget.callback),
     );
   }
 
@@ -155,5 +139,14 @@ class _PrayForSpiritualPower extends State<PrayForSpiritualPower> {
       if(list[i].keys.first == pray) return i;
     }
     return -1;
+  }
+
+  _saveWinList(int index) async {
+    final prefs = await SharedPreferences.getInstance();
+    const key = 'winList';
+    List<String>? value = prefs.getStringList(key) ?? [];
+    value.add(index.toString());
+    prefs.setStringList(key, value);
+    widget.callback(value);
   }
 }

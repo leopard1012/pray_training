@@ -1,16 +1,21 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:pray_training/pray_list.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sqflite/sqflite.dart';
 
 import '../bottom_navi.dart';
 import '../params.dart';
+import '../pray_body.dart';
 
 class PrayForCell extends StatefulWidget {
   final Future<Database> db;
   List<Map<String,dynamic>> list;
+  List<String> winList;
+  Function callback;
 
-  PrayForCell(this.db, this.list);
+  PrayForCell(this.db, this.list, this.winList, this.callback);
 
   @override
   State<StatefulWidget> createState() => _PrayForCell();
@@ -39,28 +44,7 @@ class _PrayForCell extends State<PrayForCell> {
       ),
       drawer: PrayList(),
       bottomNavigationBar: BottomNavi(list, index),
-      body: Center(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(8.0),
-          scrollDirection: Axis.vertical,
-          child: FutureBuilder(
-              future: getPray(),
-              builder: (BuildContext context, AsyncSnapshot<List<TextSpan>> snapshot) {
-                return Text.rich(
-                    TextSpan(
-                      style: Theme
-                          .of(context)
-                          .textTheme
-                          .bodyText1!
-                          .copyWith(
-                          fontSize: 20, fontWeight: FontWeight.bold),
-                      children: snapshot.data,
-                    )
-                );
-              }
-          ),
-        ),
-      ),
+      body: PrayBody(widget.winList, 'cell', getPray(), widget.callback),
     );
   }
 
@@ -184,7 +168,7 @@ class _PrayForCell extends State<PrayForCell> {
       // 검색하고자 했던 키워드에 대한 textSpan 추가
       final endIndex = startIndex + matchWord.length;
       final spanText = text.substring(startIndex, endIndex);
-      spans.add(TextSpan(text: spanText, style: style, recognizer: recognizer));
+      spans.add(TextSpan(text: spanText, style: style)); //, recognizer: recognizer));
 
       // mark the boundary to start the next search from
       spanBoundary = endIndex;
@@ -202,5 +186,14 @@ class _PrayForCell extends State<PrayForCell> {
       if(list[i].keys.first == pray) return i;
     }
     return -1;
+  }
+
+  _saveWinList(int index) async {
+    final prefs = await SharedPreferences.getInstance();
+    const key = 'winList';
+    List<String>? value = prefs.getStringList(key) ?? [];
+    value.add(index.toString());
+    prefs.setStringList(key, value);
+    widget.callback(value);
   }
 }

@@ -1,12 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:pray_training/pray_list.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../bottom_navi.dart';
+import '../pray_body.dart';
 
 class PrayForHealing extends StatefulWidget {
   List<Map<String, dynamic>> list;
+  List<String> winList;
+  Function callback;
 
-  PrayForHealing(this.list);
+  PrayForHealing(this.list, this.winList, this.callback);
 
   @override
   State<StatefulWidget> createState() => _PrayForHealing();
@@ -33,28 +38,7 @@ class _PrayForHealing extends State<PrayForHealing> {
       ),
       drawer: PrayList(),
       bottomNavigationBar: BottomNavi(list, index),
-      body: Center(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(8.0),
-          scrollDirection: Axis.vertical,
-          child: FutureBuilder(
-              future: getPray(),
-              builder: (BuildContext context, AsyncSnapshot<List<TextSpan>> snapshot) {
-                return Text.rich(
-                    TextSpan(
-                      style: Theme
-                          .of(context)
-                          .textTheme
-                          .bodyText1!
-                          .copyWith(
-                          fontSize: 20, fontWeight: FontWeight.bold),
-                      children: snapshot.data,
-                    )
-                );
-              }
-          ),
-        ),
-      ),
+      body: PrayBody(widget.winList, 'healing', getPray(), widget.callback),
     );
   }
 
@@ -77,7 +61,7 @@ class _PrayForHealing extends State<PrayForHealing> {
         '그리고 나도 기도로 이기게 하옵소서.\n'
         '불순종으로 질병이 생겼으면 나로 깨닫게 하시며 회개하고 순종하게 하옵소서.\n'
         '하나님이 주신 육체의 관리를 잘못하여 질병이 생겼으면 깨닫게 하시고 치료하여 주옵소서.\n'
-        '하나님은 치료의 하나님이심을 믿습닏다.\n'
+        '하나님은 치료의 하나님이심을 믿습니다.\n'
         '하나님은 문둥병자를 치료하시고 죽은 자를 살리시는 치료의 하나님이심을 믿습니다.\n'
         '이 시간에 나의 병을 깨끗하게 하실 수 있나이다.\n'
         '깨끗하게 치료하여 주옵소서.\n'
@@ -161,5 +145,14 @@ class _PrayForHealing extends State<PrayForHealing> {
       if(list[i].keys.first == pray) return i;
     }
     return -1;
+  }
+
+  _saveWinList(int index) async {
+    final prefs = await SharedPreferences.getInstance();
+    const key = 'winList';
+    List<String>? value = prefs.getStringList(key) ?? [];
+    value.add(index.toString());
+    prefs.setStringList(key, value);
+    widget.callback(value);
   }
 }

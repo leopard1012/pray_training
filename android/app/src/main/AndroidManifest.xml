@@ -1,7 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.book.training.pray.pray_training">
    <application
-        android:label="pray_training"
+        android:label="기도훈련집"
         android:icon="@mipmap/ic_launcher">
         <activity
             android:name=".MainActivity"

@@ -91,7 +91,13 @@ class _ConfPerson extends State<ConfPerson> {
     // TODO: implement build
     return Scaffold(
         appBar: AppBar(
-          title: Text('APPBAR'),
+          title: Text('기도입력'),
+          leading:  IconButton(
+              onPressed: () {
+                Navigator.pop(context); //뒤로가기
+              },
+              icon: Icon(Icons.arrow_back)
+          ),
         ),
         drawer: PrayList(),
         body: Column(

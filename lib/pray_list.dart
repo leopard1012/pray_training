@@ -14,17 +14,6 @@ class PrayList extends StatelessWidget {
               Icons.adjust,
               color: Colors.grey[850],
             ),
-            title: Text('MainPage'),
-            onTap: () {
-              Navigator.pushReplacementNamed(context, '/', arguments: 'MainPage');
-            },
-            trailing: Icon(Icons.arrow_forward_ios),
-          ),
-          ListTile(
-            leading: Icon(
-              Icons.adjust,
-              color: Colors.grey[850],
-            ),
             title: Text('01. 나라를 위한 기도'),
             onTap: () {
               // Navigator.of(context).pushNamed(context, '/nation', arguments: '나라를 위한 기도');

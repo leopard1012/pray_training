@@ -1,16 +1,21 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:pray_training/pray_list.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sqflite/sqflite.dart';
 
 import '../bottom_navi.dart';
 import '../params.dart';
+import '../pray_body.dart';
 
 class PrayForWife extends StatefulWidget {
   final Future<Database> db;
   List<Map<String,dynamic>> list;
+  List<String> winList;
+  Function callback;
 
-  PrayForWife(this.db, this.list);
+  PrayForWife(this.db, this.list, this.winList, this.callback);
 
   @override
   State<StatefulWidget> createState() => _PrayForWife();
@@ -40,29 +45,7 @@ class _PrayForWife extends State<PrayForWife> {
       ),
       drawer: PrayList(),
       bottomNavigationBar: BottomNavi(list, index),
-      body: Center(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(8.0),
-          scrollDirection: Axis.vertical,
-          child: FutureBuilder(
-              future: getPray(),
-              builder: (BuildContext context,
-                  AsyncSnapshot<List<TextSpan>> snapshot) {
-                return Text.rich(
-                    TextSpan(
-                      style: Theme
-                          .of(context)
-                          .textTheme
-                          .bodyText1!
-                          .copyWith(
-                          fontSize: 20, fontWeight: FontWeight.bold),
-                      children: snapshot.data,
-                    )
-                );
-              }
-          ),
-        ),
-      ),
+      body: PrayBody(widget.winList, 'wife', getPray(), widget.callback),
     );
   }
 
@@ -97,8 +80,7 @@ class _PrayForWife extends State<PrayForWife> {
     List<TextSpan> textSpanList = [];
     textSpanList.add(TextSpan(text: '\n1) 하나님 아버지는 거룩하신 분입니다.'));
     textSpanList.add(TextSpan(text: '\n하나님 아버지의 이름이 아내('));
-    textSpanList.add(TextSpan(text: target, style: TextStyle(color: Colors.blue),
-        recognizer: TapGestureRecognizer()..onTapDown = (p) => {Navigator.pushNamed(context, '/conf/wife')} ));
+    textSpanList.add(TextSpan(text: target, style: TextStyle(color: Colors.blue) )); //, recognizer: TapGestureRecognizer()..onTapDown = (p) => {Navigator.pushNamed(context, '/conf/wife')} ));
     textSpanList.add(TextSpan(text: ')을(를) 통하여 거룩히 여김 받으시기를 원합니다.'));
     textSpanList.add(TextSpan(text: '\n그리고 아내가 하나님의 이름을 거룩히 여기는 일을 찾아서 하기를 원합니다.'));
     textSpanList.add(TextSpan(text: '\n'));
@@ -119,8 +101,7 @@ class _PrayForWife extends State<PrayForWife> {
     textSpanList.add(TextSpan(text: '\n그리고 큰 믿음과 건강을 주옵시며, 항상 하나님을 기쁘게 하는 사람이 되게 하옵소서.'));
     textSpanList.add(TextSpan(text: '\n또 아내의 기도를 들어 주옵소서.'));
     textSpanList.add(TextSpan(text: '\n\n'));
-    textSpanList.add(TextSpan(text: withPray, style: TextStyle(color: Colors.blue),
-        recognizer: TapGestureRecognizer()..onTapDown = (p) => {Navigator.pushNamed(context, '/conf/wife')} ));
+    textSpanList.add(TextSpan(text: withPray, style: TextStyle(color: Colors.blue) )); //, recognizer: TapGestureRecognizer()..onTapDown = (p) => {Navigator.pushNamed(context, '/conf/wife')} ));
     textSpanList.add(TextSpan(text: '\n아내에게 풍성한 물질을 주셔서 하나님을 위하여 언제나 마음껏 드리게 하옵시며, 모범적으로 충성하고 헌신하는 사람이 되게 하옵소서.'));
     textSpanList.add(TextSpan(text: '\n목사님께 순종하며 섬기는 믿음을 주옵시고, 성도를 사랑하며 겸손히 섬기는 신앙을 주옵소서.'));
     textSpanList.add(TextSpan(text: '\n가정에 충실하고 믿음의 사람이 되어 가정을 신앙으로 이끌게 하옵소서.'));
@@ -210,5 +191,14 @@ class _PrayForWife extends State<PrayForWife> {
       if(list[i].keys.first == pray) return i;
     }
     return -1;
+  }
+
+  _saveWinList(int index) async {
+    final prefs = await SharedPreferences.getInstance();
+    const key = 'winList';
+    List<String>? value = prefs.getStringList(key) ?? [];
+    value.add(index.toString());
+    prefs.setStringList(key, value);
+    widget.callback(value);
   }
 }

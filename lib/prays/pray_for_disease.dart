@@ -1,16 +1,21 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:pray_training/pray_list.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sqflite/sqflite.dart';
 
 import '../bottom_navi.dart';
 import '../params.dart';
+import '../pray_body.dart';
 
 class PrayForDisease extends StatefulWidget {
   final Future<Database> db;
   List<Map<String,dynamic>> list;
+  List<String> winList;
+  Function callback;
 
-  PrayForDisease(this.db, this.list);
+  PrayForDisease(this.db, this.list, this.winList, this.callback);
 
   @override
   State<StatefulWidget> createState() => _PrayForDisease();
@@ -40,29 +45,7 @@ class _PrayForDisease extends State<PrayForDisease> {
       ),
       drawer: PrayList(),
       bottomNavigationBar: BottomNavi(list, index),
-      body: Center(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(8.0),
-          scrollDirection: Axis.vertical,
-          child: FutureBuilder(
-              future: getPray(),
-              builder: (BuildContext context,
-                  AsyncSnapshot<List<TextSpan>> snapshot) {
-                return Text.rich(
-                    TextSpan(
-                      style: Theme
-                          .of(context)
-                          .textTheme
-                          .bodyText1!
-                          .copyWith(
-                          fontSize: 20, fontWeight: FontWeight.bold),
-                      children: snapshot.data,
-                    )
-                );
-              }
-          ),
-        ),
-      ),
+      body: PrayBody(widget.winList, 'disease', getPray(), widget.callback),
     );
   }
 
@@ -118,9 +101,9 @@ class _PrayForDisease extends State<PrayForDisease> {
     textSpanList.add(TextSpan(text: '\n'));
     textSpanList.add(TextSpan(text: '5-1) 자신의 병을 치료하기 위한 기도\n', style: TextStyle(color: Colors.grey)));
     textSpanList.add(TextSpan(text: '하나님! '));
-    textSpanList.add(TextSpan(text: target, style: TextStyle(color: Colors.blue), recognizer: TapGestureRecognizer()..onTapDown = (p) => {Navigator.pushNamed(context, '/conf/disease')} ));
+    textSpanList.add(TextSpan(text: target, style: TextStyle(color: Colors.blue) )); //, recognizer: TapGestureRecognizer()..onTapDown = (p) => {Navigator.pushNamed(context, '/conf/disease')} ));
     textSpanList.add(TextSpan(text: '의 '));
-    textSpanList.add(TextSpan(text: accident, style: TextStyle(color: Colors.blue), recognizer: TapGestureRecognizer()..onTapDown = (p) => {Navigator.pushNamed(context, '/conf/disease')} ));
+    textSpanList.add(TextSpan(text: accident, style: TextStyle(color: Colors.blue) )); //, recognizer: TapGestureRecognizer()..onTapDown = (p) => {Navigator.pushNamed(context, '/conf/disease')} ));
     textSpanList.add(TextSpan(text: '를 용서합니다.\n'));
     textSpanList.add(TextSpan(text: '예수님의 말씀에 순종하여 무조건 용서합니다.\n'));
     textSpanList.add(TextSpan(text: '그리고 그를 축복합니다.\n'));
@@ -128,7 +111,7 @@ class _PrayForDisease extends State<PrayForDisease> {
     textSpanList.add(TextSpan(text: '\n'));
     textSpanList.add(TextSpan(text: '5-2) 다른 사람의 병을 치료하기 위한 기도\n', style: TextStyle(color: Colors.grey)));
     textSpanList.add(TextSpan(text: '하나님! '));
-    textSpanList.add(TextSpan(text: patient, style: TextStyle(color: Colors.blue), recognizer: TapGestureRecognizer()..onTapDown = (p) => {Navigator.pushNamed(context, '/conf/disease')} ));
+    textSpanList.add(TextSpan(text: patient, style: TextStyle(color: Colors.blue) )); //, recognizer: TapGestureRecognizer()..onTapDown = (p) => {Navigator.pushNamed(context, '/conf/disease')} ));
     textSpanList.add(TextSpan(text: '가 다른 사람의 죄를 용서해 주기를 원합니다.\n'));
     textSpanList.add(TextSpan(text: '가슴에 맺혀 있는 미움과 분노와 증오를 버리고 이 시간에 예수님의 말씀에 순종하여 무조건으로 용서해 주기를 바랍니다.\n'));
     textSpanList.add(TextSpan(text: '자신도 남에게 상처를 준 죄인인 것을 알게 하시고 회개의 영을 부어 주옵소서.\n'));
@@ -137,19 +120,19 @@ class _PrayForDisease extends State<PrayForDisease> {
     textSpanList.add(TextSpan(text: '하나님! 다른 사람의 죄를 용서해 준 것같이 나의 죄를 사하여 주옵소서.\n'));
     textSpanList.add(TextSpan(text: '내가 하나님을 믿지 않고 지은 죄를 용서하여 주옵소서.\n'));
     textSpanList.add(TextSpan(text: '내가 하나님의 말씀을 불순종한 것을 용서하여 주옵소서'));
-    textSpanList.add(TextSpan(text: sin, style: TextStyle(color: Colors.blue), recognizer: TapGestureRecognizer()..onTapDown = (p) => {Navigator.pushNamed(context, '/conf/disease')} ));
+    textSpanList.add(TextSpan(text: sin, style: TextStyle(color: Colors.blue) )); //, recognizer: TapGestureRecognizer()..onTapDown = (p) => {Navigator.pushNamed(context, '/conf/disease')} ));
     textSpanList.add(TextSpan(text: '\n모든 죄를 예수님의 십자가의 보혈로 씻어 주옵소서.\n'));
     textSpanList.add(TextSpan(text: '다시는 같은 죄를 범하지 않겠습니다.\n'));
     textSpanList.add(TextSpan(text: '하나님만이 죄를 사하는 권세가 있는 줄 믿습니다.\n'));
     textSpanList.add(TextSpan(text: '\n'));
     textSpanList.add(TextSpan(text: '6-2) 다른 사람의 병을 치료하기 위한 기도\n', style: TextStyle(color: Colors.grey)));
-    textSpanList.add(TextSpan(text: patient, style: TextStyle(color: Colors.blue), recognizer: TapGestureRecognizer()..onTapDown = (p) => {Navigator.pushNamed(context, '/conf/disease')} ));
+    textSpanList.add(TextSpan(text: patient, style: TextStyle(color: Colors.blue) )); //, recognizer: TapGestureRecognizer()..onTapDown = (p) => {Navigator.pushNamed(context, '/conf/disease')} ));
     textSpanList.add(TextSpan(text: '가 자신도 죄인 중에 괴수인 것을 깨닫게 하시고 진심으로 회개하는 마음을 주옵소서.\n'));
     textSpanList.add(TextSpan(text: '그리고 회개할 때 지금까지의 모든 죄를 예수님의 십자가의 보혈로 씻어 주옵소서.\n'));
     textSpanList.add(TextSpan(text: '다시는 같은 죄를 범하지 않도록 할 것입니다.\n'));
     textSpanList.add(TextSpan(text: '하나님만이 죄를 사하는 권세가 있는 줄 믿습니다.\n'));
     textSpanList.add(TextSpan(text: '하나님! 나('));
-    textSpanList.add(TextSpan(text: patient, style: TextStyle(color: Colors.blue), recognizer: TapGestureRecognizer()..onTapDown = (p) => {Navigator.pushNamed(context, '/conf/disease')} ));
+    textSpanList.add(TextSpan(text: patient, style: TextStyle(color: Colors.blue) )); //, recognizer: TapGestureRecognizer()..onTapDown = (p) => {Navigator.pushNamed(context, '/conf/disease')} ));
     textSpanList.add(TextSpan(text: ')에게 건강을 선물로 주옵소서.\n'));
     textSpanList.add(TextSpan(text: '\n'));
     textSpanList.add(TextSpan(text: '예수님이 말씀하시기를 (막 16:17~18) "[17] 믿는 자들에게는 이런 표적이 따르리니 곧 그들이 내 이름으로 귀신을 쫓아내며 새 방언을 말하며 [18] 뱀을 집어올리며 무슨 독을 마실지라도 해를 받지 아니하며 병든 사람에게 손을 얹은즉 나으리라."고 하셨습니다.\n'));
@@ -158,12 +141,12 @@ class _PrayForDisease extends State<PrayForDisease> {
     textSpanList.add(TextSpan(text: '\'믿는 자들에게는 이런 표적이 따르리니 곧 그들이 내 이름으로 귀신을 쫓아내며,,,. 병든 사람에게 손을 얹은즉 나으리라 하신 말씀이 내게 이루어지기를 원합니다.\' (반복)\n'));
     textSpanList.add(TextSpan(text: '\n'));
     textSpanList.add(TextSpan(text: '\'예수님의 이름으로 명령하노니 내 몸속에 있는 '));
-    textSpanList.add(TextSpan(text: disease, style: TextStyle(color: Colors.blue), recognizer: TapGestureRecognizer()..onTapDown = (p) => {Navigator.pushNamed(context, '/conf/disease')} ));
+    textSpanList.add(TextSpan(text: disease, style: TextStyle(color: Colors.blue) )); //, recognizer: TapGestureRecognizer()..onTapDown = (p) => {Navigator.pushNamed(context, '/conf/disease')} ));
     textSpanList.add(TextSpan(text: '은 없어져라! 병마는 떠나라! 귀신은 나가라!\' (계속 반복)\n'));
     textSpanList.add(TextSpan(text: '\''));
-    textSpanList.add(TextSpan(text: disease, style: TextStyle(color: Colors.blue), recognizer: TapGestureRecognizer()..onTapDown = (p) => {Navigator.pushNamed(context, '/conf/disease')} ));
+    textSpanList.add(TextSpan(text: disease, style: TextStyle(color: Colors.blue) )); //, recognizer: TapGestureRecognizer()..onTapDown = (p) => {Navigator.pushNamed(context, '/conf/disease')} ));
     textSpanList.add(TextSpan(text: '은 치료될지어다! '));
-    textSpanList.add(TextSpan(text: disease, style: TextStyle(color: Colors.blue), recognizer: TapGestureRecognizer()..onTapDown = (p) => {Navigator.pushNamed(context, '/conf/disease')} ));
+    textSpanList.add(TextSpan(text: disease, style: TextStyle(color: Colors.blue) )); //, recognizer: TapGestureRecognizer()..onTapDown = (p) => {Navigator.pushNamed(context, '/conf/disease')} ));
     textSpanList.add(TextSpan(text: '은 깨끗이 나을지어다!\' (반복)\n'));
     textSpanList.add(TextSpan(text: '하나님께서 치료해 주신 줄로 믿겠습니다.\n'));
     textSpanList.add(TextSpan(text: '\n'));
@@ -226,5 +209,14 @@ class _PrayForDisease extends State<PrayForDisease> {
       if(list[i].keys.first == pray) return i;
     }
     return -1;
+  }
+
+  _saveWinList(int index) async {
+    final prefs = await SharedPreferences.getInstance();
+    const key = 'winList';
+    List<String>? value = prefs.getStringList(key) ?? [];
+    value.add(index.toString());
+    prefs.setStringList(key, value);
+    widget.callback(value);
   }
 }
