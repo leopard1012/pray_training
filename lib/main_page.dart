@@ -163,8 +163,76 @@ class _MainPage extends State<MainPage> {
         },
         home: Scaffold(
             appBar: AppBar(
-                title: const Text('기도훈련집'),
-                // automaticallyImplyLeading: false
+                title: const Text('기도훈련집'), automaticallyImplyLeading: false,
+                centerTitle: true,
+                elevation: 0.0,
+                actions: [
+
+                Padding(
+                  padding: EdgeInsets.fromLTRB(10, 0, 20, 0),
+                  child: SizedBox(
+                      // width: 100,
+                      // height: 10,
+                      // child: FloatingActionButton(
+                      //     backgroundColor: Colors.blueGrey,
+                      //     child: Text("양육\n교재", style: TextStyle(color: Colors.white)),
+                      //     onPressed: () {
+                      //         Navigator.push(
+                      //           context,
+                      //           MaterialPageRoute(builder: (context) => LinkList()),
+                      //         );
+                      //     }
+                      // )
+                    child: TextButton(
+                      onPressed: (){
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => LinkList()),
+                        );
+                      },
+                      // style: OutlinedButton.styleFrom(side: BorderSide(color:Colors.white)),
+                      child: Text("양육교재", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),),
+                      // child: Text("양육\n교재"),
+                      // style: OutlinedButton.styleFrom(
+                      //     fixedSize: Size(10,10)
+                      // )
+                    )
+                  ),
+                )
+                  // FloatingActionButton(
+                  //   child: Text("양육"),
+                  //   onPressed: (){
+                  //     Navigator.push(
+                  //       context,
+                  //       MaterialPageRoute(builder: (context) => LinkList()),
+                  //     );
+                  //   },
+                  // )
+                  // OutlinedButton(
+                  //     onPressed: (){
+                  //       Navigator.push(
+                  //         context,
+                  //         MaterialPageRoute(builder: (context) => LinkList()),
+                  //       );
+                  //     },
+                  //     style: OutlinedButton.styleFrom(side: BorderSide(color:Colors.white)),
+                  //     child: Text("양육\n교재", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),),
+                  //     // child: Text("양육\n교재"),
+                  //     // style: OutlinedButton.styleFrom(
+                  //     //     fixedSize: Size(10,10)
+                  //     // )
+                  // )
+                  // IconButton(
+                  //   icon: Icon(Icons.web),
+                  //   onPressed: () {
+                  //     // Navigator.pushNamed(context, '/conf/disease');
+                  //     Navigator.push(
+                  //       context,
+                  //       MaterialPageRoute(builder: (context) => LinkList()),
+                  //     );
+                  //   },
+                  // )
+                ]
             ),
             drawer: LinkList(),
             // bottomNavigationBar: SelectBottom(0),

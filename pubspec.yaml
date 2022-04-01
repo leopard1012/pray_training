@@ -42,8 +42,8 @@ dependencies:
   cupertino_icons: ^1.0.2
   fluttertoast: ^8.0.8
   flutter_launcher_icons: ^0.9.2
-  flutter_tree: ^1.1.0
   url_launcher: ^6.0.20
+  grouped_list: ^3.5.0
 
 #flutter_launcher_name:
 #  name: "기도훈련집"

@@ -98,7 +98,7 @@ class _PrayForPerson extends State<PrayForPerson> {
     textSpanList.add(TextSpan(text: '이(가) 하나님의 통치를 받으며 하나님 나라의 법을 소중히 여기고 지키며 살게 하옵시고, 하나님 나라의 영광을 위하여 일하게 하옵소서.\n'));
     textSpanList.add(TextSpan(text: '그리고 '));
     textSpanList.add(TextSpan(text: target, style: TextStyle(color: Colors.blue) )); //, recognizer: TapGestureRecognizer()..onTapDown = (p) => {Navigator.pushNamed(context, '/conf/person')} ));
-    textSpanList.add(TextSpan(text: '을(를) 통하여 하나님 나라가 세상 모든 사람 전파되기를 원합니다.\n'));
+    textSpanList.add(TextSpan(text: '을(를) 통하여 하나님 나라가 세상 모든 사람들에게 전파되기를 원합니다.\n'));
     textSpanList.add(TextSpan(text: '\n'));
     textSpanList.add(TextSpan(text: '3) 하나님의 뜻이 하늘에서 이루어진 것 같이 땅에서 '));
     textSpanList.add(TextSpan(text: target, style: TextStyle(color: Colors.blue) )); //, recognizer: TapGestureRecognizer()..onTapDown = (p) => {Navigator.pushNamed(context, '/conf/person')} ));
