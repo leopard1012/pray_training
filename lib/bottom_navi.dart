@@ -49,8 +49,8 @@ class BottomNavi extends StatelessWidget {
             icon: Icon(Icons.arrow_back_ios),
         ),
         BottomNavigationBarItem(
-            title: Text('MAIN'),
-            icon: Icon(Icons.home)
+            title: Text('LIST'),
+            icon: Icon(Icons.list_alt)
         ),
         BottomNavigationBarItem(
             title: Text('NEXT'),

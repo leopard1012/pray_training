@@ -48,7 +48,7 @@ class LinkList extends StatelessWidget {
               onPressed: () {
                 Navigator.pop(context); //뒤로가기
               },
-              icon: Icon(Icons.arrow_back)),
+              icon: Icon(Icons.home_filled)),
         ),
         body: groupedList(), //grouped_list 함수
       ),
