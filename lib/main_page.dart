@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:path/path.dart';
 import 'package:pray_training/personal/praymemo/list.dart';
+import 'package:pray_training/pray_full/pray_full.dart';
 import 'package:pray_training/pray_training_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sqflite/sqflite.dart';
@@ -67,9 +68,18 @@ class MainPage extends StatelessWidget {
       themeTextColor = Colors.white;
     }
 
-    final List<String> titles = ["기도훈련집", "나의기도문", "양육교재"];
+    final List<String> titles = ["기도훈련집", "기도훈련집\n(전체)", "나의기도문", "양육교재"];
 
     final List<Widget> images = [
+      Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(20.0),
+          border: Border.all(
+            width: 4,
+            color: themeBorderColor,
+          ),
+        ),
+      ),
       Container(
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(20.0),
@@ -142,11 +152,17 @@ class MainPage extends StatelessWidget {
                                   );
                                 } else if (index == 1) {
                                   Navigator.push(
+                                      context,
+                                      MaterialPageRoute(builder: (context) =>
+                                        PrayFull(db)),
+                                  );
+                                } else if (index == 2) {
+                                  Navigator.push(
                                     context,
                                     MaterialPageRoute(builder: (context) =>
                                         PrayMemoList(title: 'memo')),
                                   );
-                                } else if (index == 2) {
+                                } else if (index == 3) {
                                   Navigator.push(
                                     context,
                                     MaterialPageRoute(

@@ -1,4 +1,4 @@
-package com.book.training.pray.pray_training
+package com.book.training.pray.training
 
 import io.flutter.embedding.android.FlutterActivity
 
