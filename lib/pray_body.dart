@@ -109,25 +109,15 @@ class _PrayBody extends State<PrayBody> {
                   future: _loadWinCounter(pray),
                   builder: (BuildContext context, AsyncSnapshot<int> snapshot) {
                     counter = snapshot.data ?? 0;
-                    // return Text(
-                    //   '${snapshot.data}',
-                    //   textAlign: TextAlign.center,
-                    //   style: TextStyle(fontWeight: FontWeight.bold),
-                    // );
                     _inputTextController.text = '${snapshot.data}';
                     return TextField(
                       textAlign: TextAlign.center,
                       keyboardType: TextInputType.number,
-                      // controller: _inputTextController.text = counter.toString(),
-                      // controller: _inputTextController..text = '$counter',
                       controller: _inputTextController,
                       onChanged: (text) {
                         _saveWinCounter(pray, int.parse(text));
                       },
                     );
-                    // return TextFormField(
-                    //   initialValue: '$counter',
-                    // );
                   }
               ),
             ),

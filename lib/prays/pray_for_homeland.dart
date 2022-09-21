@@ -34,7 +34,7 @@ class _PrayForHomeland extends State<PrayForHomeland> {
     // TODO: implement build
     return Scaffold(
       appBar: AppBar(
-        title: Text('01. 나라를 위한 기도'),
+        title: Text('1. 나라를 위한 기도'),
       ),
       drawer: PrayList(),
       bottomNavigationBar: BottomNavi(list, index),

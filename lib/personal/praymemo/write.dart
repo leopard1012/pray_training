@@ -41,7 +41,7 @@ class WritePage extends StatelessWidget {
               ),
               Padding(padding: EdgeInsets.all(10)),
               TextField(
-                maxLines: 8,
+                maxLines: 20,
                 onChanged: (String text) {
                   this.text = text;
                 },

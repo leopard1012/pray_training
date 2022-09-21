@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:pray_training/personal/praymemo/view.dart';
 import 'package:sqflite/sqflite.dart';
 import '../../main_page.dart';
@@ -28,10 +29,9 @@ class _PrayMemoListState extends State<PrayMemoList> {
         leading: IconButton(
           icon: Icon(Icons.home_filled),
           onPressed: (){
-            Navigator.pushReplacement(
-              context,
-              // MaterialPageRoute(builder: (context) => MainPage(database, list, winList, winCounter)),
-              MaterialPageRoute(builder: (context) => MainPage(false)),
+            Navigator.pushAndRemoveUntil(
+                context,
+                MaterialPageRoute(builder: (context) => MainPage(false)), (route) => false
             );
           },
         ),
@@ -108,6 +108,10 @@ class _PrayMemoListState extends State<PrayMemoList> {
             ),
           );
         }
+        Color themBoxColor = Color.fromRGBO(240, 240, 240, 1);
+        if (SchedulerBinding.instance?.window.platformBrightness == Brightness.dark) {
+          themBoxColor = Color.fromRGBO(30, 30, 30, 1);
+        }
         return ListView.builder(
           physics: BouncingScrollPhysics(),
           padding: EdgeInsets.all(20),
@@ -146,28 +150,12 @@ class _PrayMemoListState extends State<PrayMemoList> {
                             ),
                             overflow: TextOverflow.ellipsis,
                           ),
-                          // Text(
-                          //   memo.text,
-                          //   style: TextStyle(fontSize: 15),
-                          //   overflow: TextOverflow.ellipsis,
-                          // ),
                         ],
                       ),
-                      Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: <Widget>[
-                          Text(
-                            "최종 수정 시간: " + memo.editTime.split('.')[0],
-                            style: TextStyle(fontSize: 11),
-                            textAlign: TextAlign.end,
-                          ),
-                        ],
-                      )
                     ],
                   ),
                   decoration: BoxDecoration(
-                    color: Color.fromRGBO(240, 240, 240, 1),
+                    color: themBoxColor,
                     border: Border.all(
                       color: Colors.blue,
                       width: 1,

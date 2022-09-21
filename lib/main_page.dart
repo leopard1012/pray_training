@@ -56,6 +56,7 @@ class MainPage extends StatelessWidget {
 
   List<String> winList = [];
   int winCounter = 0;
+  double initPos = 0;
 
   @override
   Widget build(BuildContext context) {
@@ -73,6 +74,7 @@ class MainPage extends StatelessWidget {
     final List<Widget> images = [
       Container(
         decoration: BoxDecoration(
+          color: Colors.cyan,
           borderRadius: BorderRadius.circular(20.0),
           border: Border.all(
             width: 4,
@@ -82,6 +84,7 @@ class MainPage extends StatelessWidget {
       ),
       Container(
         decoration: BoxDecoration(
+          color: Colors.blueAccent,
           borderRadius: BorderRadius.circular(20.0),
           border: Border.all(
             width: 4,
@@ -91,6 +94,7 @@ class MainPage extends StatelessWidget {
       ),
       Container(
         decoration: BoxDecoration(
+          color: Colors.deepOrangeAccent,
           borderRadius: BorderRadius.circular(20.0),
           border: Border.all(
             width: 4,
@@ -100,6 +104,7 @@ class MainPage extends StatelessWidget {
       ),
       Container(
         decoration: BoxDecoration(
+          color: Colors.deepPurple,
           borderRadius: BorderRadius.circular(20.0),
           border: Border.all(
             width: 4,
@@ -113,8 +118,9 @@ class MainPage extends StatelessWidget {
       future: Init.instance.initialize(),
       builder: (context, AsyncSnapshot snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting && initRun) {
-          _readListMap();
-          _readWinList();
+          // _readListMap();
+          // _readWinList();
+          // _readInitPos();
           return const MaterialApp(home: Splash());
         } else {
           return MaterialApp(
@@ -142,7 +148,10 @@ class MainPage extends StatelessWidget {
                               // optional
                               onPageChanged: (page) { // optional
                               },
-                              onSelectedItem: (index) { // optional
+                              onSelectedItem: (index) {
+                                _readInitPos();
+                                _readWinList();
+                                _readListMap();
                                 if (index == 0) {
                                   Navigator.push(
                                     context,
@@ -154,7 +163,7 @@ class MainPage extends StatelessWidget {
                                   Navigator.push(
                                       context,
                                       MaterialPageRoute(builder: (context) =>
-                                        PrayFull(db)),
+                                        PrayFull(db, initPos)),
                                   );
                                 } else if (index == 2) {
                                   Navigator.push(
@@ -205,6 +214,14 @@ class MainPage extends StatelessWidget {
       ret.add(json.decode(data[i]));
     }
     return ret;
+  }
+
+  _readInitPos() async {
+    final prefs = await SharedPreferences.getInstance();
+    const key = 'initPos';
+    final value = prefs.getDouble(key) ?? 0;
+    print('read : ' + value.toString());
+    initPos = value;
   }
 
   //로컬에 있는 데이터를 읽는 함수

@@ -170,10 +170,9 @@ class _PrayTrainigPage extends State<PrayTrainigPage> {
                 leading: IconButton(
                   icon: Icon(Icons.home_filled),
                   onPressed: (){
-                    Navigator.pushReplacement(
+                    Navigator.pushAndRemoveUntil(
                       context,
-                      // MaterialPageRoute(builder: (context) => MainPage(database, list, winList, winCounter)),
-                      MaterialPageRoute(builder: (context) => MainPage(false)),
+                      MaterialPageRoute(builder: (context) => MainPage(false)), (route) => false
                     );
                   },
                 ),
@@ -197,7 +196,6 @@ class _PrayTrainigPage extends State<PrayTrainigPage> {
             drawer: LinkList(),
             // bottomNavigationBar: SelectBottom(0),
             body: Column(
-
                 children: <Widget> [
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -212,6 +210,7 @@ class _PrayTrainigPage extends State<PrayTrainigPage> {
                             future: _loadWin(),
                             builder: (BuildContext context, AsyncSnapshot<int> snapshot) {
                               _inputTextController.text = '${snapshot.data}';
+                              winCounter = int.parse(_inputTextController.text);
                               return TextField(
                                 style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
                                 textAlign: TextAlign.end,
@@ -228,6 +227,15 @@ class _PrayTrainigPage extends State<PrayTrainigPage> {
                         '독',
                         style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
                       ),
+                      // Padding (
+                      //     padding: const EdgeInsets.all(8.0),
+                      //     child: ElevatedButton(
+                      //       child: const Text('저장'),
+                      //       onPressed: (){
+                      //         _saveWin(int.parse(_inputTextController.text));
+                      //       },
+                      //     )
+                      // )
                     ]
                   ),
                   Expanded(

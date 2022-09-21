@@ -1,14 +1,18 @@
-
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_switch/flutter_switch.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sqflite/sqflite.dart';
+import 'package:toggle_switch/toggle_switch.dart';
+import 'package:back_button_interceptor/back_button_interceptor.dart';
 
+import '../main_page.dart';
 import '../params.dart';
 
 class PrayFull extends StatefulWidget {
-  final Future<Database> db;
+  Future<Database> db;
+  double initPos;
 
-  PrayFull(this.db);
+  PrayFull(this.db, this.initPos);
 
   @override
   State<StatefulWidget> createState() => _PrayFull();
@@ -17,8 +21,30 @@ class PrayFull extends StatefulWidget {
 class _PrayFull extends State<PrayFull> {
   ScrollController _scrollController = ScrollController();
   bool animatedActive = false;
-  int step = 3;
 
+  double initPos = 0;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    initPos = widget.initPos;
+    BackButtonInterceptor.add(myInterceptor);
+  }
+
+  @override
+  void dispose() {
+    BackButtonInterceptor.remove(myInterceptor);
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  bool myInterceptor(bool stopDefaultButtonEvent, RouteInfo info) {
+    _saveInitPos(_scrollController.offset);
+    Navigator.pop(context); //뒤로가기
+    return true;
+  }
+  
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -38,136 +64,94 @@ class _PrayFull extends State<PrayFull> {
           centerTitle: true,
           leading:  IconButton(
               onPressed: () {
-                Navigator.pop(context); //뒤로가기
+                _saveInitPos(_scrollController.offset);
+                Navigator.pushAndRemoveUntil(
+                    context,
+                    MaterialPageRoute(builder: (context) => MainPage(false)), (route) => false
+                );
               },
-              icon: Icon(Icons.home_filled)),
+              icon: Icon(Icons.home_filled)
+          ),
+          actions: [
+            IconButton(
+              onPressed: (){
+                _scrollController.animateTo(
+                    initPos,
+                    duration: Duration(milliseconds: 1),
+                    curve: Curves.linear
+                );
+              },
+              icon: Icon(Icons.my_location_outlined))
+          ],
         ),
-        floatingActionButton: FloatingActionButton(
-            onPressed: () async {
-              animatedActive = !animatedActive;
-              double targetPos;
-              if (animatedActive) {
-                targetPos = _scrollController.position.maxScrollExtent;
-
-              } else {
-                targetPos = _scrollController.offset;
-              }
-              _scrollController.animateTo(
-                  targetPos,
-                  duration: Duration(seconds: ((targetPos - _scrollController.offset) / (10*step)).round()),
-                  curve: Curves.linear
-              );
-            },
-            child: const Icon(
-              Icons.swap_vert_outlined,
-            ),
-        ),
-        body: Column(
+        body:  Column(
           children: <Widget>[
             Expanded(
-              child: SingleChildScrollView(
-              padding: const EdgeInsets.all(8.0),
-              controller: _scrollController,
-              scrollDirection: Axis.vertical,
-              child: FutureBuilder(
-                  future: getPray(),
-                  builder: (BuildContext context, AsyncSnapshot<List<TextSpan>> snapshot) {
-                    return Text.rich(
-                        TextSpan(
-                          style: Theme
-                              .of(context)
-                              .textTheme
-                              .bodyText1!
-                              .copyWith(
-                              fontSize: 20, fontWeight: FontWeight.bold),
-                          children: snapshot.data,
-                        )
-                    );
-                  }
+              child: GestureDetector(
+                onTapDown: (TapDownDetails details) {
+                  animatedActive = false;
+                  _saveInitPos(_scrollController.offset);
+                },
+                child: SingleChildScrollView(
+                padding: const EdgeInsets.all(8.0),
+                controller: _scrollController,
+                scrollDirection: Axis.vertical,
+                child: FutureBuilder(
+                    future: getPray(),
+                    builder: (BuildContext context, AsyncSnapshot<List<TextSpan>> snapshot) {
+                      return Text.rich(
+                          TextSpan(
+                            style: Theme
+                                .of(context)
+                                .textTheme
+                                .bodyText1!
+                                .copyWith(
+                                fontSize: 20, fontWeight: FontWeight.bold),
+                            children: snapshot.data,
+                          )
+                      );
+                    }
+                  ),
                 ),
               ),
             ),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
-                _inputButton(),
-                // Padding(
-                //   padding: EdgeInsets.fromLTRB(20, 0, 10, 0),
-                //   child: FlutterSwitch(
-                //     value: isSwitched = true,
-                //     onToggle: (value) {
-                //       setState(() {
-                //         isSwitched = value;
-                //       });
-                //       _saveWinList(pray);
-                //     },
-                //     activeColor: Colors.green,
-                //   ),
-                // ),
-                // Padding(
-                //     padding: EdgeInsets.fromLTRB(30, 0, 10, 0),
-                //     child: SizedBox(
-                //         width: 30,
-                //         height: 30,
-                //         child: FloatingActionButton(
-                //             child: Icon(Icons.remove),
-                //             onPressed: () {
-                //               setState(() {
-                //                 counter = counter - 1;
-                //                 counter = counter < 0 ? 0 : counter;
-                //                 _inputTextController.text = '$counter';
-                //                 _saveWinCounter(pray, counter);
-                //               });
-                //             }
-                //         )
-                //     )
-                // ),
-                // SizedBox(
-                //   width: 50,
-                //   child: FutureBuilder(
-                //       future: _loadWinCounter(pray),
-                //       builder: (BuildContext context, AsyncSnapshot<int> snapshot) {
-                //         counter = snapshot.data ?? 0;
-                //         // return Text(
-                //         //   '${snapshot.data}',
-                //         //   textAlign: TextAlign.center,
-                //         //   style: TextStyle(fontWeight: FontWeight.bold),
-                //         // );
-                //         _inputTextController.text = '${snapshot.data}';
-                //         return TextField(
-                //           textAlign: TextAlign.center,
-                //           keyboardType: TextInputType.number,
-                //           // controller: _inputTextController.text = counter.toString(),
-                //           // controller: _inputTextController..text = '$counter',
-                //           controller: _inputTextController,
-                //           onChanged: (text) {
-                //             _saveWinCounter(pray, int.parse(text));
-                //           },
-                //         );
-                //         // return TextFormField(
-                //         //   initialValue: '$counter',
-                //         // );
-                //       }
-                //   ),
-                // ),
-                // Padding(
-                //   padding: EdgeInsets.fromLTRB(10, 0, 30, 0),
-                //   child: SizedBox(
-                //       width: 30,
-                //       height: 30,
-                //       child: FloatingActionButton(
-                //           child: Icon(Icons.add),
-                //           onPressed: () {
-                //             setState(() {
-                //               counter = counter + 1;
-                //               counter = counter < 0 ? 0 : counter;
-                //               _inputTextController.text = '$counter';
-                //               _saveWinCounter(pray, counter);
-                //             });
-                //           }
-                //       )
-                //   ),
-                // ),
+                // _inputButton(),
+                Padding(
+                  padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
+                  child: ToggleSwitch(
+                    minWidth: 35.0,
+                    minHeight: 35.0,
+                    fontSize: 20.0,
+                    initialLabelIndex: 0,
+                    activeBgColor: [Colors.green],
+                    activeFgColor: Colors.white,
+                    inactiveBgColor: Colors.grey,
+                    inactiveFgColor: Colors.grey[900],
+                    totalSwitches: 6,
+                    labels: ['0', '1', '2', '3', '4', '5'],
+                    onToggle: (index) {
+                        int step = index!;
+                        double targetPos;
+                        if (step > 0) {
+                          animatedActive = true;
+                          targetPos = _scrollController.position.maxScrollExtent;
+                        } else {
+                          _saveInitPos(_scrollController.offset);
+                          animatedActive = false;
+                          targetPos = _scrollController.offset;
+                          step = 1;
+                        }
+                        _scrollController.animateTo(
+                            targetPos,
+                            duration: Duration(seconds: ((targetPos - _scrollController.offset) / (10 * step)).round()),
+                            curve: Curves.linear
+                        );
+                    },
+                  ),
+                ),
               ],
             )
           ]
@@ -176,17 +160,21 @@ class _PrayFull extends State<PrayFull> {
     );
   }
 
-  Widget _inputButton() {
-    return Padding(
-        padding: EdgeInsets.fromLTRB(10, 0, 0, 0),
-        child: OutlinedButton(
-          // backgroundColor: Colors.grey,
-          style: OutlinedButton.styleFrom(side: BorderSide(color:Colors.blue)),
-          child: Text("기도\n입력", style: TextStyle(color: Colors.blue, fontWeight: FontWeight.bold),),
-          onPressed: () => Navigator.pushNamed(context, '/conf/conf_church'),
-        )
-    );
-  }
+  // Widget _inputButton() {
+  //   return Padding(
+  //       padding: EdgeInsets.fromLTRB(10, 0, 10, 0),
+  //       child: OutlinedButton(
+  //         // backgroundColor: Colors.grey,
+  //         style: OutlinedButton.styleFrom(side: BorderSide(color:Colors.blue)),
+  //         child: Text("기도\n입력", style: TextStyle(color: Colors.blue, fontWeight: FontWeight.bold),),
+  //         onPressed: (){
+  //           _saveInitPos(_scrollController.offset);
+  //           // Navigator.push(context, MaterialPageRoute(builder: (context) => ConfChurch(widget.db)),);
+  //           Navigator.pushNamed(context, '/conf/church');
+  //         },
+  //       )
+  //   );
+  // }
 
   Future<Params> getParams(String prayType) async {
     final Database database = await widget.db;
@@ -225,17 +213,9 @@ class _PrayFull extends State<PrayFull> {
     Params params12 = await getParams('personal_1');
     Params params13 = await getParams('personal_2');
     Params params14 = await getParams('repentance');
+    Params params21 = await getParams('spouse');
     Params params26 = await getParams('devil');
     Params params27 = await getParams('disease');
-
-
-
-
-
-
-
-
-
 
     String? withPray2 = params2.param1 ?? '(교회를 위한 중보기도)';
     String? target3 = params3.param1 ?? '그들(이름)';
@@ -259,6 +239,7 @@ class _PrayFull extends State<PrayFull> {
     String? accident13 = params13.param3 == null ? "죄(구체적으로)" : params13.param3.toString();
     String? target14 = params14.param1 == null ? "다른 사람(이름)" : params14.param1.toString();
     String? accident14 = params14.param3 == null ? "죄(구체적으로)" : params14.param3.toString();
+    String? param21 = params21.param1 ?? '남편(아내)';
     String? target27 = params27.param1 == null ? "다른 사람(이름)" : params27.param1.toString();
     String? accident27 = params27.param2 == null ? "죄(구체적으로)" : params27.param2.toString();
     String? patient27 = params27.param3 == null ? "이 환자" : params27.param3.toString();
@@ -289,6 +270,9 @@ class _PrayFull extends State<PrayFull> {
     accident13 = accident13 == "" ? '죄(구체적으로)' : accident13;
     target14 = target14 == "" ? '다른 사람(이름)' : target14;
     accident14 = accident14 == "" ? '죄(구체적으로)' : accident14;
+    String ext1 = param21 == '남편' ? '을' : '를';
+    String ext2 = param21 == '남편' ? '이' : '가';
+    String ext3 = param21 == '남편' ? '으로' : '로';
     target26 = target26 == "" ? '다른 사람(이름)' : target26;
     accident26 = accident26 == "" ? '죄(구체적으로)' : accident26;
     target27 = target27 == "" ? '다른 사람(이름)' : target27;
@@ -298,7 +282,61 @@ class _PrayFull extends State<PrayFull> {
     disease27 = disease27 == "" ? '"위암(병명)' : disease27;
 
     List<TextSpan> textSpanList = [];
-    textSpanList.add(TextSpan(text: '2. 교회를 위한 기도\n\n', style: TextStyle(color: Colors.black, fontSize: 30)));
+    textSpanList.add(TextSpan(text: '1. 나라를 위한 기도\n\n', style: TextStyle(fontSize: 30)));
+    textSpanList.add(TextSpan(text: '1) 하나님 아버지는 거룩하십니다.\n'
+        '하나님 아버지의 이름이 우리나라를 통하여 거룩히 여김 받으시기를 원합니다.\n'
+        '그러므로 우리나라 지도자들과 백성들이 하나님의 이름을 거룩히 할 일만 행하게 하옵소서.\n'
+        '\n'
+        '2) 우리나라에 하나님의 나라가 이루어지기를 소원 합니다.\n'
+        '그리하여 우리나라가 의와 평강과 희락이 있는 국가가 되게 하옵소서.\n'
+        '우리나라가 하나님의 통치를 받아서 악이 없어지고 선을 행하는 하나님의 백성들이 되고 하나님 나라의 법을 지키며 살게 하옵시고, 세상의 영광 보다는 하나님 나라의 영광을 위하여 일하게 하옵소서.\n'
+        '그리고 우리나라를 통하여 하나님 나라가 세상 모든 나라에 전파되기를 원합니다.\n'
+        '\n'
+        '3) 하나님의 뜻이 하늘에서 이루어진 것 같이 땅에서 우리나라에 이루어지기를 원합니다.\n'
+        '또 우리나라를 통하여 하나님의 선하고 의로운 뜻이 이루어지기를 기도합니다.\n'
+        '그리고 하나님의 뜻이 우리나라를 통하여 세계 만민에게 전파되기를 원합니다.\n'
+        '\n'
+        '4) 하나님께서 우리나라에 언제나 일용할 양식을 공급해 주시기를 원합니다.\n'
+        '그리하여 가난한 사람이 없게 하옵소서.\n'
+        '우리나라를 북한과 강대국들 사이에서 지켜 주옵소서.\n'
+        '전쟁이 일어나지 않도록 보호하여 주옵소서.\n'
+        '정치가 안정되게 하옵시고 노사가 안정되게 하옵소서.\n'
+        '이기적인 마음을 버리고 서로 이해하고 사랑하는 풍토가 조성되게 하옵소서.\n'
+        '또 경제 대국이 되어 믿는 사람들이 잘 살아 더 많은 선교를 할 수 있도록 축복하여 주옵소서.\n'
+        '한국의 교회가 바르게 성장하게 하옵시고 많은 영혼을 구원하도록 하여 주옵소서.\n'
+        '이 민족을 모두 구원하여 주옵소서.\n'
+        '\n'
+        '5) 하나님! 다른나라의 죄를 용서해 주시기 원합니다.\n'
+        '우리나라에 상처를 주고 힘들게 하였던 사람들과 민족들을 용서해 주옵소서.\n'
+        '예수님의 이름으로 용서해 주옵소서.\n'
+        '그리고 그 민족과 사람들을 축복해 주옵소서.\n'
+        '그 사람들이 하나님을 경외하고 복 받기를 원합니다.\n'
+        '\n'
+        '6) 하나님! 다른 나라들의 죄를 용서하여 준 것 같이 우리나라의 죄를 사하여 주옵소서.\n'
+        '우리나라 지도자들과 백성들이 지은 죄가 많습니다.\n'
+        '하나님만이 죄를 사하는 권세가 있는줄 믿습니다.\n'
+        '\n'
+        '7) 하나님! 우리나라가 시험에 들지 않기를 원합니다.\n'
+        '마귀에게 시험당하지 않기를 원합니다.\n'
+        '그러므로 마귀에게 시험을 허락지 마옵소서.\n'
+        '우리나라가 전쟁, 지진, 홍수, 전염병, 내란, 기근, 가난 등으로 시험당하지 않기를 원합니다.\n'
+        '교회에 핍박이 없게 하옵시고, 영적으로 사탄의 방해가 없도록 지켜 보호하여 주옵소서.\n'
+        '천군천사를 보내 지켜 주옵소서.\n'
+        '\n'
+        '8) 하나님! 우리나라를 악에서 구원하여 주옵소서.\n'
+        '우리나라에 하나님의 법을 지키지 않는 악이 가득합니다.\n'
+        '이 악에서 우리나라를 구원하여 주옵소서.\n'
+        '그리하여 하나님의 법을 지키는 선한 나라가 되게 하옵소서.\n'
+        '우리나라가 타락한 세상의 악에 물들고 있습니다.\n'
+        '어린아이, 청소년, 장년, 노년에 이르기까지 악에 물들고 있사오니 이 악에서 구원하여 주옵소서.\n'
+        '모든 사람에게 악을 버릴 수 있는 마음을 주옵시며 악에서 구원하여 선한 백성들이 되게 하옵소서.\n'
+        '하나님께서 이 백성에게 악을 이길 수 있는 힘을 공급하여 주옵소서.\n'
+        '\n'
+        '9) 하나님의 나라와 권세와 영광이 영원히, 영원히 하나님 아버지께 있사오며,\n'
+        '\n'
+        '10) 예수님의 이름으로 기도드립니다. 아멘.\n\n\n'));
+
+    textSpanList.add(TextSpan(text: '2. 교회를 위한 기도\n\n', style: TextStyle(fontSize: 30)));
     textSpanList.add(TextSpan(text: '1) 하나님 아버지는 거룩하십니다.\n'
         '하나님 아버지의 이름이 우리 교회를 통하여 거룩히 여김 받으시기를 원합니다.\n'
         '그리고 우리 교회가 하나님의 이름을 거룩하게 할 일만 하게 하옵소서.\n'
@@ -353,7 +391,7 @@ class _PrayFull extends State<PrayFull> {
         '\n'
         '10) 예수님의 이름으로 기도드립니다. 아멘.\n\n\n'));
 
-    textSpanList.add(TextSpan(text: '3. 담임목사님을 위한 기도\n\n', style: TextStyle(color: Colors.black, fontSize: 30)));
+    textSpanList.add(TextSpan(text: '3. 담임목사님을 위한 기도\n\n', style: TextStyle(fontSize: 30)));
     textSpanList.add(TextSpan(text: '1) 하나님 아버지는 거룩하신 분이십니다.\n'
         '하나님 아버지의 이름이 담임목사님과 가정을 통하여 거룩히 여김 받으시기를 원합니다.\n'
         '그러므로 우리 담임목사님과 가정이 하나님의 이름을 거룩하게 할 일만 행하게 하옵소서.\n'
@@ -410,7 +448,7 @@ class _PrayFull extends State<PrayFull> {
         '\n'
         '10) 예수님의 이름으로 기도드립니다. 아멘.\n\n\n'));
 
-    textSpanList.add(TextSpan(text: '4. 목장과 목장원을 위한 기도\n\n', style: TextStyle(color: Colors.black, fontSize: 30)));
+    textSpanList.add(TextSpan(text: '4. 목장과 목장원을 위한 기도\n\n', style: TextStyle(fontSize: 30)));
     textSpanList.add(TextSpan(text: '1) 하나님은 거룩하신 분이십니다.\n'
         '하나님 아버지의 이름이 우리 목장과 목장원을 통하여 거룩히 여김 받으시기를 원합니다.\n'
         '그리고 우리 목장원들이 하나님의 이름을 거룩히 여길 일만 행하게 하옵소서.\n'
@@ -470,7 +508,7 @@ class _PrayFull extends State<PrayFull> {
         '\n'
         '10) 예수님의 이름으로 기도드립니다. 아멘.\n\n\n'));
 
-    textSpanList.add(TextSpan(text: '5. 태신자를 위한 기도\n\n', style: TextStyle(color: Colors.black, fontSize: 30)));
+    textSpanList.add(TextSpan(text: '5. 태신자를 위한 기도\n\n', style: TextStyle(fontSize: 30)));
     textSpanList.add(TextSpan(text: '1) 하나님 아버지는 거룩하십니다.\n'));
     textSpanList.add(TextSpan(text: '하나님 아버지의 이름이 '));
     textSpanList.add(TextSpan(text: param5, style: TextStyle(color: Colors.blue) ));
@@ -562,7 +600,7 @@ class _PrayFull extends State<PrayFull> {
     textSpanList.add(TextSpan(text: '\n'));
     textSpanList.add(TextSpan(text: '10) 예수님의 이름으로 기도드립니다. 아멘.\n\n\n'));
 
-    textSpanList.add(TextSpan(text: '6. 사람을 위한 기도\n\n', style: TextStyle(color: Colors.black, fontSize: 30)));
+    textSpanList.add(TextSpan(text: '6. 사람을 위한 기도\n\n', style: TextStyle(fontSize: 30)));
     textSpanList.add(TextSpan(text: '1) 하나님 아버지는 거룩하십니다.\n하나님 아버지의 이름이 '));
     textSpanList.add(TextSpan(text: target6, style: TextStyle(color: Colors.blue) )); //, recognizer: TapGestureRecognizer()..onTapDown = (p) => {Navigator.pushNamed(context, '/conf/person')} ));
     textSpanList.add(TextSpan(text: '을(를) 통하여 거룩히 여김 받으시기를 원합니다.\n'));
@@ -669,7 +707,7 @@ class _PrayFull extends State<PrayFull> {
     textSpanList.add(TextSpan(text: '\n'));
     textSpanList.add(TextSpan(text: '10) 예수님의 이름으로 기도드립니다. 아멘.\n\n\n'));
 
-    textSpanList.add(TextSpan(text: '7. 가정을 위한 기도\n\n', style: TextStyle(color: Colors.black, fontSize: 30)));
+    textSpanList.add(TextSpan(text: '7. 가정을 위한 기도\n\n', style: TextStyle(fontSize: 30)));
     textSpanList.add(TextSpan(text: '1) 하나님 아버지는 거룩하십니다.\n'
         '하나님 아버지의 이름이 우리 가정을 통하여 거룩히 여김 받으시기를 원합니다.\n'
         '그러므로 우리 가정이 하나님의 이름을 거룩하게 할 일만 행하게 하옵소서.\n'
@@ -729,7 +767,7 @@ class _PrayFull extends State<PrayFull> {
         '\n'
         '10) 예수님의 이름으로 기도드립니다. 아멘.\n\n\n'));
 
-    textSpanList.add(TextSpan(text: '8. 남편을 위한 기도\n\n', style: TextStyle(color: Colors.black, fontSize: 30)));
+    textSpanList.add(TextSpan(text: '8. 남편을 위한 기도\n\n', style: TextStyle(fontSize: 30)));
     textSpanList.add(TextSpan(text: '1) 하나님 아버지는 거룩하십니다.\n하나님 아버지의 이름이 남편('));
     textSpanList.add(TextSpan(text: target8, style: TextStyle(color: Colors.blue) )); //, recognizer: TapGestureRecognizer()..onTapDown = (p) => {Navigator.pushNamed(context, '/conf/husband')} ));
     textSpanList.add(TextSpan(text: ')을(를) 통하여 거룩히 여김 받으시기를 원합니다.\n'));
@@ -796,7 +834,7 @@ class _PrayFull extends State<PrayFull> {
     textSpanList.add(TextSpan(text: '\n'));
     textSpanList.add(TextSpan(text: '\n아멘.\n\n\n'));
 
-    textSpanList.add(TextSpan(text: '9. 아내를 위한 기도\n\n', style: TextStyle(color: Colors.black, fontSize: 30)));
+    textSpanList.add(TextSpan(text: '9. 아내를 위한 기도\n\n', style: TextStyle(fontSize: 30)));
     textSpanList.add(TextSpan(text: '\n1) 하나님 아버지는 거룩하신 분입니다.'));
     textSpanList.add(TextSpan(text: '\n하나님 아버지의 이름이 아내('));
     textSpanList.add(TextSpan(text: target9, style: TextStyle(color: Colors.blue) )); //, recognizer: TapGestureRecognizer()..onTapDown = (p) => {Navigator.pushNamed(context, '/conf/wife')} ));
@@ -865,7 +903,7 @@ class _PrayFull extends State<PrayFull> {
     textSpanList.add(TextSpan(text: '\n'));
     textSpanList.add(TextSpan(text: '\n아멘.\n\n\n'));
 
-    textSpanList.add(TextSpan(text: '10. 부모님을 위한 기도\n\n', style: TextStyle(color: Colors.black, fontSize: 30)));
+    textSpanList.add(TextSpan(text: '10. 부모님을 위한 기도\n\n', style: TextStyle(fontSize: 30)));
     textSpanList.add(TextSpan(text: '1) 하나님 아버지는 거룩하신 분입니다.\n'));
     textSpanList.add(TextSpan(text: '하나님 아버지의 이름이 '));
     textSpanList.add(TextSpan(text: target10, style: TextStyle(color: Colors.blue) )); //, recognizer: TapGestureRecognizer()..onTapDown = (p) => {Navigator.pushNamed(context, '/conf/parents')} ));
@@ -970,7 +1008,7 @@ class _PrayFull extends State<PrayFull> {
     textSpanList.add(TextSpan(text: '\n'));
     textSpanList.add(TextSpan(text: '아멘.\n\n\n'));
 
-    textSpanList.add(TextSpan(text: '11. 자녀를 위한 기도\n\n', style: TextStyle(color: Colors.black, fontSize: 30)));
+    textSpanList.add(TextSpan(text: '11. 자녀를 위한 기도\n\n', style: TextStyle(fontSize: 30)));
     textSpanList.add(TextSpan(text: '1) 하나님 아버지는 거룩하신 분입니다.\n'));
     textSpanList.add(TextSpan(text: '하나님 아버지의 이름이 '));
     textSpanList.add(TextSpan(text: target11, style: TextStyle(color: Colors.blue) )); //, recognizer: TapGestureRecognizer()..onTapDown = (p) => {Navigator.pushNamed(context, '/conf/children')} ));
@@ -1080,7 +1118,7 @@ class _PrayFull extends State<PrayFull> {
     textSpanList.add(TextSpan(text: '\n'));
     textSpanList.add(TextSpan(text: '아멘.\n\n\n'));
 
-    textSpanList.add(TextSpan(text: '12. 개인기도\n\n', style: TextStyle(color: Colors.black, fontSize: 30)));
+    textSpanList.add(TextSpan(text: '12. 개인기도\n\n', style: TextStyle(fontSize: 30)));
     textSpanList.add(TextSpan(text: '1) 하나님은 거룩한 분이십니다.\n'));
     textSpanList.add(TextSpan(text: '하나님 아버지의 이름이 나를 통하여 거룩히 여김 받으시기를 원합니다.\n'));
     textSpanList.add(TextSpan(text: '내가 하나님의 이름을 거룩히 할 일만 하게 하옵소서.\n'));
@@ -1156,7 +1194,7 @@ class _PrayFull extends State<PrayFull> {
     textSpanList.add(TextSpan(text: '\n'));
     textSpanList.add(TextSpan(text: '아멘.\n\n\n'));
 
-    textSpanList.add(TextSpan(text: '13. 개인기도2\n\n', style: TextStyle(color: Colors.black, fontSize: 30)));
+    textSpanList.add(TextSpan(text: '13. 개인기도2\n\n', style: TextStyle(fontSize: 30)));
     textSpanList.add(TextSpan(text: '1) 하나님은 거룩하신 분이십니다.\n'));
     textSpanList.add(TextSpan(text: '하나님 아버지의 이름이 나를 통하여 거룩히 여김 받으시기를 원합니다.\n'));
     textSpanList.add(TextSpan(text: '그동안 나의 이름을 세상에 알리려고 행하였던 모든 죄를 회개합니다.\n'));
@@ -1259,7 +1297,7 @@ class _PrayFull extends State<PrayFull> {
     textSpanList.add(TextSpan(text: '\n'));
     textSpanList.add(TextSpan(text: '아멘\n\n\n'));
 
-    textSpanList.add(TextSpan(text: '14. 회개기도\n\n', style: TextStyle(color: Colors.black, fontSize: 30)));
+    textSpanList.add(TextSpan(text: '14. 회개기도\n\n', style: TextStyle(fontSize: 30)));
     textSpanList.add(TextSpan(text : '1) 하나님은 거룩한 분이십니다.\n'));
     textSpanList.add(TextSpan(text : '하나님 아버지의 이름이 나를 통하여 거룩히 여김 받으시기를 원합니다.\n'));
     textSpanList.add(TextSpan(text : '그러나 오랫동안 하나님의 이름을 거룩히 여기지 못하였음을 회개합니다.\n'));
@@ -1356,7 +1394,312 @@ class _PrayFull extends State<PrayFull> {
     textSpanList.add(TextSpan(text : '\n'));
     textSpanList.add(TextSpan(text : '아멘.\n\n\n'));
 
-    textSpanList.add(TextSpan(text: '22. 물질적인 어려움에 있을 때 드리는 기도\n\n', style: TextStyle(color: Colors.black, fontSize: 30)));
+    textSpanList.add(TextSpan(text: '15. 영적인 힘을 얻기 위한 기도\n\n', style: TextStyle(fontSize: 30)));
+    textSpanList.add(TextSpan(text : '1) 전능하신 하나님! 하나님은 거룩한 분이십니다.\n'
+        '하나님 아버지의 이름이 나를 통하여 거룩히 여김 받으시기를 원합니다.\n'
+        '\n'
+        '2) 하나님 나라를 창조하시고 사람의 믿음을 보시고 은혜로 구원하여 주심을 감사드립니다.\n'
+        '영원한 하나님의 나라가 나에게 이루어지기를 원합니다.\n'
+        '그리고 마음의 천국인 의와 평강과 희락이 마음속에 항상 있게 하옵소서.\n'
+        '\n'
+        '3) 하나님의 뜻이 하늘에서 이루어진 것 같이 나를 통하여 이 땅에서 이루어지기를 원합니다.\n'
+        '\n'
+        '4) 하나님, 이 시간에 내 마음속에 들어오셔서 나의 하나님이 되어주시고 나의 죄를 용서하시며 영생의 길로, 복된 길로 인도하여 주옵소서.\n'
+        '하나님은 나의 하나님이십니다.\n'
+        '하나님은 나의 전능자이십니다.\n'
+        '하나님은 나의 창조주이십니다.\n'
+        '하나님은 나의 구원자이십니다.\n'
+        '하나님은 나의 치료자이십니다.\n'
+        '하나님은 나의 생명이십니다.\n'
+        '하나님은 나의 소망이십니다.\n'
+        '하나님은 나의 평안이십니다.\n'
+        '하나님은 나의 능력이십니다.\n'
+        '하나님은 나의 축복이십니다.\n'
+        '하나님은 나의 반석이시며, 산성이십니다.\n'
+        '하나님은 나의 요새이시며, 피난처이십니다.\n'
+        '나의 힘이 되신 하나님을 사랑합니다.\n'
+        '나의 평생에 주의 인자하심과 성실하심 속에 거하게 하옵소서.\n'
+        '\n'
+        '5) 하나님! 다른 사람의 죄를 용서합니다.\n'
+        '나에게 아픔과 상처를 주어 분노와 혈기를 일이키며 미움과 증오를 갖게 했던 사람을 용서합니다.\n'
+        '그를 축복합니다.\n'
+        '그 사람에게 말과 행동으로 분노와 혈기를 일으켰던 악한 영의 세력을 예수님의 이름으로 결박하사 그의 삶에서 물리쳐 주시고, 그의 행동과 입술의 열매가 믿음으로 아름답게 맺히도록 성령의 충만함으로 축복하옵소서.\n'
+        '\n'
+        '6) 하나님! 다른 사람의 죄를 용서해 준 것 같이 나의 말과 행동과 거짓과 욕심과 이기적인 마음과 혈기와 분노와 미움의 죄를 사하여 주옵소서.\n'
+        '하나님만이 죄를 사하는 권세가 있는 줄 믿습니다.\n'
+        '\n'
+        '7) 하나님! 내가 이런 말과 행동으로 인하여 시험에 들지 않도록 내 마음을 지켜 주시기를 원합니다.\n'
+        '사탄의 시험에 버려두지 마옵소서.\n'
+        '\n'
+        '8) 하나님! 나의 마음속에 있는 용서하지 못하는 악과 분노와 미움과 혈기의 악에서 구원하여 주옵소서.\n'
+        '나는 연약하오니 하나님께서 악에 빠지지 않게 하옵소서.\n'
+        '\n'
+        '9) 하나님의 나라와 권세와 영광이 영원히 하나님 아버지께 있사오며,\n'
+        '\n'
+        '10) 예수님의 이름으로 기도드립니다. 아멘\n\n\n'));
+
+    textSpanList.add(TextSpan(text: '16. 시험이 있을 때 드리는 기도\n\n', style: TextStyle(fontSize: 30)));
+    textSpanList.add(TextSpan(text : '1) 하나님은 거룩하신 분이십니다.\n'
+        '하나님 아버지의 이름이 나를 통하여 거룩히 여김 받으시기를 원합니다.\n'
+        '\n'
+        '2) 하나님의 나라가 나에게 이루어지기를 원합니다.\n'
+        '나의 심령에 의와 평강과 희락이 항상 있게 하옵소서.\n'
+        '\n'
+        '3) 하나님의 뜻이 하늘에서 이루어진 것 같이 나를 통하여 이 땅에서 이루어지기를 원합니다.\n'
+        '\n'
+        '4) 하나님! 나의 기도를 방해하며 믿음을 훼방하고, 하나님을 찾지 못하게 하며 또 하나님께 예배하지 못하게 하고 말씀을 듣지도, 읽지도, 깨닫지도 못하게 하여 시험에 들게 하는 악한 영들을 물리쳐 주옵소서.\n'
+        '나의 마음속에서 쫓아 주옵소서.\n'
+        '그리고 내 삶의 현장인 가정과 직장과 사업장에서 시험 들게 하는 마귀를 물리쳐 주옵소서.\n'
+        '마귀가 마음과 입술에 시험 들게 하나이다.\n'
+        '물리쳐 주옵소서.\n'
+        '나에게 시험이 올지라도 시험에 들지 않고 이기고 물리치는 믿음과 능력을 주옵소서.\n'
+        '그리하여 매일 승리하여 감사함으로 살게 하옵소서.\n'
+        '시험에 넘어지지 않게 하옵시고 시험을 통하여 연단되어 하나님께 인정받는 굳건한 믿음이 되게 하옵소서.\n'
+        '\n'
+        '성경 말씀을 믿고 기도합니다.\n'
+        '\"시험을 가져오는 모든 악한 영들은 예수님의 이름으로 다 결박되어 내 영혼과 마음과 육체와 가정에서 떠나갈지어다!\n'
+        '예수 그리스도의 이름으로 명하노니 떠나가라!\"\n'
+        '하나님 아버지! 천군 천사들을 보내주셔서 모든 악한 영들을 진멸하며 가정과 우리의 삶을 보호해 주옵소서.\n'
+        '시험과 모든 악으로 인해 연결된 죄의 사슬과 저주의 통로가 없어지게 하옵소서.\n'
+        '그리고 축복의 통로가 열리게 하옵소서.\n'
+        '\n'
+        '5) 하나님! 다른사람의 죄를 용서합니다.\n'
+        '나에게 상처를 주고 힘들게 했던 사람을 용서합니다. 예수님의 이름으로 용서합니다.\n'
+        '그 사람을 축복합니다. 그 사람이 시험을 받을 때 이기는 사람이 되게 하옵소서.\n'
+        '\n'
+        '6) 하나님! 다른 사람의 죄를 용서해 준 것 같이 나의 죄를 용서하여 주옵소서.\n'
+        '하나님만이 죄를 사하는 권세가 있는 줄 믿습니다.\n'
+        '\n'
+        '7) 하나님! 늘 시험에 들지 않도록 사탄의 시험에 버려두지 마옵소서.\n'
+        '\n'
+        '8) 하나님! 나를 악에서 구원하여 주옵소서.\n'
+        '나의 마음속에 있는 여러 가지 악에서 구원하셔서 시험과 악을 통해 죄를 짓지 않도록 선한 마음으로 인도해 주옵소서.\n'
+        '또한 세상의 수많은 악에 물들지 않도록 지켜 주옵소서.\n'
+        '\n'
+        '9) 하나님의 나라와 권세와 영광이 영원히 하나님 아버지께 있사오며,\n'
+        '\n'
+        '10) 예수님의 이름으로 기도드립니다.아멘\n\n\n'));
+
+    textSpanList.add(TextSpan(text: '17. 기도가 잘 되지 않을 때 드리는 기도\n\n', style: TextStyle(fontSize: 30)));
+    textSpanList.add(TextSpan(text : '1) 하나님은 거룩하신 분이십니다.\n'
+        '하나님 아버지의 이름이 나를 통하여 거룩히 여김 받으시기를 원합니다.\n'
+        '\n'
+        '2) 하나님의 나라가 나에게 이루어지기를 원합니다.\n'
+        '나의 심령에 의와 평강과 희락이 항상 있게 하옵소서.\n'
+        '\n'
+        '3) 하나님의 뜻이 하늘에서 이루어진 것 같이 나를 통하여 이 땅에서 이루어지기를 원합니다.\n'
+        '\n'
+        '4) 기도를 통해 하나님과의 대화의 길을 열어주신 주님, 기도의 말문이 막혀 기도하지 못하는 나의 입술을 열어 주시기를 간구합니다.\n'
+        '바쁘다는 핑계로, 시간이 없다는 이유로, 여러 가지 다른 이유를 대고 하나님과 대화하는 기도 시간을 소홀히 하였습니다.\n'
+        '신앙생활의 우선순위를 잊어버리고 사탄으로 하여금 틈을 타게 한 나의 악을 용서하여 주옵소서.\n'
+        '영적인 호흡인 기도를 멈춤으로 인해 내 영이 목마른 가운데 있습니다.\n'
+        '주님! 이 영혼을 불쌍히 여겨 주옵소서.\n'
+        '늘 깨어 기도하라고 하셨는데 순간의 피곤함과 유혹을 이기지 못하는 나의 연약함을 도와주옵소서.\n'
+        '이 시간 이후로는 기도가 즐거워지고 행복하게 하옵소서.\n'
+        '기도의 은사를 주옵소서.\n'
+        '기도의 능력을 주옵소서.\n'
+        '내게 고난과 가난을 주심은 기도하라는 말씀이었는데 기도하지 못했음을 용서하여 주옵소서.\n'
+        '이제는 새벽기도, 철야기도, 금식기도, 작정기도 하게 하옵소서.\n'
+        '그리하여 다니엘처럼 기도의 사람이 되게 하옵소서.\n'
+        '\n'
+        '5) 하나님! 다른 사람의 죄를 용서합니다.\n'
+        '나에게 상처를 주고 힘들게 했던 사람을 용서합니다.\n'
+        '예수님의 이름으로 용서합니다.\n'
+        '그를 축복합니다.\n'
+        '\n'
+        '6) 하나님! 다른 사람의 죄를 용서해 준 것 같이 나의 죄를 용서하여 주옵소서.\n'
+        '기도의 중요성을 알면서도 게을러서 기도하지 못하고, 하나님의 기도하라는 뜻을 소홀히 한 죄를 용서하여 주옵소서.\n'
+        '하나님만이 죄를 사하는 권세가 있는 줄 믿습니다.\n'
+        '\n'
+        '7) 하나님! 내가 시험에 들지 않기를 원합니다.\n'
+        '사탄의 시험에 버려두지 마옵소서.\n'
+        '\n'
+        '8) 하나님! 나를 악에서 구원하여 주옵소서.\n'
+        '나의 마음속에 있는 여러 가지 악에서 구원하셔서 선한 마음으로 인도해 주옵소서.\n'
+        '또한 세상의 악에 물들지 않도록 지켜 주옵소서.\n'
+        '\n'
+        '9) 하나님의 나라와 권세와 영광이 영원히 하나님 아버지께 있사오며,\n'
+        '\n'
+        '10) 예수님의 이름으로 기도드립니다. 아멘\n\n\n'));
+
+    textSpanList.add(TextSpan(text: '18. 삶에 지칠 때 드리는 기도\n\n', style: TextStyle(fontSize: 30)));
+    textSpanList.add(TextSpan(text : '1) 하나님은 거룩하신 분이십니다.\n'
+        '하나님 아버지의 이름이 나를 통하여 거룩히 여김 받으시기를 원합니다.\n'
+        '\n'
+        '2) 하나님의 나라가 나에게 이루어지기를 원합니다.\n'
+        '나의 심령에 의와 평강과 희락이 항상 있게 하옵소서.\n'
+        '\n'
+        '3) 하나님의 뜻이 하늘에서 이루어진 것 같이 나를 통하여 이 땅에서 이루어지기를 원합니다.\n'
+        '\n'
+        '4) 내 삶의 모든 필요를 아시는 주님, 이 시간에 나의 짐들을 주님 앞에 내려놓기 원합니다.\n'
+        '예수님께서 \"수고하고 무거운 짐을 진 자들아 다 내게로 오라 내가 너희를 편히 쉬게 하리라\"라고 하셨으니 그 말씀을 믿고 기도합니다.\n'
+        '현재 내가 감당해야 할 삶의 무거운 짐들이 나를 힘들게 하고 지치게 합니다.\n'
+        '내 심령이 걱정과 염려로 혼란 가운데 있습니다.\n'
+        '사랑하는 주님! 나의 약함을 도와주옵소서.\n'
+        '주안에서 새 힘을 얻게 하시고 세상에 짓눌리지 않게 하옵소서.\n'
+        '주님께 온전히 모든 것을 맡기며 아뢰지 않고 나의 힘으로 해결하려고 하는 어리석은 행동을 하지 않도록 지켜 주옵소서.\n'
+        '내가 여러가지 세상일과 어려운 문제들에 매여 종노릇 하지 않게 하시고 주님이 주시는 참된 평안으로 쉼을 얻게 하옵소서.\n'
+        '세상에 낙심되고 지칠 때, 나보다 더 어려운 환경 속에서도 꿋꿋이 주님을 의지하여 감사하며 살아가는 믿음의 사람들을 보며 배우게 하옵소서.\n'
+        '(요 14:1) "너희는 마음에 근심하지 말라. 하나님을 믿으니 또 나를 믿으라."고 하신 주님의 말씀을 믿습니다. 눈앞에 있는 일만 보고 힘들어 하지 말게 하시고 내가 생각하지 못하는 더 좋은 것을 예비하시는 주님의 뜻을 깨닫는 사람이 되게 하옵소서.\n'
+        '\n'
+        '5) 하나님! 다른 사람의 죄를 용서합니다.\n'
+        '나의 삶 가운데서 나에게 상처를 주고 힘들게 했던 사람을 용서합니다.\n'
+        '예수님의 이름으로 용서합니다.\n'
+        '그를 축복합니다.\n'
+        '그 사람과의 좋은 관계를 통해 서로에게 힘을 주는 사람들이 되게 하옵소서.\n'
+        '\n'
+        '6) 하나님! 다른 사람의 죄를 용서해 준 것 같이 나의 죄를 용서하여 주옵소서.\n'
+        '하나님만이 죄를 사하는 권세가 있는 줄 믿습니다.\n'
+        '\n'
+        '7) 하나님! 내가 시험에 들지 않기를 원합니다.\n'
+        '내 삶 가운데서 사탄의 시험에 버려두지 마옵소서.\n'
+        '\n'
+        '8) 하나님! 나를 악에서 구원하여 주옵소서.\n'
+        '나의 마음속에 있는 여러 가지 악에서 구원하셔서 선한 마음으로 인도해 주옵소서.\n'
+        '또한 세상의 수많은 악에 물들지 않도록 지켜 주옵소서.\n'
+        '\n'
+        '9) 하나님의 나라와 권세와 영광이 영원히 하나님 아버지께 있사오며,\n'
+        '\n'
+        '10) 예수님의 이름으로 기도드립니다. 아멘\n\n\n'));
+
+    textSpanList.add(TextSpan(text: '19. 감사할 때 드리는 기도\n\n', style: TextStyle(fontSize: 30)));
+    textSpanList.add(TextSpan(text : '1) 하나님은 거룩하신 분이십니다.\n'
+        '하나님 아버지의 이름이 나를 통하여 거룩히 여김 받으시기를 원합니다.\n'
+        '\n'
+        '2) 하나님의 나라가 나에게 이루어지기를 원합니다.\n'
+        '나의 심령에 의와 평강와 희락이 항상 있게 하옵소서.\n'
+        '\n'
+        '3) 하나님의 뜻이 하늘에서 이루어진 것 같이 나를 통하여 이 땅에서 이루어지기를 원합니다.\n'
+        '\n'
+        '4) 나의 모든 것을 통해서 주님께 감사하는 삶을 살게 하옵소서.\n'
+        '나의 영혼을 구원하여 주신 것을 감사드립니다.\n'
+        '세상에 좋은 사람들이 많이 있는데 부족하고 천한 죄인을 불러주셔서 하나님을 알게 하시고 죄를 사하여 주시고 구원하여 주셔서 감사합니다.\n'
+        '섬길 수 있는 교회를 주심에 감사하며, 마음껏 찬양하고 기도하며 예배드릴 수 있는 환경을 주심에 감사드립니다.\n'
+        '함께 신앙생활 할 수 있는 지체들이 있게 하심을 감사하며, 구원받은 것도 감사한데 일꾼 삼아 주시니 더욱 감사합니다.\n'
+        '그리고 성도들과 주변의 사람들을 통해 날마다 배우게 하심을 감사드립니다.\n'
+        '하루의 양식과 꾸지 않을 만큼의 물질을 주신 것에 감사하고, 자녀들이 건강하게 자라게 하심을 감사드립니다.\n'
+        '돕는 배필을 주심에 감사하고 일할 수 있는 직장을 주심에 감사드립니다.\n'
+        '육신의 안식처를 주심에 감사하고, 하나님 나라의 소망을 주심을 감사드립니다.\n'
+        '나에게 피해를 주었던 사람들을 통해서도 나의 모습을 돌아보고 회개하게 하심을 감사하고, 내가 어디를 가든지 어떤 일을 하든지 주님이 주신 것 이상을 바라지 않게 하심을 감사합니다.\n'
+        '시련이나 육신의 아픔 중에 있을 때에라도 감사할 조건들을 찾을 수 있는 사람이 되게 하시고, 늘 감사가 나의 입에서 떠나지 않도록 하옵소서.\n'
+        '\n'
+        '5) 하나님! 다른 사람의 죄를 용서합니다.\n'
+        '나에게 상처를 주고 힘들게 했던 사람을 용서합니다.\n'
+        '그를 축복합니다.\n'
+        '\n'
+        '6) 하나님! 다른 사람의 죄를 용서해 준 것 같이 나의 죄를 용서하여 주옵소서.\n'
+        '하나님만이 죄를 사하는 권세가 있는 줄 믿습니다.\n'
+        '\n'
+        '7) 하나님! 내가 시험에 들지 않기를 원합니다.\n'
+        '하나님의 선하신 뜻을 헤아리지 못하고 한순간의 불평, 불만의 내뱉음으로 인해 내 앞의 축복을 쏟아버리게 하는 사탄의 시험에 들지 않게 하옵소서.\n'
+        '\n'
+        '8) 하나님! 나를 악에서 구원하여 주옵소서.\n'
+        '나의 마음속에 있는 불평, 불만의 악에서 구원하셔서 감사하는 마음으로 넘치게 하옵소서.\n'
+        '또한 세상의 수많은 악에 물들지 않도록 지켜 주옵소서.\n'
+        '\n'
+        '9) 하나님의 나라와 권세와 영광이 영원히 하나님 아버지께 있사오며,\n'
+        '\n'
+        '10) 예수님의 이름으로 기도드립니다. 아멘\n\n\n'));
+
+    textSpanList.add(TextSpan(text: '20. 몸이 아플 때 드리는 기도\n\n', style: TextStyle(fontSize: 30)));
+    textSpanList.add(TextSpan(text : '1) 하나님은 거룩하신 분이십니다.\n'
+        '하나님 아버지의 이름이 나를 통하여 거룩히 여김 받으시기를 원합니다.\n'
+        '\n'
+        '2) 하나님의 나라가 나에게 이루어지기를 원합니다.\n'
+        '나의 심령에 의와 평강과 희락이 항상 있게 하옵소서.\n'
+        '\n'
+        '3) 하나님의 뜻이 하늘에서 이루어진 것 같이 나를 통하여 이 땅에서 이루어지기를 원합니다.\n'
+        '\n'
+        '4) 생명을 주신 하나님, 주님이 주신 몸을 잘 관리하지 못함으로 인해 고통받고 있습니다.\n'
+        '죄로 인해 건강을 해친 것이 아닌지 깨닫게 하여 주시고, 죄로 인한 것이라면 회개하오니 용서하여 주옵소서.\n'
+        '그리고 나의 질병을 치료하여 주옵소서.\n'
+        '사탄이 틈타서 질병이 생긴 것이라면 깨닫게 하시며 주님께서 말씀으로 물리쳐 주셔서 건강하게 하옵소서.\n'
+        '그리고 나도 기도로 이기게 하옵소서.\n'
+        '불순종으로 질병이 생겼으면 나로 깨닫게 하시며 회개하고 순종하게 하옵소서.\n'
+        '하나님이 주신 육체의 관리를 잘못하여 질병이 생겼으면 깨닫게 하시고 치료하여 주옵소서.\n'
+        '하나님은 치료의 하나님이심을 믿습니다.\n'
+        '하나님은 문둥병자를 치료하시고 죽은 자를 살리시는 치료의 하나님이심을 믿습니다.\n'
+        '이 시간에 나의 병을 깨끗하게 하실 수 있나이다.\n'
+        '깨끗하게 치료하여 주옵소서.\n'
+        '\n'
+        '믿습니다! 믿습니다! 믿습니다! 아멘!\n'
+        '나의 육신의 연약함으로 내 주변의 식구들을 너무 오랫동안 힘들게 하지 않도록 인도하여 주옵소서.\n'
+        '내가 질병으로 짜증이나 불만, 불평의 말들을 하지 않도록 하옵소서.\n'
+        '또한 육신의 연약함이 영적인 침체를 가져오지 않게 하옵소서.\n'
+        '이제 이후로는 부지런히 일하며 영, 육간의 균형을 지혜롭게 관리하게 하셔서 질병으로부터 자유할 수 있도록 지켜 주옵소서.\n'
+        '모든 연약한 자를 치유하신 주님의 사랑의 손길이 나에게도 임하시길 기도합니다.\n'
+        '치유 받은 후로는 열심히 전도하며 하나님의 증인이 되겠습니다.\n'
+        '\n'
+        '5) 하나님! 다른 사람의 죄를 용서합니다.\n'
+        '나에게 상처를 주고 힘들게 했던 사람을 용서합니다.\n'
+        '예수님의 이름으로 용서합니다.\n'
+        '그리고 그를 축복합니다.\n'
+        '그가 하나님을 경외하고 복 받기를 원합니다.\n'
+        '\n'
+        '6) 하나님! 다른 사람의 죄를 용서해 준 것 같이 나의 죄를 사하여 주옵소서.\n'
+        '하나님만이 죄를 사하는 권세가 있는 줄 믿습니다.\n'
+        '\n'
+        '7) 하나님! 내가 시험에 들지 않도록 사탄으로부터 지켜 주시기를 원합니다.\n'
+        '육신의 연약함을 이용해 사탄이 틈타지 못하도록 지켜 주옵소서.\n'
+        '\n'
+        '8) 하나님! 나의 마음속에 있는 여러 가지 악에서 구원하셔서 선한 마음으로 인도해 주옵소서.\n'
+        '또한 세상의 악에 물들지 않도록 지켜주옵소서.\n'
+        '나는 연약하오니 하나님께서 악을 이길 수 있는 힘을 공급하여 주옵소서.\n'
+        '악에 빠지지 않게 하옵소서.\n'
+        '\n'
+        '9) 하나님의 나라와 권세와 영광이 영원히 하나님 아버지께 있사오며,\n'
+        '\n'
+        '10) 예수님의 이름으로 기도드립니다. 아멘\n\n\n'));
+
+    textSpanList.add(TextSpan(text: '21. 부부간에 불화가 있을 때 드리는 기도\n\n', style: TextStyle(fontSize: 30)));
+    textSpanList.add(TextSpan(text : '1) 하나님은 거룩하신 분이십니다.\n'
+        '하나님 아버지의 이름이 나를 통하여 거룩히 여김 받으시기를 원합니다.\n'
+        '또한 나의 '+param21+ext1+' 통하여 거룩히 여김 받으시기를 원합니다.\n'
+        '\n'
+        '2) 하나님의 나라가 지금 이시간에 나에게 이루어지기를 원합니다.\n'
+        '나와 '+param21+'의 심령에 의와 평강과 희락이 항상 있게 하옵소서.\n'
+        '\n'
+        '3) 하나님의 뜻이 하늘에서 이루어진 것 같이 나와 '+param21+ext1+' 통하여 이땅에 이루어지기를 원합니다.\n'
+        '\n'
+        '4) 하나님, 지금 우리 부부 사이에 서로를 이해하지 못하고, 각자의 이기적인 마음 때문에 짜증과 불평과 성내는 마음이 자리잡고 있습니다.\n'
+        '서로의 잘못을 인정하지 못하고 내 안의 분노를 다스리지 못하고 있습니다.\n'
+        '모든 죄인들을 품으신 주님의 그 사랑을 받은 자들로서 행하지 못하고 악을 품고 있습니다.\n'
+        '하나님! 용서하여 주옵소서.\n'
+        '하나님 아버지! 부부로 짝 지어주신 하나님의 뜻을 올바로 깨닫게 하셔서 우리 부부가 서로 돕는 자가 되게 하옵소서.\n'
+        '서로를 신뢰하게 하옵소서.\n'
+        '서로에게 지나친 기대를 하기보다는 섬기는 자가 되게 하여 주옵소서.\n'
+        '남편에게 주께 하듯 하고, 아내를 자신의 몸과 같이 사랑하라고 하신 말씀을 깨닫게 하옵소서.\n'
+        '파괴적인 말과 습관적인 행동으로 인해 서로에게 상처를 주지 않게 하옵소서.\n'
+        '또한 상처와 실망으로 인해 우리 부부의 사랑이 사라지거나 흔들리지 않도록 지켜 주옵소서.\n'
+        '우리 부부사이의 불화를 조성하게 하는 사탄의 역사를 예수님의 이름으로 결박하사 물리쳐 주옵소서.\n'
+        '성령 하나님이 우리들의 마음속에 들어오셔서 통치하여 주시고, 서로 돕고 사랑하고 이해하고 용서하는 부부가 되게 하옵소서.\n'
+        '환경에 관계없이 조그만 일에도 머리숙여 감사할 수 있는 마음을 주시며 사소한 일도 서로를 배려하고 이해하는 마음을 가지게 하옵소서.\n'
+        '우리 부부의 갈등으로 자녀들이 상처 받지 않게 하옵소서.\n'
+        '우리가 좋은 가정을 꾸며서 자녀들이보고 배우게 하옵소서.\n'
+        '\'내가 죽어야 가정이산다.\',\'내가 가정의 십자가를 지고 가야한다.\'는 말씀을 마음에 새기며 예수님처럼 오래 참고 살아가게 하옵소서.\n'
+        '우리 부부가 행복하여 하나님을 기쁘게 하는 부부가 되게 하여 주시기를 기도합니다.\n'
+        '\n'
+        '5) 하나님! '+param21+'의 죄를 용서합니다.\n'
+        '나에게 상처를 주고 힘들게 했던 '+param21+ext1+' 용서합니다.\n'
+        '예수님의 이름으로 용서합니다.\n'
+        +param21+ext2+' 하나님의 뜻을 이루는 자가 되도록 축복하여 주옵소서.\n'
+        '하나님이 나를 온전히 말없이 용서하여 주시는 것처럼 나도 용서하게 하옵소서.\n'
+        '\n'
+        '6) 하나님! '+param21+'의 죄를 용서해 주었으니 나의 죄를 용서하여 주옵소서.\n'
+        '하나님만이 죄를 사하는 권세가 있는 줄 믿습니다.\n'
+        '\n'
+        '7) 하나님! 내가 '+param21+ext3+' 인해 시험에 들지 않기를 원합니다.\n'
+        '우리 부부를 사탄의 시험에 버려두지 마옵소서.\n'
+        '\n'
+        '8) 하나님! 우리 부부를 악에서 구원하여 주옵소서.\n'
+        '우리의 마음속에 있는 여러가지 악에서 구원하셔서 선한 마음으로 인도해 주옵소서.\n'
+        '또한 세상의 악에 물들지 않도록 지켜주옵소서.\n'
+        '\n'
+        '9) 하나님의 나라와 권세와 영광이 영원히 하나님 아버지께 있사오며,\n'
+        '\n'
+        '10) 예수님의 이름으로 기도드립니다. 아멘\n\n\n'));
+
+    textSpanList.add(TextSpan(text: '22. 물질적인 어려움에 있을 때 드리는 기도\n\n', style: TextStyle(fontSize: 30)));
     textSpanList.add(TextSpan(text: '1) 하나님은 거룩하신 분이십니다.\n'
         '하나님 아버지의 이름이 나를 통하여 거룩히 여김 받으시기를 원합니다.\n'
         '\n'
@@ -1399,7 +1742,7 @@ class _PrayFull extends State<PrayFull> {
         '\n'
         '10) 예수님의 이름으로 기도드립니다. 아멘\n\n\n'));
 
-    textSpanList.add(TextSpan(text: '23. 사업을 위한 기도\n\n', style: TextStyle(color: Colors.black, fontSize: 30)));
+    textSpanList.add(TextSpan(text: '23. 사업을 위한 기도\n\n', style: TextStyle(fontSize: 30)));
     textSpanList.add(TextSpan(text: '1) 하나님은 거룩하신 분이십니다.\n'
         '하나님 아버지의 이름이 우리 사업장을 통하여 거룩히 여김 받으시기를 원합니다.\n'
         '그러므로 우리 사업장이 하나님의 이름을 거룩히 할 일만 행하게 하옵소서.\n'
@@ -1460,7 +1803,7 @@ class _PrayFull extends State<PrayFull> {
         '\n'
         '10) 예수님의 이름으로 기도드립니다. 아멘.\n\n\n'));
 
-    textSpanList.add(TextSpan(text: '24. 하루를 시작하며 드리는 기도\n\n', style: TextStyle(color: Colors.black, fontSize: 30)));
+    textSpanList.add(TextSpan(text: '24. 하루를 시작하며 드리는 기도\n\n', style: TextStyle(fontSize: 30)));
     textSpanList.add(TextSpan(text: '1) 하나님은 거룩하신 분이십니다.\n'
         '하나님 아버지의 이름이 나를 통하여 거룩히 여김 받으시기를 원합니다.\n'
         '\n'
@@ -1515,7 +1858,7 @@ class _PrayFull extends State<PrayFull> {
 
         '아멘.\n\n\n'));
 
-    textSpanList.add(TextSpan(text: '25. 하루를 마감하며 드리는 기도\n\n', style: TextStyle(color: Colors.black, fontSize: 30)));
+    textSpanList.add(TextSpan(text: '25. 하루를 마감하며 드리는 기도\n\n', style: TextStyle(fontSize: 30)));
     textSpanList.add(TextSpan(text: '1) 하나님은 거룩하신 분이십니다.\n'
         '하나님 아버지의 이름이 나를 통하여 거룩히 여김 받으시기를 원합니다.\n'
         '하루하루를 사는 나의 삶 속에서 모든 말과 행동을 통하여 하나님의 이름이 거룩히 여김 받으시기 원합니다.\n'
@@ -1559,7 +1902,7 @@ class _PrayFull extends State<PrayFull> {
         '\n'
         '10) 예수님의 이름으로 기도드립니다. 아멘\n\n\n'));
 
-    textSpanList.add(TextSpan(text: '26. 마귀를 물리치는 기도\n\n', style: TextStyle(color: Colors.black, fontSize: 30)));
+    textSpanList.add(TextSpan(text: '26. 마귀를 물리치는 기도\n\n', style: TextStyle(fontSize: 30)));
     textSpanList.add(TextSpan(text: '1) 하나님은 거룩하신 분이십니다.\n'));
     textSpanList.add(TextSpan(text: '내가 하나님의 이름을 거룩하게 할 일만 하게 하옵소서.\n'));
     textSpanList.add(TextSpan(text: '내가 하는 일로 하나님의 이름이 사람들에게서 거룩하게 되기를 원합니다.\n'));
@@ -1609,7 +1952,7 @@ class _PrayFull extends State<PrayFull> {
     textSpanList.add(TextSpan(text: '\n'));
     textSpanList.add(TextSpan(text: '아멘.\n\n\n'));
 
-    textSpanList.add(TextSpan(text: '27. 질병을 치료하는 기도\n\n', style: TextStyle(color: Colors.black, fontSize: 30)));
+    textSpanList.add(TextSpan(text: '27. 질병을 치료하는 기도\n\n', style: TextStyle(fontSize: 30)));
     textSpanList.add(TextSpan(text: '1) 하나님은 거룩하신 분이십니다.\n'));
     textSpanList.add(TextSpan(text: '하나님 아버지의 이름이 나를 통하여 거룩히 여김 받으시기를 원합니다.\n'));
     textSpanList.add(TextSpan(text: '\n'));
@@ -1684,8 +2027,13 @@ class _PrayFull extends State<PrayFull> {
     textSpanList.add(TextSpan(text: '\n'));
     textSpanList.add(TextSpan(text: '10) 예수님의 이름으로 기도드립니다.\n'));
     textSpanList.add(TextSpan(text: '\n'));
-    textSpanList.add(TextSpan(text: '아멘.\n'));
+    textSpanList.add(TextSpan(text: '아멘.\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n'));
 
     return textSpanList;
+  }
+
+  Future<bool> _saveInitPos(double pos) async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.setDouble('initPos', pos);
   }
 }

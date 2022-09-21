@@ -58,7 +58,7 @@ class _ViewPageState extends State<ViewPage> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: <Widget>[
               Container(
-                height: 70,
+                height: 30,
                 child: SingleChildScrollView(
                   child: Text(
                     memo.title,
@@ -66,20 +66,13 @@ class _ViewPageState extends State<ViewPage> {
                   ),
                 ),
               ),
-              Text(
-                "기도문 만든 시간: " + memo.createTime.split('.')[0],
-                style: TextStyle(fontSize: 11),
-                textAlign: TextAlign.end,
-              ),
-              Text(
-                "기도문 수정 시간: " + memo.editTime.split('.')[0],
-                style: TextStyle(fontSize: 11),
-                textAlign: TextAlign.end,
-              ),
               Padding(padding: EdgeInsets.all(10)),
               Expanded(
                 child: SingleChildScrollView(
-                  child: Text(memo.text),
+                  child: Text(
+                      memo.text,
+                      style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                  ),
                 ),
               ),
             ],

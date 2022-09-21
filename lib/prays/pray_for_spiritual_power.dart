@@ -87,7 +87,7 @@ class _PrayForSpiritualPower extends State<PrayForSpiritualPower> {
         '\n'
         '9) 하나님의 나라와 권세와 영광이 영원히 하나님 아버지께 있사오며,\n'
         '\n'
-        '10) 얘수님의 이름으로 기도드립니다. 아멘';
+        '10) 예수님의 이름으로 기도드립니다. 아멘';
 
     final wordToStyle = param;
     final wordStyle = TextStyle(color: Colors.blue);

@@ -79,7 +79,7 @@ class _EditPageState extends State<EditPage> {
               Padding(padding: EdgeInsets.all(10)),
               TextField(
                 controller: tecText,
-                maxLines: 8,
+                maxLines: 20,
                 onChanged: (String text) {
                   this.text = text;
                 },

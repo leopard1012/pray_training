@@ -52,7 +52,7 @@ android {
         applicationId "com.book.training.pray.training"
         minSdkVersion 16
         targetSdkVersion 30
-        versionCode flutterVersionCode.toInteger()
+        versionCode 4
         versionName flutterVersionName
     }
 

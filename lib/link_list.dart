@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:grouped_list/grouped_list.dart';
 
+import 'main_page.dart';
+
 /*
  데이터 리스트
 */
@@ -44,8 +46,11 @@ class LinkList extends StatelessWidget {
           title: Text('양육교재'),
           centerTitle: true,
           leading:  IconButton(
-              onPressed: () {
-                Navigator.pop(context); //뒤로가기
+              onPressed: (){
+                Navigator.pushAndRemoveUntil(
+                    context,
+                    MaterialPageRoute(builder: (context) => MainPage(false)), (route) => false
+                );
               },
               icon: Icon(Icons.home_filled)),
         ),
