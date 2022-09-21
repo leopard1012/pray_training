@@ -34,7 +34,7 @@ class _PrayForHomeland extends State<PrayForHomeland> {
     // TODO: implement build
     return Scaffold(
       appBar: AppBar(
-        title: Text('01. 나라를 위한 기도'),
+        title: Text('1. 나라를 위한 기도'),
       ),
       drawer: PrayList(),
       bottomNavigationBar: BottomNavi(list, index),
@@ -79,7 +79,7 @@ class _PrayForHomeland extends State<PrayForHomeland> {
         '우리나라 지도자들과 백성들이 지은 죄가 많습니다.\n'
         '하나님만이 죄를 사하는 권세가 있는줄 믿습니다.\n'
         '\n'
-        '하나님! 우리나라가 시험에 들지 않기를 원합니다.\n'
+        '7) 하나님! 우리나라가 시험에 들지 않기를 원합니다.\n'
         '마귀에게 시험당하지 않기를 원합니다.\n'
         '그러므로 마귀에게 시험을 허락지 마옵소서.\n'
         '우리나라가 전쟁, 지진, 홍수, 전염병, 내란, 기근, 가난 등으로 시험당하지 않기를 원합니다.\n'
